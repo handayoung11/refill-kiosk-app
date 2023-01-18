@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:gravity="center"
+    tools:context=".Dialog300">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="#34925f"
+            android:text="영수증 출력"
+            android:textColor="#ffffff"
+            android:textSize="55dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8"
+        android:orientation="vertical">
+
+        <com.ssomai.android.scalablelayout.ScalableLayout
+            android:layout_marginTop="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:scale_base_width="100"
+            app:scale_base_height="142" >
+
+            <TextView
+                android:id="@+id/tv_01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:scale_width="100"
+                app:scale_height="30"
+                app:scale_left="0"
+                app:scale_top="50"
+                android:gravity="center"
+                app:scale_textsize="4.5"
+                android:text="@string/msg_03"
+                android:textColor="#202020" />
+
+            <TextView
+                android:id="@+id/tv_02"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:scale_width="100"
+                app:scale_height="20"
+                app:scale_top="90"
+                app:scale_left="1"
+                android:gravity="center"
+                app:scale_textsize="3"
+                android:text=""
+                android:textColor="@color/red" />
+
+        </com.ssomai.android.scalablelayout.ScalableLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#213429"
+            android:gravity="center"
+            android:text="아니오"
+            android:textSize="50dp"
+            android:textColor="#ffffff"
+            android:visibility="visible"/>
+
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#213429"
+            android:gravity="center"
+            android:text="영수증 출력"
+            android:textSize="50dp"
+            android:textColor="#ffffff"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

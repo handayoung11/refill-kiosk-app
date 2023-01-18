@@ -1,0 +1,103 @@
+package kr.co.nicevan.nvcat;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.util.Log;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.text.DecimalFormat;
+import java.util.Base64;
+
+public class CommonUtil {
+
+    public static String TAG = "CommonUtil";
+
+    // 키오스크 정보
+    public static String CATID = "2393300001"; // CATID
+    public static String corpNo = "2208115770"; // 사업자번호
+
+    // 결제방법
+    public static String _신용카드 = "신용카드";
+    public static String _삼성페이 = "삼성페이";
+    public static String _MS결제 = "MS결제";
+
+    // 전문요청 거래구분 (코드)
+    public static String _승인요청 = "0200";
+    public static String _취소요청 = "0420";
+
+    // 전문응답 거래구분 (코드)
+    public static String _승인응답 = "0210";
+    public static String _취소응답 = "0430";
+
+    // 전문요청 WCC 구분 (코드)
+    public static String _IC카드 = "I"; // 카드
+    public static String _MS카드 = "F"; // FALLBACK
+
+    // 결제중지 구분
+    public static String _결제중지 = "결제중지";
+    public static String _대기종료 = "대기종료";
+
+    // 다이얼로그
+    public static String _결제방법선택 = "결제방법선택";
+    public static String _결제요청대기_신용카드 = "결제요청대기_신용카드";
+    public static String _결제요청대기_삼성페이 = "결제요청대기_삼성페이";
+
+
+    /**
+     * 비트맵 -> 문자 변환
+     * @param bitmap
+     * @return
+     */
+    public static String bitmapToString(Bitmap bitmap){
+        String image = "";
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            image = Base64.getEncoder().encodeToString(byteArray);
+        }
+        return image;
+    }
+
+    /**
+     * 비트맵문자 -> 비트맵 변환
+     * @param data
+     * @return
+     */
+    public static Bitmap stringToBitmap(String data){
+        Bitmap bitmap = null;
+        byte[] byteArray = new byte[0];
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            byteArray = Base64.getDecoder().decode(data);
+        }
+        ByteArrayInputStream stream = new ByteArrayInputStream(byteArray);
+        bitmap = BitmapFactory.decodeStream(stream);
+        return bitmap;
+    }
+
+    /**
+     * 문자 null 체크
+     * @param str
+     * @return
+     */
+    public static boolean isNull(String str) {
+        return str == null || str.length() == 0;
+    }
+
+    /**
+     * 콤마가 포함된 가격 String 을 콤마를 제거한 Integer 로 변환
+     * @param value
+     * @return
+     */
+    public static int convertDecimalFormatToInteger(String value) {
+        String retVal = "0";
+        if (!isNull(value)) {
+            retVal = value.replaceAll("\\,", "");
+        }
+        return Integer.parseInt(retVal);
+    }
+
+
+}
