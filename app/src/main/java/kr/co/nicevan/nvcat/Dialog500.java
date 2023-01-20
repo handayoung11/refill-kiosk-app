@@ -23,14 +23,20 @@ public class Dialog500 extends Dialog {
     private Context context;
     private DialogListener dialogListener;
 
+    TextView tv_01;
     TextView tv_02;
 
     int waitTimeCnt = 10; // 제한시간(초)
     boolean isTimeout = false; // 제한시간 초과여부
 
-    public Dialog500(@NonNull Context context){
+    boolean isCompletePrintReceipt = false;
+    boolean isCompletePrintLabel = false;
+
+    public Dialog500(@NonNull Context context, boolean isCompletePrintReceipt, boolean isCompletePrintLabel){
         super(context);
         this.context = context;
+        this.isCompletePrintReceipt = isCompletePrintReceipt;
+        this.isCompletePrintLabel = isCompletePrintLabel;
     }
 
     public interface DialogListener{
@@ -58,7 +64,14 @@ public class Dialog500 extends Dialog {
         layoutParams.height = (int) (size.y * 0.8f);
         getWindow().setAttributes(layoutParams);
 
+        tv_01 = (TextView)findViewById(R.id.tv_01);
         tv_02 = (TextView)findViewById(R.id.tv_02);
+
+        if(isCompletePrintReceipt && isCompletePrintLabel){
+            tv_01.setText(context.getResources().getString(R.string.msg_05));
+        }else if(isCompletePrintLabel){
+            tv_01.setText(context.getResources().getString(R.string.msg_05_01));
+        }
 
         Button btn_ok = (Button)findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {

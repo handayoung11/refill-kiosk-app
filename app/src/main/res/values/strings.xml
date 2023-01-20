@@ -23,7 +23,8 @@
     <string name="msg_02_0_01">30초 이내로 처리하지 않으면 자동으로 종료됩니다.</string>
     <string name="msg_03">결제가 완료되었습니다. \n카드를 회수해 주세요. \n\n영수증을 출력 하시겠습니까?</string>
     <string name="msg_04">영수증을 출력 중 입니다. \n\n잠시만 기다려 주세요.</string>
-    <string name="msg_05">라벨이 출력 되었습니다. \n\n라벨은 용기에 부착해주세요.</string>
+    <string name="msg_05">영수증과 라벨이 출력 되었습니다. \n\n라벨은 용기에 부착해주세요.</string>
+    <string name="msg_05_01">라벨이 출력 되었습니다. \n\n라벨은 용기에 부착해주세요.</string>
     <string name="msg_06">IC카드를 인식하지 못하여 \nMS결제로 진행합니다. \n\n카드를 IC 리더기에서 제거 한 후 \n그림과 같이 마그네틱 리더기 슬롯에 \n긁어 주세요.</string>
     <string name="msg_07">30초 이내로 결제하지 않으면 자동 취소됩니다.</string>
 

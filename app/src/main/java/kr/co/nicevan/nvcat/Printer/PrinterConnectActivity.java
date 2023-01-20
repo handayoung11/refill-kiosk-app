@@ -1,6 +1,8 @@
 package kr.co.nicevan.nvcat.Printer;
 
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -8,11 +10,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.hardware.usb.UsbDevice;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,7 +35,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bxl.config.editor.BXLConfigLoader;
+import com.bxl.config.util.BXLBluetooth;
 import com.bxl.config.util.BXLBluetoothLE;
 import com.bxl.config.util.BXLNetwork;
 
@@ -96,6 +102,13 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
         mProgressLarge = findViewById(R.id.progressBar1);
         mProgressLarge.setVisibility(ProgressBar.GONE);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
+                }
+            }
+        }
         setPairedDevices();
 
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_single_choice, bondedDevices);
@@ -120,21 +133,14 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
-                }
-            }
-        }
     }
 
+    @SuppressLint("MissingPermission")
     private void setPairedDevices() {
         bondedDevices.clear();
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> bondedDeviceSet = bluetoothAdapter.getBondedDevices();
+        @SuppressLint("MissingPermission") Set<BluetoothDevice> bondedDeviceSet = bluetoothAdapter.getBondedDevices();
 
         for (BluetoothDevice device : bondedDeviceSet) {
             bondedDevices.add(device.getName() + DEVICE_ADDRESS_START + device.getAddress() + DEVICE_ADDRESS_END);
@@ -149,6 +155,33 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
         mHandler.obtainMessage(0).sendToTarget();
         BXLBluetoothLE.setBLEDeviceSearchOption(5, 1);
         new searchBLEPrinterTask().execute();
+    }
+
+    private void setUSBDevice(){
+
+        String[] items;
+        int index = 0;
+        bondedDevices.clear();
+
+        Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
+        items = new String[usbDevices.size()];
+        if (usbDevices != null && !usbDevices.isEmpty()) {
+            for (UsbDevice device : usbDevices) {
+                items[index] = device.getProductName() + " (" + device.getDeviceName() + ")";
+
+                bondedDevices.add(items[index++]);
+
+            }
+        }else {
+            Toast.makeText(getApplicationContext(), "Can't found USB devices. ", Toast.LENGTH_SHORT).show();
+        }
+
+        if (arrayAdapter != null) {
+            arrayAdapter.notifyDataSetChanged();
+        }
+
+        mHandler.obtainMessage(1).sendToTarget();
+
     }
 
     private void setNetworkDevices() {
@@ -207,6 +240,7 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
         protected void onPreExecute() {
         }
 
+        @SuppressLint("MissingPermission")
         @Override
         protected void onPostExecute(Set<BluetoothDevice> bluetoothDeviceSet) {
             bondedDevices.clear();
@@ -275,9 +309,12 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
             case R.id.radioUSB:
                 portType = BXLConfigLoader.DEVICE_BUS_USB;
                 Log.d(TAG,"P-portType:" + portType);
-                layoutIPAddress.setVisibility(View.GONE);
+
                 textViewBluetooth.setVisibility(View.GONE);
                 listView.setVisibility(View.GONE);
+                layoutIPAddress.setVisibility(View.GONE);
+
+                setUSBDevice();
                 break;
         }
     }
@@ -313,8 +350,10 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
                         address = editTextIPAddress.getText().toString();
                     }
 
-                    Log.d(TAG,"P-address::" + address);
-                    Log.d(TAG,"P-checkBoxAsyncMode:" + checkBoxAsyncMode.isChecked());
+                    Log.d("TAG", "postType : " + portType);
+                    Log.d("TAG", "logicalName : " + logicalName);
+                    Log.d("TAG", "address : " + address);
+                    Log.d("TAG", "checkBoxAsyncMode : " + checkBoxAsyncMode.isChecked());
 
                     if (MainActivity.getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode.isChecked())) {
                         finish();
@@ -362,6 +401,7 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
     });
 
     // ----------------- Bluetooth Scan & Pairing ----------------- //
+    @SuppressLint("MissingPermission")
     private void startBluetoothDiscovery(int timeout) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -384,6 +424,7 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void stopBluetoothDiscovery(boolean isReceiver) {
         if (isReceiver) {
             try {
@@ -400,6 +441,7 @@ public class PrinterConnectActivity extends AppCompatActivity implements RadioGr
     }
 
     private final BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

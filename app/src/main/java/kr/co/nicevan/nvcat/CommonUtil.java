@@ -53,7 +53,7 @@ public class CommonUtil {
     public static String bitmapToString(Bitmap bitmap){
         String image = "";
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             image = Base64.getEncoder().encodeToString(byteArray);
@@ -97,6 +97,29 @@ public class CommonUtil {
             retVal = value.replaceAll("\\,", "");
         }
         return Integer.parseInt(retVal);
+    }
+
+    /**
+     * 숫자형 문자 3자리 마다 콤마
+     * @return
+     */
+    public static String convertCommaDecimalFormat(String orgVal){
+        String rtnVal = "";
+        try {
+            String tempVal = "";
+            if (orgVal == null) {
+                tempVal = "";
+            } else {
+                tempVal = orgVal.trim();
+            }
+            tempVal = Integer.toString(Integer.parseInt(tempVal));
+            DecimalFormat decFormat = new DecimalFormat("###,###,###");
+            rtnVal = decFormat.format(Integer.parseInt(tempVal));
+            Log.d(TAG, "rtnVal : " + rtnVal);
+        }catch(Exception e){
+            Log.d(TAG, "Exception : " + e.getMessage());
+        }
+        return rtnVal;
     }
 
 

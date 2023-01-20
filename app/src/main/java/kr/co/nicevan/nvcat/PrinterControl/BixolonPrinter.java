@@ -139,7 +139,9 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     private UserListener userListener;
 
     public interface UserListener{
-        public void onEvent(int data);
+        public void onPrintEventErrorOccurred(int eventCode);
+        public void onPrintEventOutputCompleteOccurred(int eventCode);
+        public void onPrintEventStatusUpdateOccurred(int eventCode);
     }
 
     public void setUserListener(UserListener userListener){
@@ -170,6 +172,12 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     }
 
     public boolean printerOpen(int portType, String logicalName, String address, boolean isAsyncMode) {
+
+        Log.d("TAG", "portType : " + portType);
+        Log.d("TAG", "logicalName : " + logicalName);
+        Log.d("TAG", "address : " + address);
+        Log.d("TAG", "isAsyncMode : " + isAsyncMode);
+
         if (setTargetDevice(portType, logicalName, BXLConfigLoader.DEVICE_CATEGORY_POS_PRINTER, address)) {
             int retry = 1;
             if (portType == BXLConfigLoader.DEVICE_BUS_BLUETOOTH_LE) {
@@ -347,6 +355,8 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
             productName = BXLConfigLoader.PRODUCT_NAME_BK3_2;
         } else if ((name.equals("BK3-3"))) {
             productName = BXLConfigLoader.PRODUCT_NAME_BK3_3;
+        } else if ((name.equals("BK5-3"))) {
+            productName = BXLConfigLoader.PRODUCT_NAME_BK5_3;
         } else if ((name.equals("SMB6350"))) {
             productName = BXLConfigLoader.PRODUCT_NAME_SMB6350;
         } else if ((name.equals("SLP X-Series"))) {
@@ -835,6 +845,9 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     }
 
     public boolean formFeed() {
+
+        Log.d("TAG","formFeed()");
+
         try {
             if (!posPrinter.getDeviceEnabled()) {
                 return false;
@@ -1640,6 +1653,10 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void errorOccurred(ErrorEvent errorEvent) {
+        Log.d("PrintEvent", "errorOccurred - errorEvent : " + errorEvent.getErrorCode());
+
+        userListener.onPrintEventErrorOccurred(errorEvent.getErrorCode());
+
         Fragment fm = MainActivity.getVisibleFragment();
         if (fm != null) {
             if (fm instanceof TextFragment) {
@@ -1674,9 +1691,9 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void outputCompleteOccurred(OutputCompleteEvent outputCompleteEvent) {
+        Log.d("PrintEvent", "outputCompleteOccurred - outputCompleteEvent : " + outputCompleteEvent.getOutputID());
 
-        //MainActivity.resPrintCompleteOccurred(outputCompleteEvent.getOutputID());
-        userListener.onEvent(outputCompleteEvent.getOutputID());
+        userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID());
 
         Fragment fm = MainActivity.getVisibleFragment();
         if (fm != null) {
@@ -1708,6 +1725,10 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void statusUpdateOccurred(StatusUpdateEvent statusUpdateEvent) {
+        Log.d("PrintEvent", "statusUpdateOccurred - statusUpdateEvent : " + statusUpdateEvent.getStatus());
+
+        userListener.onPrintEventStatusUpdateOccurred(statusUpdateEvent.getStatus());
+
         Fragment fm = MainActivity.getVisibleFragment();
         if (fm != null) {
             if (fm instanceof TextFragment) {
@@ -1742,6 +1763,8 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void dataOccurred(DataEvent dataEvent) {
+        Log.d("PrintEvent", "dataOccurred - dataEvent : " + dataEvent.getStatus());
+
         Fragment fm = MainActivity.getVisibleFragment();
         if (fm != null) {
             if (fm instanceof MsrFragment) {

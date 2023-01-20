@@ -188,6 +188,7 @@ public class EtcFragment extends Fragment implements View.OnClickListener {
         MainActivity.getPrinterInstance().printText("\n" + address, BixolonPrinter.ALIGNMENT_RIGHT, 0, 1);
     }
 
+
     private void arabicSample() {
         int currentCs = MainActivity.getPrinterInstance().getCharacterSet();
 
@@ -196,45 +197,54 @@ public class EtcFragment extends Fragment implements View.OnClickListener {
         MainActivity.getPrinterInstance().setCharacterSet(currentCs);
     }
 
+    private String arabicText(){
+        String text = "شركة ایدي فریش للتجارة";
+        return text + "\n";
+    }
+
     private void printReceiptforArabic() {
-        String printText = "                           فاتورة بيع نقدي" + "\n";
-        printText += "" + "\n";
-        printText += "الفرع:Aujan                                                       " + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "العميل:   13S228_B000 - ABRAJ AL KUWAIT                             " + "\n";
-        printText += "هاتف:MOHD                                                            " + "\n";
-        printText += "جهة الاتصا4551622                  " + "\n";
-        printText += "العنوان : JAHRA SANNYA,KUWAIT                                       " + "\n";
-        printText += "JAHRA SANNYA,KUWAIT                                                  " + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "الخط:     R13272                   " + "\n";
-        printText += "البائع:   13272 - اشرودين لوراييل م" + "\n";
-        printText += "القسم:HPC                                         " + "\n";
-        printText += "رقم الفاتورهR13272INV16           التاريخ :05/11/2019 11:01 AM" + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "رمزالمنتج   شرح المنتج           الوحد الكم سعر الوحد الخصم    القيمه" + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "21111279    BBRL TEA PACKET 25 K PCS     4   7.108   0.219    27.558" + "\n";
-        printText += "32477998    YLT PACKET 48200GM ( PCS     4   0.649       0     2.596" + "\n";
-        printText += "67440264    LUX BS CRMY PRFCTN 8 PCS     4   1.353       0     5.412" + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "                               الكميه:                             12" + "\n";
-        printText += "                               المجموع قبل الضريبه             35.566" + "\n";
-        printText += "                               الضريبه 0.0% :                   0.000" + "\n";
-        printText += "                               المجموع النهائي:                35.566" + "\n";
-        printText += "" + "\n";
-        printText += "Total:                                  THIRTY FIVE . FIVE SIX SIX " + "\n";
-        printText += "---------------------------------------------------------------------" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "" + "\n";
-        printText += "توقيع العميل: ______________  توقيع البائع: ______________" + "\n";
+        String printText = "";
+        printText = arabicText();
+//        String printText = "                           فاتورة بيع نقدي" + "\n";
+//        printText += "" + "\n";
+//        printText += "الفرع:Aujan                                                       " + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "العميل:   13S228_B000 - ABRAJ AL KUWAIT                             " + "\n";
+//        printText += "هاتف:MOHD                                                            " + "\n";
+//        printText += "جهة الاتصا4551622                  " + "\n";
+//        printText += "العنوان : JAHRA SANNYA,KUWAIT                                       " + "\n";
+//        printText += "JAHRA SANNYA,KUWAIT                                                  " + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "الخط:     R13272                   " + "\n";
+//        printText += "البائع:   13272 - اشرودين لوراييل م" + "\n";
+//        printText += "القسم:HPC                                         " + "\n";
+//        printText += "رقم الفاتورهR13272INV16           التاريخ :05/11/2019 11:01 AM" + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "رمزالمنتج   شرح المنتج           الوحد الكم سعر الوحد الخصم    القيمه" + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "21111279    BBRL TEA PACKET 25 K PCS     4   7.108   0.219    27.558" + "\n";
+//        printText += "32477998    YLT PACKET 48200GM ( PCS     4   0.649       0     2.596" + "\n";
+//        printText += "67440264    LUX BS CRMY PRFCTN 8 PCS     4   1.353       0     5.412" + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "                               الكميه:                             12" + "\n";
+//        printText += "                               المجموع قبل الضريبه             35.566" + "\n";
+//        printText += "                               الضريبه 0.0% :                   0.000" + "\n";
+//        printText += "                               المجموع النهائي:                35.566" + "\n";
+//        printText += "" + "\n";
+//        printText += "Total:                                  THIRTY FIVE . FIVE SIX SIX " + "\n";
+//        printText += "---------------------------------------------------------------------" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "" + "\n";
+//        printText += "توقيع العميل: ______________  توقيع البائع: ______________" + "\n";
+
         MainActivity.getPrinterInstance().printText(printText, BixolonPrinter.ALIGNMENT_LEFT, 0, 1);
     }
+
 
     private void getLocalCardInfo() {
         if (MainActivity.getPrinterInstance().localSmartCardRWOpen()) {

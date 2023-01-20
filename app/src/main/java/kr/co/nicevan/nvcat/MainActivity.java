@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.usb.UsbDevice;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
@@ -17,33 +20,50 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
 import java.text.DecimalFormat;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Set;
 
 import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
+import com.bixolon.commonlib.BXLCommonConst;
+import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
+import com.bixolon.commonlib.log.LogService;
+import com.bxl.config.editor.BXLConfigLoader;
 
 public class MainActivity extends AppCompatActivity {
 
     String TAG = this.getClass().getSimpleName();
     Context context;
 
+    public WebView webView;
+
     // 프린터
-    private static BixolonPrinter bxlPrinter = null;
+    private static BixolonPrinter bxlPrinter = null; // 영수증 프린터
+    private static BixolonPrinter bxlPrinter02 = null; // 라벨 프린터
     private static Fragment currentFragment;
-    private static int currentPosition = 0;
-    private TabLayout mTabLayout = null;
-    private ViewPager mViewPager = null;
     private static TabPagerAdapter mPagerAdapter = null;
 
     // 전문요청코드
@@ -65,19 +85,30 @@ public class MainActivity extends AppCompatActivity {
     Dialog200 dialog200; // 카드투입대기
     Dialog250 dialog250; // MS결제투입대기
     Dialog300 dialog300; // 결제완료/영수증출력
-    Dialog400 dialog400; // 영수증 출력중
+    Dialog400 dialog400; // 프린터 출력중
     Dialog500 dialog500; // 영수증 출력완료
     Dialog900 dialog900; // 결제종료
-
-    // 인코딩 서명이미지
-    String imgString = "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";
 
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
 
     int waitTimeCnt = 30; // 제한시간(초)
     boolean isTimeout = false; // 제한시간 초과여부
 
-    // 프린트용 데이터
+    // 인코딩 서명이미지
+    String signImgString = "";
+
+    // WEB 결제정보 파라미터
+    String payAmount = ""; // 거래금액
+    String payOrderNo = ""; // 주문번호
+    String payUserId = ""; // 주문자 고유 아이디
+    String payAgreenum = ""; // 승인번호 (취소요청시만 해당)
+    String payAgreedate = ""; // 원거래일자(YYMMDD) (취소요청시만 해당)
+
+    // 프린터
+    boolean isPrintOpen = false; // 영수증 프린터 오픈여부
+    boolean isPrintOpen02 = false; // 라벨 프린터 오픈여부
+    boolean isCompletePrintReceipt = false; // 영수증 프린트 완료여부
+    boolean isCompletePrintLabel = false; // 라벨 프린트 완료여부
     String prtAmount = ""; // 금액
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
@@ -103,42 +134,232 @@ public class MainActivity extends AppCompatActivity {
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
-        // 프린터
+
+        webView = (WebView) findViewById(R.id.webView);
+        webView.setWebContentsDebuggingEnabled(true);
+        WebSettings webViewSettings = webView.getSettings();
+        webViewSettings.setDefaultTextEncodingName("UTF-8");                  // 한글
+        webViewSettings.setCacheMode(webView.getSettings().LOAD_NO_CACHE);    // 캐시파일 사용 금지(운영중엔 주석처리 할 것)
+        webViewSettings.setJavaScriptEnabled(true);                           // javascript를 실행할 수 있도록 설정
+        webViewSettings.setJavaScriptCanOpenWindowsAutomatically(true);       // javascript가 window.open()을 사용할 수 있도록 설정
+        webViewSettings.setSupportMultipleWindows(true);                      // 여러개의 윈도우를 사용할 수 있도록 설정
+        webViewSettings.setUseWideViewPort(true);                             // wide viewport를 사용하도록 설정
+        webViewSettings.setBlockNetworkImage(false);                          // 네트워크의 이미지의 리소스를 로드하지 않음
+        webViewSettings.setLoadsImagesAutomatically(true);                    // 웹뷰가 앱에 등록되어 있는 이미지 리소스를 자동으로 로드하도록 설정
+        webViewSettings.setAppCacheEnabled(true);
+        webViewSettings.setDatabaseEnabled(true);
+        webViewSettings.setDomStorageEnabled(true);
+        webViewSettings.setGeolocationEnabled(true);
+        webViewSettings.setSupportZoom(false);								   // 확대,축소 기능을 사용할 수 있도록 설정
+        webViewSettings.setBuiltInZoomControls(false);						   // 줌인 아이콘을 사용할 수 있도록 설정
+        webView.setWebViewClient(new WebViewClient() {
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(final WebView webview, final String url){
+                Log.d(TAG, "url - " + url);
+
+                return super.shouldOverrideUrlLoading(webview, url);
+            }
+            //@TargetApi(Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webview, WebResourceRequest request) {
+                Log.d("shouldOverrideUrl", "url ---- " + request.getUrl());
+
+                webview.loadUrl(request.getUrl().toString());
+                return true;
+
+                //return super.shouldOverrideUrlLoading(webview, request);
+            }
+            @Override
+            public void onPageFinished(WebView webview, String url) {
+                // 페이지 로딩완료시 호출
+                Log.d("onPageFinished", "url :: " + url);
+
+                super.onPageFinished(webview, url);
+            }
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                Log.d("onReceivedSslError", "url = " + error.getUrl().toString());
+                handler.proceed(); // SSL 인증서 무시
+            }
+        });
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                Log.d("onCreateWindow","onCreateWindow");
+
+                return true;
+            }
+        });
+        webView.addJavascriptInterface(new WebViewInterface(this), "android");
+        webView.loadUrl("https://refillcycle.com");
+
+
+        // 영수증 프린터
         bxlPrinter = new BixolonPrinter(getApplicationContext());
         bxlPrinter.setUserListener(new BixolonPrinter.UserListener() {
+            String TagPirnt = "PrintEvent01";
             @Override
-            public void onEvent(int outId) {
-                String data = String.valueOf(outId);
-                Log.d("MainActivity", "resPrintCompleteOccurred : " + data);
+            public void onPrintEventOutputCompleteOccurred(int eventCode) {
+                Log.d(TagPirnt, "onPrintEventOutputCompleteOccurred : " + eventCode);
 
-                if(outId == 3) { // 프린터 명령수 만큼
+                // 영수증 프린트 완료
+                isCompletePrintReceipt = true;
 
-                    // 영수증 출력중 팝업 닫기
-                    if (dialog400 != null && dialog400.isShowing()) {
-                        dialog400.dismiss();
-                    }
+                // 라벨 출력
+                printLabel();
+            }
+            @Override
+            public void onPrintEventErrorOccurred(int eventCode){
+                Log.d(TagPirnt, "onPrintEventErrorOccurred : " + eventCode);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "영수증 출력 완료");
-                            // 영수증 출력완료 팝업
-                            popDialog500();
-                        }
-                    });
-
-                    bxlPrinter.printerClose();
-
-                    // 프린트 완료 후속처리
-                    completePrintReceipt();
+                switch (eventCode) {
+                    case 201:
+                        Log.d(TagPirnt, "프린터 Cover Open");
+                        break;
+                    case 203:
+                        Log.d(TagPirnt, "프린터 Paper Empty");
+                        break;
+                    case 217:
+                        Log.d(TagPirnt, "프린터 off-line");
+                        break;
                 }
+            }
+            @Override
+            public void onPrintEventStatusUpdateOccurred(int eventCode){
+                Log.d(TagPirnt, "onPrintEventStatusUpdateOccurred : " + eventCode);
+
+                switch (eventCode) {
+                    case 2001 :
+                        Log.d(TagPirnt, "프린터 Pown On");
+                        break;
+                    case 2004 :
+                        Log.d(TagPirnt, "프린터 Pown Off");
+                        break;
+                    case 11 :
+                        Log.d(TagPirnt, "프린터 Cover Open");
+                        break;
+                    case 12 :
+                        Log.d(TagPirnt, "프린터 Cover OK");
+                        break;
+                    case 24 :
+                        Log.d(TagPirnt, "프린터 Paper Empty");
+                        break;
+                    case 25 :
+                        Log.d(TagPirnt, "프린터 Paper Near Empty");
+                        break;
+                    case 26 :
+                        Log.d(TagPirnt, "프린터 Paper OK");
+                        break;
+                    case 53 :
+                        Log.d(TagPirnt, "프린터 off-line");
+                        break;
+                    case 54 :
+                        Log.d(TagPirnt, "프린터 on-line");
+                        break;
+                }
+            }
+        });
+        printOpen(); // 영수증 프린터 오픈
+
+        // 라벨 프린터
+        bxlPrinter02 = new BixolonPrinter(getApplicationContext());
+        bxlPrinter02.setUserListener(new BixolonPrinter.UserListener() {
+            String TagPirnt = "PrintEvent02";
+            @Override
+            public void onPrintEventOutputCompleteOccurred(int eventCode) {
+                Log.d(TagPirnt, "onPrintEventOutputCompleteOccurred : " + eventCode);
+
+                // 라벨 프린트 완료
+                isCompletePrintLabel = true;
+
+                // 프린터 출력중 팝업 닫기
+                if (dialog400 != null && dialog400.isShowing()) {
+                    dialog400.dismiss();
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "출력 완료");
+                        // 출력완료 팝업
+                        popDialog500();
+                    }
+                });
+            }
+            @Override
+            public void onPrintEventErrorOccurred(int eventCode){
+                Log.d(TagPirnt, "onPrintEventErrorOccurred : " + eventCode);
+
+                switch (eventCode) {
+                    case 201:
+                        Log.d(TagPirnt, "프린터 Cover Open");
+                        break;
+                    case 203:
+                        Log.d(TagPirnt, "프린터 Paper Empty");
+                        break;
+                    case 217:
+                        Log.d(TagPirnt, "프린터 off-line");
+                        break;
+                }
+            }
+            @Override
+            public void onPrintEventStatusUpdateOccurred(int eventCode){
+                Log.d(TagPirnt, "onPrintEventStatusUpdateOccurred : " + eventCode);
+
+                switch (eventCode) {
+                    case 2001 :
+                        Log.d(TagPirnt, "프린터 Pown On");
+                        break;
+                    case 2004 :
+                        Log.d(TagPirnt, "프린터 Pown Off");
+                        break;
+                    case 11 :
+                        Log.d(TagPirnt, "프린터 Cover Open");
+                        break;
+                    case 12 :
+                        Log.d(TagPirnt, "프린터 Cover OK");
+                        break;
+                    case 24 :
+                        Log.d(TagPirnt, "프린터 Paper Empty");
+                        break;
+                    case 25 :
+                        Log.d(TagPirnt, "프린터 Paper Near Empty");
+                        break;
+                    case 26 :
+                        Log.d(TagPirnt, "프린터 Paper OK");
+                        break;
+                    case 53 :
+                        Log.d(TagPirnt, "프린터 off-line");
+                        break;
+                    case 54 :
+                        Log.d(TagPirnt, "프린터 on-line");
+                        break;
+                }
+            }
+        });
+        printOpen02(); // 라벨 프린터 오픈
+
+
+        /**
+         * 결제요청 (결제방법선택)
+         */
+        findViewById(R.id.btn_01).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // 현재 거래구분(승인)
+                curReqType = CommonUtil._승인요청;
+
+                // 결제방법 선택 팝업
+                popDialog100();
             }
         });
 
         /**
          * 결제취소요청
          */
-        findViewById(R.id.iv_01).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_02).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -151,35 +372,33 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /**
-         * 결제요청 (결제방법선택)
+         * 테스트
          */
-        findViewById(R.id.iv_02).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_03).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // 현재 거래구분(승인)
-                curReqType = CommonUtil._승인요청;
-
-                // 결제방법 선택 팝업
-                popDialog100();
+                testFunction();
             }
         });
 
-        /**
-         * 결제요청 (결제방법선택)
-         */
-        findViewById(R.id.iv_03).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                // 현재 거래구분(승인)
-                curReqType = CommonUtil._승인요청;
+        String strPathLOG = "";
+        File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
+        if (mediaDirs != null && mediaDirs.length > 0) {
+            strPathLOG = mediaDirs[0].getPath() + "/Log/";
+        } else {
+            strPathLOG = MainActivity.this.getFilesDir().getParent() + "/Bixolon/Log/";
+        }
 
-                // 결제방법 선택 팝업
-                popDialog100();
-            }
-        });
-
+        LogService.InitDebugLog(true,
+                true,
+                BXLCommonConst._LOG_LEVEL_HIGH,
+                128,
+                128,
+                (1024 * 1024) * 10 /* 10MB */,
+                0,
+                strPathLOG,
+                "bixolon.log");
 
     }
 
@@ -194,11 +413,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         getPrinterInstance().printerClose();
+        getPrinterInstance02().printerClose();
     }
 
 
     public static BixolonPrinter getPrinterInstance() {
         return bxlPrinter;
+    }
+    public static BixolonPrinter getPrinterInstance02() {
+        return bxlPrinter02;
     }
 
     public static Fragment getVisibleFragment() {
@@ -216,6 +439,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * JavascriptInterface
+     */
+    public class WebViewInterface {
+        Context mContext;
+
+        WebViewInterface(Context ctx) {
+            mContext = ctx;
+        }
+
+        @JavascriptInterface
+        public void showToast(String toast) {
+            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+        }
+
+        @JavascriptInterface
+        public void requestPayment(String reqType, String amount, String orderNo, String userId, String agreenum, String agreedate){
+            /*
+            WEB 자바스크립트에서 아래 형태로 호출
+            android.requestPayment('승인', '3000', '2301101234', '01011112222', '', '');
+            */
+
+            // 현재 거래구분(승인/취소)
+            if(reqType.equals("승인")) {
+                curReqType = CommonUtil._승인요청;
+            }else if(reqType.equals("취소")) {
+                curReqType = CommonUtil._취소요청;
+            }
+
+            payAmount = amount; // 거래금액
+            payOrderNo = orderNo; // 주문번호
+            payUserId = userId; // 주문자 고유 아이디
+            payAgreenum = agreenum; // 승인번호 (취소요청시만 해당)
+            payAgreedate = agreedate; // 원거래일자(YYMMDD) (취소요청시만 해당)
+
+            // 결제방법 선택 팝업
+            popDialog100();
+        }
+    }
 
     /**
      * 팝업 Dialog100 (결제방법)
@@ -326,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
         dialog300.setDialogListener(new Dialog300.DialogListener() {
             @Override
             public void onPositiveClicked() {
-                // 영수증 출력중 팝업
+                // 프린터 출력중 팝업
                 //popDialog400();
 
                 // 영수증 출력
@@ -334,11 +596,11 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void onNegativeClicked() {
-                // 영수증 미출력
+                // 프린터 출력중 팝업
+                //popDialog400();
 
-                // 라벨 출력 완료 가정
-                // 영수증 출력완료 팝업
-                popDialog500();
+                // 라벨 출력
+                printLabel();
             }
         });
         dialog300.setCanceledOnTouchOutside(false);
@@ -347,7 +609,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 팝업 Dialog400 (영수증 출력중)
+     * 팝업 Dialog400 (프린터 출력중)
      */
     public void popDialog400(){
 
@@ -370,7 +632,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void popDialog500(){
 
-        dialog500 = new Dialog500(MainActivity.this);
+        dialog500 = new Dialog500(MainActivity.this, isCompletePrintReceipt, isCompletePrintLabel);
         dialog500.setDialogListener(new Dialog500.DialogListener() {
             @Override
             public void onPositiveClicked() {
@@ -427,28 +689,32 @@ public class MainActivity extends AppCompatActivity {
 
         curReqType = reqType;
 
+        // 데이터 초기화
+        signImgString = ""; // 인코딩 서명이미지
+
         // 응답 전문 데이터 초기화
         strRecv01 = ""; strRecv02 = ""; strRecv03 = ""; strRecv04 = ""; strRecv05 = ""; strRecv06 = ""; strRecv07 = ""; strRecv08 = ""; strRecv09 = ""; strRecv10 = ""; strRecv11 = ""; strRecv12 = ""; strRecv13 = ""; strRecv14 = ""; strRecv15 = ""; strRecv16 = ""; strRecv17 = ""; strRecv18 = ""; strRecv19 = ""; strRecv20 = ""; strRecv21 = ""; strRecv22 = ""; strRecv23 = ""; strRecv24 = ""; strRecv25 = ""; strRecv26 = ""; strRecv27 = ""; strRecv28 = ""; strRecv29 = ""; strRecv30 = "";
 
         // 프린트용 데이터 초기화
+        isCompletePrintReceipt = false; isCompletePrintLabel = false;
         prtAmount = ""; prtTax = ""; prtTotAmount = "";
 
-        // WEB 결제정보 파라미터
-        String userId = ""; // 주문자 고유아이디
-        String orderNo = ""; // 주문번호
-        int amount = 55000; // 거래금액
-        int tax = amount * 10 / 110; // 부가세
+        // WEB 결제정보 파라미터 테스트 데이터
+        payAmount = "55000"; // 거래금액
+        payOrderNo = ""; // 주문번호
+        payUserId = ""; // 주문자 고유 아이디
+        payAgreenum = "11586893"; // 승인번호 (취소요청시만 해당)
+        payAgreedate = "230117"; // 원거래일자(YYMMDD) (취소요청시만 해당)
 
-        String agreenum = "11586893"; // 승인번호 (취소요청시만 해당)
-        String agreedate = "230117"; // 원거래일자(YYMMDD) (취소요청시만 해당)
+        int tax = Integer.parseInt(payAmount) * 10 / 110; // 부가세
 
         // 결제정보 세팅
-        String spAmount = String.valueOf(amount); // 거래금액
+        String spAmount = payAmount; // 거래금액
         String spTax = String.valueOf(tax); // 부가세
         String spBongsa = "0"; // 봉사료
         String spHalbu = "00"; // 할부
-        String spAgreenum = agreenum; // 승인번호
-        String spAgreedate = agreedate; // 원거래일자(YYMMDD)
+        String spAgreenum = payAgreenum; // 승인번호
+        String spAgreedate = payAgreedate; // 원거래일자(YYMMDD)
         String spMyunse = "0"; // 면세금액
         String spTxtnum = ""; // 전문관리번호(CATID(10) + MMDDhhmmss)
         String spFiller = ""; // Filler
@@ -735,31 +1001,121 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "strRecv29 : " + strRecv29);
         Log.d(TAG, "strRecv30 : " + strRecv30);
 
+        // 프린트 데이터
+        int tmpAmount = Integer.parseInt(strRecv04) - Integer.parseInt(strRecv05);
+        prtAmount = CommonUtil.convertCommaDecimalFormat(Integer.toString(tmpAmount)); // 금액
+        prtTax = CommonUtil.convertCommaDecimalFormat(strRecv05); // 부가세
+        prtTotAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 합계금액
+
+        // 사인 이미지 추출
+        signImgString = getSignBitmapString();
+
+        // WEB 결과 데이터
+        String rtnResult = "";
+        String rtnAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 거래금액
+        String rtnOrderNo = payOrderNo; // 주문번호
+        String rtnUserId = payUserId; // 주문자 고유 아이디
+        String rtnAgreenum = strRecv08.trim(); // 승인번호
+        String rtnAgreedate = strRecv09.trim(); // 승인일자
 
         // 승인요청 정상처리
         if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._승인응답) ) {
             // 응답 거래구분 (승인 : 0210)
             Log.d(TAG, "결제승인 정상 응답");
 
+            rtnResult = "정상승인"; // 코드화 할 것
+
             // 영수증 출력확인 팝업
             popDialog300();
 
         // 취소요청 정상처리
         }else if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._취소응답) ){
-                // 응답 거래구분 (취소 : 0430)
-                Log.d(TAG, "승인취소 정상 응답");
+            // 응답 거래구분 (취소 : 0430)
+            Log.d(TAG, "승인취소 정상 응답");
 
-                // 영수증 출력확인 팝업
-                popDialog300();
+            rtnResult = "정상취소"; // 코드화 할 것
+
+            // 영수증 출력확인 팝업
+            popDialog300();
 
         }else{
             Log.d(TAG, "결제승인 비정상 응답");
+
+            rtnResult = "비정상"; // 코드화 할 것
         }
 
+
         // 결과 web 전달
-        //returnPaymentResult();
+        returnPaymentResult(rtnResult, rtnAmount, rtnOrderNo, rtnUserId, rtnAgreenum, rtnAgreedate);
     }
 
+    /**
+     * 프린터 오픈
+     */
+    public boolean printOpen(){
+
+        int portType = BXLConfigLoader.DEVICE_BUS_USB;
+        String logicalName = "";
+        String address = "";
+        Boolean checkBoxAsyncMode = true;
+
+        String[] productNames;
+        String[] deviceNames;
+        int index = 0;
+        Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
+        productNames = new String[usbDevices.size()];
+        deviceNames = new String[usbDevices.size()];
+        if (usbDevices != null && !usbDevices.isEmpty()) {
+            for (UsbDevice device : usbDevices) {
+                productNames[index] = device.getProductName();
+                deviceNames[index] = device.getDeviceName();
+                if(productNames[index].equals("BK3-3")){ // 영수증 프린터
+                    logicalName = productNames[index];
+                    address = deviceNames[index];
+                }
+            }
+        }else {
+            Log.d(TAG, "Not found USB devices");
+            isPrintOpen = false;
+        }
+
+        isPrintOpen = getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode);
+        return isPrintOpen;
+    }
+
+    /**
+     * 프린터 오픈 02
+     */
+    public boolean printOpen02(){
+
+        int portType = BXLConfigLoader.DEVICE_BUS_USB;
+        String logicalName = "";
+        String address = "";
+        Boolean checkBoxAsyncMode = true;
+
+        String[] productNames;
+        String[] deviceNames;
+        int index = 0;
+        Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
+        productNames = new String[usbDevices.size()];
+        deviceNames = new String[usbDevices.size()];
+        if (usbDevices != null && !usbDevices.isEmpty()) {
+            for (UsbDevice device : usbDevices) {
+                productNames[index] = device.getProductName();
+                deviceNames[index] = device.getDeviceName();
+                if(productNames[index].equals("BK5-3")){ // 라벨 프린터
+                    logicalName = productNames[index];
+                    address = deviceNames[index];
+                }
+            }
+        }else {
+            Log.d(TAG, "Not found USB devices");
+            isPrintOpen = false;
+        }
+
+        isPrintOpen02 = getPrinterInstance02().printerOpen(portType, logicalName, address, checkBoxAsyncMode);
+        return isPrintOpen02;
+    }
 
     /**
      * 영수증 출력
@@ -768,23 +1124,22 @@ public class MainActivity extends AppCompatActivity {
 
         mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
 
-        // 프린터 설정 (고정)
-        int portType = 2;
-        String logicalName = "BK3-3";
-        String address = "";
-        Boolean checkBoxAsyncMode = true;
-
-        if (MainActivity.getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode)) {
+        if (isPrintOpen) {
             Log.d(TAG, "P-printer open!!!");
+
+            // 테스트 데이터
+            prtAmount = "2,700"; // 금액
+            prtTax = "300"; // 부가세
+            prtTotAmount = "3,000"; // 합계금액
 
             String strData = "";
             strData = strData + "\n";
             strData = strData + "\n";
             strData = strData + "====================\n";
             strData = strData + "영 수 증\n";
-            strData = strData + "금  액 : 2,700원\n";
-            strData = strData + "부가세 :   300원\n";
-            strData = strData + "합  계 : 3,000원\n";
+            strData = strData + "금  액 : " + prtAmount + "원\n";
+            strData = strData + "부가세 : " + prtTax + "원\n";
+            strData = strData + "합  계 : " + prtTotAmount + "원\n";
             strData = strData + "====================";
             strData = strData + "\n";
             strData = strData + "\n";
@@ -800,39 +1155,65 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "P-attribute : " + attribute);
             Log.d(TAG, "P-spinnerSize : " + spinnerSize);
 
-            MainActivity.getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
+            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-            /*
-            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sign_sample);
-            imgString = bitmapToString(bitmap);
-            Log.d(TAG,"imgString:[" + imgString.length() + "]" + imgString + ">>");
-            */
+            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
+            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
-            Bitmap stringBitmap = CommonUtil.stringToBitmap(imgString);
-            MainActivity.getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
-
-            MainActivity.getPrinterInstance().cutPaper();
+            getPrinterInstance().cutPaper();
 
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
         }
-
-
     }
 
-    public void completePrintReceipt(){
-        Log.d(TAG, "completePrintReceipt()");
+    /**
+     * 라벨 출력
+     */
+    public void printLabel(){
 
+        mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
+
+        if (isPrintOpen02) {
+            Log.d(TAG, "P-printer02 open!!!");
+
+            String strData = "";
+            strData = strData + "====================\n";
+            strData = strData + "라 벨\n";
+            strData = strData + "====================";
+
+            int alignment = 1;
+            int attribute = 1;
+            int spinnerSize = 0;
+
+            Log.d(TAG, "P-strData : " + strData);
+            Log.d(TAG, "P-alignment : " + alignment);
+            Log.d(TAG, "P-attribute : " + attribute);
+            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
+
+            getPrinterInstance02().printText(strData, alignment, attribute, (spinnerSize + 1));
+
+            getPrinterInstance02().formFeed();
+
+        } else {
+            mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
+        }
     }
+
 
     /**
      * 결제결과 WEB 전달
      */
-    public void returnPaymentResult(){
+    public void returnPaymentResult(String rtnResult, String rtnAmount, String rtnOrderNo, String rtnUserId, String rtnAgreenum, String rtnAgreedate){
         Log.d(TAG, "returnPayResult()");
 
+        webView.loadUrl("javascript:retrunPayment('" + rtnResult + "', '" + rtnAmount + "', '" + rtnOrderNo + "', '" + rtnUserId + "', '" + rtnAgreenum + "', '" + rtnAgreedate + "')");
+        /*
+        WEB 자바스크립트에서 아래 형태로 처리
+        function retrunPayment(rtnResult, rtnAmount, rtnOrderNo, rtnUserId, rtnAgreenum, rtnAgreedate) {
+        }
+        */
     }
-
 
     public final Handler mToastHandler = new Handler(new Handler.Callback() {
         @SuppressWarnings("unchecked")
@@ -862,6 +1243,63 @@ public class MainActivity extends AppCompatActivity {
         decorView.requestLayout();
     }
 
+    /**
+     * 사인 이미지 인코딩 문자 가져오기
+     */
+    public String getSignBitmapString(){
 
+        String bitmapString = ""; // 변환된 인코딩 문자
+
+        try {
+            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "";
+            Log.d(TAG, "path :: " + path);
+            File dir = new File(path);
+            File[] files = dir.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    String filename = pathname.getName().toLowerCase(Locale.US);
+
+                    Log.d(TAG, "pathname : " + filename);
+                    Log.d(TAG, "startsWith : " + filename.startsWith("signature_"));
+                    Log.d(TAG, "endsWith : " + filename.endsWith(".bmp"));
+
+                    return filename.startsWith("signature_") && filename.endsWith(".bmp");
+                }
+            });
+
+            String signFilePath = ""; // 파일경로
+            Log.d(TAG, "files.length : " + files.length);
+            if (files.length == 1) {
+                signFilePath = files[0].getAbsolutePath();
+                Log.d(TAG, "signFilePath :: " + signFilePath);
+                Bitmap bitmap = BitmapFactory.decodeFile(signFilePath);
+                bitmapString = CommonUtil.bitmapToString(bitmap);
+                Log.d(TAG, "bitmapString :: " + bitmapString);
+            }
+
+            for (File f : files) {
+                f.delete();
+            }
+
+        }catch(Exception e){
+            Log.d(TAG, "Exception : " + e.getMessage());
+            return "";
+        }
+
+        return bitmapString;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
+            webView.goBack();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void testFunction(){
+
+    }
 
 }
