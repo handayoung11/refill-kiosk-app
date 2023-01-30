@@ -9,7 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
+//import androidx.core.app.Fragment;
 import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
@@ -24,6 +24,8 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import kr.co.nicevan.nvcat.MainActivity;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;

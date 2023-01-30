@@ -1,12 +1,14 @@
 package kr.co.nicevan.nvcat.Printer;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+//import androidx.core.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import java.io.UnsupportedEncodingException;
 

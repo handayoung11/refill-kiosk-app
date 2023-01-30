@@ -1,6 +1,5 @@
 package kr.co.nicevan.nvcat;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -14,14 +13,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,26 +29,27 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.text.DecimalFormat;
-import java.util.Base64;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
+import kr.co.nicevan.nvcat.roomdb.Payment;
+import kr.co.nicevan.nvcat.roomdb.PaymentDao;
+import kr.co.nicevan.nvcat.roomdb.RoomDB;
+
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bixolon.commonlib.log.LogService;
 import com.bxl.config.editor.BXLConfigLoader;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
     Context context;
 
     public WebView webView;
+    public WebView webView2;
+
+    RoomDB db;
+    PaymentDao paymentDao;
 
     // 프린터
     private static BixolonPrinter bxlPrinter = null; // 영수증 프린터
@@ -80,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
     String strRecv01, strRecv02, strRecv03, strRecv04, strRecv05, strRecv06, strRecv07, strRecv08, strRecv09, strRecv10, strRecv11, strRecv12, strRecv13, strRecv14, strRecv15, strRecv16, strRecv17, strRecv18, strRecv19, strRecv20, strRecv21, strRecv22, strRecv23, strRecv24, strRecv25, strRecv26, strRecv27, strRecv28, strRecv29, strRecv30;
 
     // 팝업 다이얼로그
-    String dialogNo = ""; // 다이얼로그 번호
     Dialog100 dialog100; // 결제방법선택
     Dialog200 dialog200; // 카드투입대기
     Dialog250 dialog250; // MS결제투입대기
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     Dialog900 dialog900; // 결제종료
 
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
+    String curPayType = ""; // 현재 진행중인 결제방법(신용카드/삼성페이)
 
     int waitTimeCnt = 30; // 제한시간(초)
     boolean isTimeout = false; // 제한시간 초과여부
@@ -134,7 +136,19 @@ public class MainActivity extends AppCompatActivity {
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
+        // NVCAT 모듈앱 재시작요청
+        Intent sendIntent = new Intent();
+        sendIntent.setAction("NICEVCAT");
+        sendIntent.putExtra("NVCATSENDDATA", "RESTART");
+        sendIntent.setType("text/plain");
+        startActivityForResult(sendIntent, SEND_REQUEST_NORMAL);
 
+        Log.d(TAG, "NVCAT RESTART");
+
+        db = RoomDB.getDBInstance(getApplicationContext());
+        paymentDao = db.paymentDao();
+
+        // webView Start =============================================================
         webView = (WebView) findViewById(R.id.webView);
         webView.setWebContentsDebuggingEnabled(true);
         WebSettings webViewSettings = webView.getSettings();
@@ -165,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView webview, WebResourceRequest request) {
                 Log.d("shouldOverrideUrl", "url ---- " + request.getUrl());
 
-                webview.loadUrl(request.getUrl().toString());
+                //webview.loadUrl(request.getUrl().toString());
                 return true;
 
                 //return super.shouldOverrideUrlLoading(webview, request);
@@ -193,7 +207,68 @@ public class MainActivity extends AppCompatActivity {
         });
         webView.addJavascriptInterface(new WebViewInterface(this), "android");
         webView.loadUrl("https://refillcycle.com");
+        // webView End =============================================================
 
+        // webView2 Start =============================================================
+        webView2 = (WebView) findViewById(R.id.webView2);
+        webView2.setWebContentsDebuggingEnabled(true);
+        WebSettings webViewSettings2 = webView2.getSettings();
+        webViewSettings2.setDefaultTextEncodingName("UTF-8");                  // 한글
+        webViewSettings2.setCacheMode(webView2.getSettings().LOAD_NO_CACHE);    // 캐시파일 사용 금지(운영중엔 주석처리 할 것)
+        webViewSettings2.setJavaScriptEnabled(true);                           // javascript를 실행할 수 있도록 설정
+        webViewSettings2.setJavaScriptCanOpenWindowsAutomatically(true);       // javascript가 window.open()을 사용할 수 있도록 설정
+        webViewSettings2.setSupportMultipleWindows(true);                      // 여러개의 윈도우를 사용할 수 있도록 설정
+        webViewSettings2.setUseWideViewPort(true);                             // wide viewport를 사용하도록 설정
+        webViewSettings2.setBlockNetworkImage(false);                          // 네트워크의 이미지의 리소스를 로드하지 않음
+        webViewSettings2.setLoadsImagesAutomatically(true);                    // 웹뷰가 앱에 등록되어 있는 이미지 리소스를 자동으로 로드하도록 설정
+        webViewSettings2.setAppCacheEnabled(true);
+        webViewSettings2.setDatabaseEnabled(true);
+        webViewSettings2.setDomStorageEnabled(true);
+        webViewSettings2.setGeolocationEnabled(true);
+        webViewSettings2.setSupportZoom(false);								   // 확대,축소 기능을 사용할 수 있도록 설정
+        webViewSettings2.setBuiltInZoomControls(false);						   // 줌인 아이콘을 사용할 수 있도록 설정
+        webView2.setWebViewClient(new WebViewClient() {
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(final WebView webview, final String url){
+                Log.d(TAG, "url - " + url);
+
+                return super.shouldOverrideUrlLoading(webview, url);
+            }
+            //@TargetApi(Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webview, WebResourceRequest request) {
+                Log.d("shouldOverrideUrl", "url ---- " + request.getUrl());
+
+                //webview.loadUrl(request.getUrl().toString());
+                return true;
+
+                //return super.shouldOverrideUrlLoading(webview, request);
+            }
+            @Override
+            public void onPageFinished(WebView webview, String url) {
+                // 페이지 로딩완료시 호출
+                Log.d("onPageFinished", "url :: " + url);
+
+                super.onPageFinished(webview, url);
+            }
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                Log.d("onReceivedSslError", "url = " + error.getUrl().toString());
+                handler.proceed(); // SSL 인증서 무시
+            }
+        });
+        webView2.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+                Log.d("onCreateWindow","onCreateWindow");
+
+                return true;
+            }
+        });
+        webView2.addJavascriptInterface(new WebViewInterface2(this), "android2");
+        webView2.loadUrl("https://refillcycle.com/kiosk/webview");
+        // webView2 End =============================================================
 
         // 영수증 프린터
         bxlPrinter = new BixolonPrinter(getApplicationContext());
@@ -205,9 +280,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // 영수증 프린트 완료
                 isCompletePrintReceipt = true;
-
-                // 라벨 출력
-                printLabel();
             }
             @Override
             public void onPrintEventErrorOccurred(int eventCode){
@@ -472,11 +544,31 @@ public class MainActivity extends AppCompatActivity {
             payOrderNo = orderNo; // 주문번호
             payUserId = userId; // 주문자 고유 아이디
             payAgreenum = agreenum; // 승인번호 (취소요청시만 해당)
-            payAgreedate = agreedate; // 원거래일자(YYMMDD) (취소요청시만 해당)
+
+            if(agreedate.length() >= 6) {
+                payAgreedate = agreedate.substring(0,6); // 원거래일자(YYMMDD) (취소요청시만 해당)
+            }
 
             // 결제방법 선택 팝업
             popDialog100();
         }
+    }
+
+    /**
+     * JavascriptInterface
+     */
+    public class WebViewInterface2 {
+        Context mContext;
+
+        WebViewInterface2(Context ctx) {
+            mContext = ctx;
+        }
+
+        @JavascriptInterface
+        public void showToast(String toast) {
+            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     /**
@@ -535,11 +627,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void popDialog200(String payType){
 
-        if(payType.equals(CommonUtil._신용카드)){
-            dialogNo = CommonUtil._결제요청대기_신용카드;
-        }else if(payType.equals(CommonUtil._삼성페이)){
-            dialogNo = CommonUtil._결제요청대기_삼성페이;
-        }
         dialog200 = new Dialog200(MainActivity.this, curReqType, payType);
         dialog200.setDialogListener(new Dialog200.DialogListener() {
             @Override
@@ -593,6 +680,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // 영수증 출력
                 printReceipt();
+
+                // 라벨 출력
+                printLabel();
             }
             @Override
             public void onNegativeClicked() {
@@ -651,9 +741,16 @@ public class MainActivity extends AppCompatActivity {
      * 결제종료
      */
     public void closePayment(String cancelType) {
-        Toast.makeText(getApplicationContext(), "결제가 취소되었습니다.", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "closePayment()");
+        //Toast.makeText(getApplicationContext(), "결제가 취소되었습니다.", Toast.LENGTH_SHORT).show();
+
         // 결제취소 전달
+        webView.loadUrl("javascript:cancelPayment('" + cancelType + "', '" + payOrderNo + "', '" + payUserId + "')");
+        /*
+        WEB 자바스크립트에서 아래 형태로 처리
+        function cancelPayment(cancelType, payOrderNo, payUserId) {
+        }
+        */
 
         // 결제종료 팝업
         popDialog900(curReqType, cancelType);
@@ -663,6 +760,9 @@ public class MainActivity extends AppCompatActivity {
      * 결제단계 200 (결제요청)
      */
     public void payStep200(String payType){
+
+        this.curPayType = payType;
+
         // 결제요청 대기 팝업
         popDialog200(payType);
 
@@ -687,7 +787,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void reqPayment(String reqType, String wcc){
 
-        curReqType = reqType;
+        Log.d(TAG, "reqType:" + reqType + ", wcc:" + wcc);
 
         // 데이터 초기화
         signImgString = ""; // 인코딩 서명이미지
@@ -720,7 +820,7 @@ public class MainActivity extends AppCompatActivity {
         String spFiller = ""; // Filler
         String spTxt = ""; // 전문TEXT
         String spDevicegb = ""; // 기종구분
-        String spSigndata = ""; // 서명데이터
+        String spSigndata = ""; // 서명데이터 (NVCAT 모듈에서 알아서 전송)
 
         // 전문데이터 세팅
         String senddata = "";
@@ -1011,42 +1111,124 @@ public class MainActivity extends AppCompatActivity {
         signImgString = getSignBitmapString();
 
         // WEB 결과 데이터
-        String rtnResult = "";
-        String rtnAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 거래금액
-        String rtnOrderNo = payOrderNo; // 주문번호
-        String rtnUserId = payUserId; // 주문자 고유 아이디
-        String rtnAgreenum = strRecv08.trim(); // 승인번호
-        String rtnAgreedate = strRecv09.trim(); // 승인일자
+        String rstResult = "";
+        String rstOrderNo = payOrderNo; // 주문번호
+        String rstUserId = payUserId; // 주문자 고유 아이디
+        String rstReqType = strRecv01; // 거래구분
+        String rstReqKind = strRecv02; // 거래유형
+        String rstResCode = strRecv03; // 응답코드
+        String rstAmount = Integer.toString(Integer.parseInt(strRecv04)); // 거래금액
+        String rstTax = Integer.toString(Integer.parseInt(strRecv05)); // 부가세
+        String rstBongsa = Integer.toString(Integer.parseInt(strRecv06)); // 봉사료
+        String rstHalbu = strRecv07; // 할부
+        String rstAgreenum = strRecv08.trim(); // 승인번호
+        String rstAgreedate = strRecv09.trim(); // 승인일자
+        String rstBankCd1 = strRecv10; // 발급사코드
+        String rstBankNm1 = strRecv11.trim(); // 발급사명
+        String rstBankCd2 = strRecv12; // 매입사코드
+        String rstBankNm2 = strRecv13.trim(); // 매입사명
+        String rstStoreNo = strRecv14.trim(); // 가맹점번호
+        String rstCatId = strRecv15; // CATID
+        String rstResMsg = strRecv17.trim(); // 응답메세지
+        String rstCardNo = strRecv18; // 카드번호
+        String rstCardGubun = strRecv19; // 카드구분
+        String rstMngNo = strRecv20; // 전문관리번호
+        String rstSeqNo = strRecv21; // 거래일련번호
+        String rstSignImg = signImgString; // 서명이미지
+        String rstJson = "";
+
+
+        ObjectMapper mapper = new ObjectMapper();
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("order_no", rstOrderNo);
+        map.put("user_id", rstUserId);
+        map.put("req_type", rstReqType);
+        map.put("req_kind", rstReqKind);
+        map.put("res_code", rstResCode);
+        map.put("amount", rstAmount);
+        map.put("tax", rstTax);
+        map.put("bongsa", rstBongsa);
+        map.put("halbu", rstHalbu);
+        map.put("agree_num", rstAgreenum);
+        map.put("agree_date", rstAgreedate);
+        map.put("bank_cd1", rstBankCd1);
+        map.put("bank_nm1", rstBankNm1);
+        map.put("bank_cd2", rstBankCd2);
+        map.put("bank_nm2", rstBankNm2);
+        map.put("store_no", rstStoreNo);
+        map.put("cat_id", rstCatId);
+        map.put("res_msg", rstResMsg);
+        map.put("card_no", rstCardNo);
+        map.put("card_gubun", rstCardGubun);
+        map.put("mng_no", rstMngNo);
+        map.put("seq_no", rstSeqNo);
+        map.put("sign_img", rstSignImg);
+        try {
+            rstJson = mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
 
         // 승인요청 정상처리
         if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._승인응답) ) {
             // 응답 거래구분 (승인 : 0210)
             Log.d(TAG, "결제승인 정상 응답");
-
-            rtnResult = "정상승인"; // 코드화 할 것
-
-            // 영수증 출력확인 팝업
-            popDialog300();
+            rstResult = "정상승인"; // 코드화 할 것
 
         // 취소요청 정상처리
         }else if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._취소응답) ){
             // 응답 거래구분 (취소 : 0430)
             Log.d(TAG, "승인취소 정상 응답");
-
-            rtnResult = "정상취소"; // 코드화 할 것
-
-            // 영수증 출력확인 팝업
-            popDialog300();
+            rstResult = "정상취소"; // 코드화 할 것
 
         }else{
             Log.d(TAG, "결제승인 비정상 응답");
-
-            rtnResult = "비정상"; // 코드화 할 것
+            rstResult = "비정상"; // 코드화 할 것
         }
 
+        if( strRecv03.equals("0000") ){
+
+            // 로컬DB 저장
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Payment payment = new Payment();
+
+                    payment.order_no = rstOrderNo;
+                    payment.user_id = rstUserId;
+                    payment.req_type = rstReqType;
+                    payment.req_kind = rstReqKind;
+                    payment.res_code = rstResCode;
+                    payment.amount = rstAmount;
+                    payment.tax = rstTax;
+                    payment.bongsa = rstBongsa;
+                    payment.halbu = rstHalbu;
+                    payment.agree_num = rstAgreenum;
+                    payment.agree_date = rstAgreedate;
+                    payment.bank_cd1 = rstBankCd1;
+                    payment.bank_nm1 = rstBankNm1;
+                    payment.bank_cd2 = rstBankCd2;
+                    payment.bank_nm2 = rstBankNm2;
+                    payment.store_no = rstStoreNo;
+                    payment.cat_id = rstCatId;
+                    payment.res_msg = rstResMsg;
+                    payment.card_no = rstCardNo;
+                    payment.card_gubun = rstCardGubun;
+                    payment.mng_no = rstMngNo;
+                    payment.seq_no = rstSeqNo;
+                    payment.sign_img = rstSignImg;
+
+                    paymentDao.insertPayment(payment);
+                }
+            }).start();
+
+            // 영수증 출력확인 팝업
+            popDialog300();
+        }
 
         // 결과 web 전달
-        returnPaymentResult(rtnResult, rtnAmount, rtnOrderNo, rtnUserId, rtnAgreenum, rtnAgreedate);
+        returnPaymentResult(rstResult, rstAmount, rstOrderNo, rstUserId, rstAgreenum, rstAgreedate, rstJson);
     }
 
     /**
@@ -1179,8 +1361,7 @@ public class MainActivity extends AppCompatActivity {
 
             String strData = "";
             strData = strData + "====================\n";
-            strData = strData + "라 벨\n";
-            strData = strData + "====================";
+            strData = strData + "라벨출력\n";
 
             int alignment = 1;
             int attribute = 1;
@@ -1204,15 +1385,19 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 결제결과 WEB 전달
      */
-    public void returnPaymentResult(String rtnResult, String rtnAmount, String rtnOrderNo, String rtnUserId, String rtnAgreenum, String rtnAgreedate){
+    public void returnPaymentResult(String rstResult, String rstAmount, String rstOrderNo, String rstUserId, String rstAgreenum, String rstAgreedate, String rstJson){
         Log.d(TAG, "returnPayResult()");
 
-        webView.loadUrl("javascript:retrunPayment('" + rtnResult + "', '" + rtnAmount + "', '" + rtnOrderNo + "', '" + rtnUserId + "', '" + rtnAgreenum + "', '" + rtnAgreedate + "')");
+        // 결제결과 전달
+        webView.loadUrl("javascript:retrunPayment('" + rstResult + "', '" + rstAmount + "', '" + rstOrderNo + "', '" + rstUserId + "', '" + rstAgreenum + "', '" + rstAgreedate + "')");
         /*
         WEB 자바스크립트에서 아래 형태로 처리
-        function retrunPayment(rtnResult, rtnAmount, rtnOrderNo, rtnUserId, rtnAgreenum, rtnAgreedate) {
+        function retrunPayment(rstResult, rstAmount, rstOrderNo, rstUserId, rstAgreenum, rstAgreedate) {
         }
         */
+
+        // 결제정보 저장
+        webView2.loadUrl("javascript:savePayment('" + rstJson + "')");
     }
 
     public final Handler mToastHandler = new Handler(new Handler.Callback() {
@@ -1251,6 +1436,7 @@ public class MainActivity extends AppCompatActivity {
         String bitmapString = ""; // 변환된 인코딩 문자
 
         try {
+            // NVCAT 모듈에서 생성한 서명 이미지
             String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "";
             Log.d(TAG, "path :: " + path);
             File dir = new File(path);
@@ -1299,7 +1485,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void testFunction(){
-
     }
 
 }

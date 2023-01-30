@@ -3,8 +3,10 @@ package kr.co.nicevan.nvcat.PrinterControl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
+//import androidx.core.app.Fragment;
 import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import kr.co.nicevan.nvcat.Printer.BarcodeFragment;
 import kr.co.nicevan.nvcat.Printer.CashDrawerFragment;

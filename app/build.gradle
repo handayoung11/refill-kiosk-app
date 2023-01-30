@@ -5,12 +5,12 @@ android {
 
     defaultConfig {
         applicationId "kr.co.nicevan.nvcat"
-        minSdkVersion 21
+        minSdkVersion 28
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary true
         multiDexEnabled true
     }
@@ -37,10 +37,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
     //noinspection GradleCompatible
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 
     /*
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -48,8 +48,8 @@ dependencies {
     })
     */
 
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
     dependencies {
         implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
         implementation 'io.reactivex.rxjava3:rxjava:3.0.7'
@@ -57,5 +57,14 @@ dependencies {
     implementation project(path: ':bixolon_pdf')
 
     implementation 'com.ssomai:android.scalablelayout:2.1.6'
+
+    def room_version = "2.3.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    def jackson_version = "2.9.7"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
 
 }

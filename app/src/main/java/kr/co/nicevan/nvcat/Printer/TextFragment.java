@@ -3,7 +3,7 @@ package kr.co.nicevan.nvcat.Printer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
+//import androidx.core.app.Fragment;
 import android.text.Layout;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -17,6 +17,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import kr.co.nicevan.nvcat.MainActivity;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;

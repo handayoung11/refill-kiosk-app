@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -14,6 +13,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 public class Dialog200 extends Dialog {
 
@@ -25,7 +26,7 @@ public class Dialog200 extends Dialog {
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
     String payType = ""; // 결제방법(신용카드/삼성페이)
 
-    public Dialog200(@NonNull Context context,String curReqType, String payType){
+    public Dialog200(@NonNull Context context, String curReqType, String payType){
         super(context);
         this.context = context;
         this.curReqType = curReqType;

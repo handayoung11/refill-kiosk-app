@@ -14,14 +14,13 @@ public class CommonUtil {
 
     public static String TAG = "CommonUtil";
 
-    // 키오스크 정보
+    // 키오스크 정보 (키오스크 정보 관리자 화면에서 저장한 값 가져오기)
     public static String CATID = "2393300001"; // CATID
     public static String corpNo = "2208115770"; // 사업자번호
 
     // 결제방법
     public static String _신용카드 = "신용카드";
     public static String _삼성페이 = "삼성페이";
-    public static String _MS결제 = "MS결제";
 
     // 전문요청 거래구분 (코드)
     public static String _승인요청 = "0200";
@@ -38,11 +37,6 @@ public class CommonUtil {
     // 결제중지 구분
     public static String _결제중지 = "결제중지";
     public static String _대기종료 = "대기종료";
-
-    // 다이얼로그
-    public static String _결제방법선택 = "결제방법선택";
-    public static String _결제요청대기_신용카드 = "결제요청대기_신용카드";
-    public static String _결제요청대기_삼성페이 = "결제요청대기_삼성페이";
 
 
     /**

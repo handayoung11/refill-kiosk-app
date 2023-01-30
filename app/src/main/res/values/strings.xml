@@ -28,8 +28,4 @@
     <string name="msg_06">IC카드를 인식하지 못하여 \nMS결제로 진행합니다. \n\n카드를 IC 리더기에서 제거 한 후 \n그림과 같이 마그네틱 리더기 슬롯에 \n긁어 주세요.</string>
     <string name="msg_07">30초 이내로 결제하지 않으면 자동 취소됩니다.</string>
 
-
-
-
-
 </resources>
