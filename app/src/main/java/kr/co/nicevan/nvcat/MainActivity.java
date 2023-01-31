@@ -1,6 +1,5 @@
 package kr.co.nicevan.nvcat;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -14,14 +13,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -32,22 +29,22 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.text.DecimalFormat;
-import java.util.Base64;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 
 import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
+import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.dto.RequestDTO;
+import kr.co.nicevan.nvcat.dto.ResponseDTO;
+import kr.co.nicevan.nvcat.retrofit.RevealStringCallbacks;
+import kr.co.nicevan.nvcat.service.ReceiptService;
+import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
+
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bixolon.commonlib.log.LogService;
@@ -113,6 +110,11 @@ public class MainActivity extends AppCompatActivity {
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
 
+    //RetrofitService DI.
+    ReceiptService receiptService = new ReceiptServiceImpl();
+
+    //카드관련 응답데이터 setDTO.
+    CardDTO cardInfo = new CardDTO();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -592,7 +594,7 @@ public class MainActivity extends AppCompatActivity {
                 //popDialog400();
 
                 // 영수증 출력
-                printReceipt();
+                printReceipt(cardInfo.getApprovalNo());
             }
             @Override
             public void onNegativeClicked() {
@@ -698,6 +700,7 @@ public class MainActivity extends AppCompatActivity {
         // 프린트용 데이터 초기화
         isCompletePrintReceipt = false; isCompletePrintLabel = false;
         prtAmount = ""; prtTax = ""; prtTotAmount = "";
+        cardInfo = new CardDTO();
 
         // WEB 결제정보 파라미터 테스트 데이터
         payAmount = "55000"; // 거래금액
@@ -1006,6 +1009,7 @@ public class MainActivity extends AppCompatActivity {
         prtAmount = CommonUtil.convertCommaDecimalFormat(Integer.toString(tmpAmount)); // 금액
         prtTax = CommonUtil.convertCommaDecimalFormat(strRecv05); // 부가세
         prtTotAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 합계금액
+        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, strRecv18, strRecv07, strRecv19, strRecv08, strRecv09);
 
         // 사인 이미지 추출
         signImgString = getSignBitmapString();
@@ -1120,48 +1124,47 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 영수증 출력
      */
-    public void printReceipt(){
+    public void printReceipt(String approvalNo){
 
         mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
 
         if (isPrintOpen) {
             Log.d(TAG, "P-printer open!!!");
+            RequestDTO.ReceiptDTO request = new RequestDTO.ReceiptDTO();
+            request.setApprovalNo(approvalNo);
+            receiptService.printReceiptByOrder(
+                    request,
+                    cardInfo,
+                    new RevealStringCallbacks() {
+                        @Override
+                        public void onSuccess(@NonNull String value) {
+                            Log.d("RevealCallbacks","onSuccess");
 
-            // 테스트 데이터
-            prtAmount = "2,700"; // 금액
-            prtTax = "300"; // 부가세
-            prtTotAmount = "3,000"; // 합계금액
+                            String strData = "출력데이터: " + value;
+                            int alignment = 1;
+                            int attribute = 1;
+                            int spinnerSize = 0;
 
-            String strData = "";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "====================\n";
-            strData = strData + "영 수 증\n";
-            strData = strData + "금  액 : " + prtAmount + "원\n";
-            strData = strData + "부가세 : " + prtTax + "원\n";
-            strData = strData + "합  계 : " + prtTotAmount + "원\n";
-            strData = strData + "====================";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "\n";
+                            Log.d(TAG, "P-strData : " + strData);
+                            Log.d(TAG, "P-alignment : " + alignment);
+                            Log.d(TAG, "P-attribute : " + attribute);
+                            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
 
-            int alignment = 1;
-            int attribute = 1;
-            int spinnerSize = 0;
+                            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-            Log.d(TAG, "P-strData : " + strData);
-            Log.d(TAG, "P-alignment : " + alignment);
-            Log.d(TAG, "P-attribute : " + attribute);
-            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
+                            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
+                            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
-            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
+                            getPrinterInstance().cutPaper();
+                        }
 
-            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
-            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
-
-            getPrinterInstance().cutPaper();
-
+                        @Override
+                        public void onError(@NonNull Throwable throwable) {
+                            Log.d("RevealCallbacks","onError");
+                            Log.d(this.getClass().getSimpleName(),"RevealReceiptPlaceCallbacks");
+                            Log.d(this.getClass().getSimpleName(), throwable.toString());
+                        }
+                    });
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
         }
