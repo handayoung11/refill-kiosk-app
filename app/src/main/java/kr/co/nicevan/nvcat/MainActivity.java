@@ -40,6 +40,7 @@ import java.util.Set;
 
 import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
+import kr.co.nicevan.nvcat.PrinterControl.DefaultBixolonPrinterUserListener;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
@@ -164,75 +165,23 @@ public class MainActivity extends AppCompatActivity {
 
         // 영수증 프린터
         bxlPrinter = new BixolonPrinter(getApplicationContext());
-        bxlPrinter.setUserListener(new BixolonPrinter.UserListener() {
-            String TagPirnt = "PrintEvent01";
+        bxlPrinter.setUserListener(new DefaultBixolonPrinterUserListener("PrintEvent01") {
             @Override
             public void onPrintEventOutputCompleteOccurred(int eventCode) {
-                Log.d(TagPirnt, "onPrintEventOutputCompleteOccurred : " + eventCode);
+                Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
 
                 // 영수증 프린트 완료
                 isCompletePrintReceipt = true;
-            }
-            @Override
-            public void onPrintEventErrorOccurred(int eventCode){
-                Log.d(TagPirnt, "onPrintEventErrorOccurred : " + eventCode);
-
-                switch (eventCode) {
-                    case 201:
-                        Log.d(TagPirnt, "프린터 Cover Open");
-                        break;
-                    case 203:
-                        Log.d(TagPirnt, "프린터 Paper Empty");
-                        break;
-                    case 217:
-                        Log.d(TagPirnt, "프린터 off-line");
-                        break;
-                }
-            }
-            @Override
-            public void onPrintEventStatusUpdateOccurred(int eventCode){
-                Log.d(TagPirnt, "onPrintEventStatusUpdateOccurred : " + eventCode);
-
-                switch (eventCode) {
-                    case 2001 :
-                        Log.d(TagPirnt, "프린터 Pown On");
-                        break;
-                    case 2004 :
-                        Log.d(TagPirnt, "프린터 Pown Off");
-                        break;
-                    case 11 :
-                        Log.d(TagPirnt, "프린터 Cover Open");
-                        break;
-                    case 12 :
-                        Log.d(TagPirnt, "프린터 Cover OK");
-                        break;
-                    case 24 :
-                        Log.d(TagPirnt, "프린터 Paper Empty");
-                        break;
-                    case 25 :
-                        Log.d(TagPirnt, "프린터 Paper Near Empty");
-                        break;
-                    case 26 :
-                        Log.d(TagPirnt, "프린터 Paper OK");
-                        break;
-                    case 53 :
-                        Log.d(TagPirnt, "프린터 off-line");
-                        break;
-                    case 54 :
-                        Log.d(TagPirnt, "프린터 on-line");
-                        break;
-                }
             }
         });
         printOpen(); // 영수증 프린터 오픈
 
         // 라벨 프린터
         bxlPrinter02 = new BixolonPrinter(getApplicationContext());
-        bxlPrinter02.setUserListener(new BixolonPrinter.UserListener() {
-            String TagPirnt = "PrintEvent02";
+        bxlPrinter02.setUserListener(new DefaultBixolonPrinterUserListener("PrintEvent02") {
             @Override
             public void onPrintEventOutputCompleteOccurred(int eventCode) {
-                Log.d(TagPirnt, "onPrintEventOutputCompleteOccurred : " + eventCode);
+                Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
 
                 // 라벨 프린트 완료
                 isCompletePrintLabel = true;
@@ -242,64 +191,11 @@ public class MainActivity extends AppCompatActivity {
                     dialog400.dismiss();
                 }
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                runOnUiThread(() -> {
                         Log.d(TAG, "출력 완료");
                         // 출력완료 팝업
                         popDialog500();
-                    }
                 });
-            }
-            @Override
-            public void onPrintEventErrorOccurred(int eventCode){
-                Log.d(TagPirnt, "onPrintEventErrorOccurred : " + eventCode);
-
-                switch (eventCode) {
-                    case 201:
-                        Log.d(TagPirnt, "프린터 Cover Open");
-                        break;
-                    case 203:
-                        Log.d(TagPirnt, "프린터 Paper Empty");
-                        break;
-                    case 217:
-                        Log.d(TagPirnt, "프린터 off-line");
-                        break;
-                }
-            }
-            @Override
-            public void onPrintEventStatusUpdateOccurred(int eventCode){
-                Log.d(TagPirnt, "onPrintEventStatusUpdateOccurred : " + eventCode);
-
-                switch (eventCode) {
-                    case 2001 :
-                        Log.d(TagPirnt, "프린터 Pown On");
-                        break;
-                    case 2004 :
-                        Log.d(TagPirnt, "프린터 Pown Off");
-                        break;
-                    case 11 :
-                        Log.d(TagPirnt, "프린터 Cover Open");
-                        break;
-                    case 12 :
-                        Log.d(TagPirnt, "프린터 Cover OK");
-                        break;
-                    case 24 :
-                        Log.d(TagPirnt, "프린터 Paper Empty");
-                        break;
-                    case 25 :
-                        Log.d(TagPirnt, "프린터 Paper Near Empty");
-                        break;
-                    case 26 :
-                        Log.d(TagPirnt, "프린터 Paper OK");
-                        break;
-                    case 53 :
-                        Log.d(TagPirnt, "프린터 off-line");
-                        break;
-                    case 54 :
-                        Log.d(TagPirnt, "프린터 on-line");
-                        break;
-                }
             }
         });
         printOpen02(); // 라벨 프린터 오픈
