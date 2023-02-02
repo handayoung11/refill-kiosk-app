@@ -1,7 +1,6 @@
 package kr.co.nicevan.nvcat.service;
 
-
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.RequestDTO;

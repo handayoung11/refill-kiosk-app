@@ -1,18 +1,7 @@
 package kr.co.nicevan.nvcat.dto;
-
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 public class ResponseDTO {
