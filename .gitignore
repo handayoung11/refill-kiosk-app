@@ -204,7 +204,6 @@ proguard/
 *.ipr
 *~
 *.swp
-
 # Keystore files
 
 # Google Services (e.g. APIs or Firebase)
@@ -279,5 +278,7 @@ fabric.properties
 
 !/gradle/wrapper/gradle-wrapper.jar
 
+#bixolon lib
+!app/libs/*.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,java,androidstudio,android,gradle
