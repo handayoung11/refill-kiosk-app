@@ -13,10 +13,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,20 +33,23 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
 import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
-
+import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.dto.RequestDTO;
+import kr.co.nicevan.nvcat.dto.ResponseDTO;
+import kr.co.nicevan.nvcat.retrofit.RevealStringCallbacks;
+import kr.co.nicevan.nvcat.service.ReceiptService;
+import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bixolon.commonlib.log.LogService;
@@ -115,6 +121,11 @@ public class MainActivity extends AppCompatActivity {
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
 
+    //RetrofitService DI.
+    ReceiptService receiptService = new ReceiptServiceImpl();
+
+    //카드관련 응답데이터 setDTO.
+    CardDTO cardInfo = new CardDTO();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -679,7 +690,7 @@ public class MainActivity extends AppCompatActivity {
                 //popDialog400();
 
                 // 영수증 출력
-                printReceipt();
+                printReceipt(cardInfo.getApprovalNo());
 
                 // 라벨 출력
                 printLabel();
@@ -798,6 +809,7 @@ public class MainActivity extends AppCompatActivity {
         // 프린트용 데이터 초기화
         isCompletePrintReceipt = false; isCompletePrintLabel = false;
         prtAmount = ""; prtTax = ""; prtTotAmount = "";
+        cardInfo = new CardDTO();
 
         // WEB 결제정보 파라미터 테스트 데이터
         payAmount = "55000"; // 거래금액
@@ -1106,6 +1118,7 @@ public class MainActivity extends AppCompatActivity {
         prtAmount = CommonUtil.convertCommaDecimalFormat(Integer.toString(tmpAmount)); // 금액
         prtTax = CommonUtil.convertCommaDecimalFormat(strRecv05); // 부가세
         prtTotAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 합계금액
+        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, strRecv18, strRecv07, strRecv19, strRecv08, strRecv09);
 
         // 사인 이미지 추출
         signImgString = getSignBitmapString();
@@ -1302,14 +1315,13 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 영수증 출력
      */
-    public void printReceipt(){
+    public void printReceipt(String approvalNo){
 
         mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
 
         if (isPrintOpen) {
             Log.d(TAG, "P-printer open!!!");
 
-            // 테스트 데이터
             prtAmount = "2,700"; // 금액
             prtTax = "300"; // 부가세
             prtTotAmount = "3,000"; // 합계금액
@@ -1344,6 +1356,47 @@ public class MainActivity extends AppCompatActivity {
 
             getPrinterInstance().cutPaper();
 
+
+            /**
+             * <프린터 출력 기능 개발완료>
+             * 개발환경이 상이하여 해당 코드 사용시 일부 환경에서 error 발생됨.
+             * 개발완료한 코드 우선 주석처리.
+             */
+//            RequestDTO.ReceiptDTO request = new RequestDTO.ReceiptDTO();
+//            request.setApprovalNo(approvalNo);
+//            receiptService.printReceiptByOrder(
+//                    request,
+//                    cardInfo,
+//                    new RevealStringCallbacks() {
+//                        @Override
+//                        public void onSuccess(@NonNull String value) {
+//                            Log.d("RevealCallbacks","onSuccess");
+//
+//                            String strData = "출력데이터: " + value;
+//                            int alignment = 1;
+//                            int attribute = 1;
+//                            int spinnerSize = 0;
+//
+//                            Log.d(TAG, "P-strData : " + strData);
+//                            Log.d(TAG, "P-alignment : " + alignment);
+//                            Log.d(TAG, "P-attribute : " + attribute);
+//                            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
+//
+//                            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
+//
+//                            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
+//                            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
+//
+//                            getPrinterInstance().cutPaper();
+//                        }
+//
+//                        @Override
+//                        public void onError(@NonNull Throwable throwable) {
+//                            Log.d("RevealCallbacks","onError");
+//                            Log.d(this.getClass().getSimpleName(),"RevealReceiptPlaceCallbacks");
+//                            Log.d(this.getClass().getSimpleName(), throwable.toString());
+//                        }
+//                    });
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
         }
