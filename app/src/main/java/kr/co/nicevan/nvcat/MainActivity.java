@@ -13,13 +13,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,29 +26,32 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
-import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
-import kr.co.nicevan.nvcat.roomdb.Payment;
-import kr.co.nicevan.nvcat.roomdb.PaymentDao;
-import kr.co.nicevan.nvcat.roomdb.RoomDB;
-import kr.co.nicevan.nvcat.dto.CardDTO;
-import kr.co.nicevan.nvcat.dto.RequestDTO;
-import kr.co.nicevan.nvcat.dto.ResponseDTO;
-import kr.co.nicevan.nvcat.retrofit.RevealStringCallbacks;
-import kr.co.nicevan.nvcat.service.ReceiptService;
-import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bixolon.commonlib.log.LogService;
 import com.bxl.config.editor.BXLConfigLoader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Set;
+
+import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
+import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
+import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.roomdb.Payment;
+import kr.co.nicevan.nvcat.roomdb.PaymentDao;
+import kr.co.nicevan.nvcat.roomdb.RoomDB;
+import kr.co.nicevan.nvcat.service.ReceiptService;
+import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
 
 public class MainActivity extends AppCompatActivity {
 
