@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                 isCompletePrintReceipt = true;
             }
         });
-        printOpen(); // 영수증 프린터 오픈
 
         // 라벨 프린터
         bxlPrinter02 = new BixolonPrinter(getApplicationContext());
@@ -198,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        printOpen02(); // 라벨 프린터 오픈
 
+        printOpen(); // 영수증 & 라벨 프린터 오픈
 
         /**
          * 결제요청 (결제방법선택)
@@ -1031,69 +1030,30 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 프린터 오픈
      */
-    public boolean printOpen(){
+    public void printOpen(){
 
         int portType = BXLConfigLoader.DEVICE_BUS_USB;
-        String logicalName = "";
-        String address = "";
         Boolean checkBoxAsyncMode = true;
 
-        String[] productNames;
-        String[] deviceNames;
-        int index = 0;
         Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
-        productNames = new String[usbDevices.size()];
-        deviceNames = new String[usbDevices.size()];
         if (usbDevices != null && !usbDevices.isEmpty()) {
             for (UsbDevice device : usbDevices) {
-                productNames[index] = device.getProductName();
-                deviceNames[index] = device.getDeviceName();
-                if(productNames[index].equals("BK3-3")){ // 영수증 프린터
-                    logicalName = productNames[index];
-                    address = deviceNames[index];
+                //logical name
+                String productName = device.getProductName();
+                //address
+                String deviceName = device.getDeviceName();
+
+                if(productName.equals("BK3-3")){ // 영수증 프린터
+                    isPrintOpen = getPrinterInstance().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
+                }
+
+                if(productName.equals("BK5-3")){ // 라벨 프린터
+                    isPrintOpen02 = getPrinterInstance02().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
                 }
             }
         }else {
             Log.d(TAG, "Not found USB devices");
-            isPrintOpen = false;
         }
-
-        isPrintOpen = getPrinterInstance().printerOpen(portType, logicalName, address, checkBoxAsyncMode);
-        return isPrintOpen;
-    }
-
-    /**
-     * 프린터 오픈 02
-     */
-    public boolean printOpen02(){
-
-        int portType = BXLConfigLoader.DEVICE_BUS_USB;
-        String logicalName = "";
-        String address = "";
-        Boolean checkBoxAsyncMode = true;
-
-        String[] productNames;
-        String[] deviceNames;
-        int index = 0;
-        Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
-        productNames = new String[usbDevices.size()];
-        deviceNames = new String[usbDevices.size()];
-        if (usbDevices != null && !usbDevices.isEmpty()) {
-            for (UsbDevice device : usbDevices) {
-                productNames[index] = device.getProductName();
-                deviceNames[index] = device.getDeviceName();
-                if(productNames[index].equals("BK5-3")){ // 라벨 프린터
-                    logicalName = productNames[index];
-                    address = deviceNames[index];
-                }
-            }
-        }else {
-            Log.d(TAG, "Not found USB devices");
-            isPrintOpen = false;
-        }
-
-        isPrintOpen02 = getPrinterInstance02().printerOpen(portType, logicalName, address, checkBoxAsyncMode);
-        return isPrintOpen02;
     }
 
     /**
