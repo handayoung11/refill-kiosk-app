@@ -45,6 +45,7 @@ public class NicepayDTO {
                     k++;
                 }
             }
+            printRecvData();
         }
 
         private void printRecvData() {
