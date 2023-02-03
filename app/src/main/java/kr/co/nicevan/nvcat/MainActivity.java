@@ -107,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
     // 프린터
     boolean isPrintOpen = false; // 영수증 프린터 오픈여부
     boolean isPrintOpen02 = false; // 라벨 프린터 오픈여부
-    boolean isCompletePrintReceipt = false; // 영수증 프린트 완료여부
-    boolean isCompletePrintLabel = false; // 라벨 프린트 완료여부
     String prtAmount = ""; // 금액
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
@@ -169,9 +167,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrintEventOutputCompleteOccurred(int eventCode) {
                 Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
-
-                // 영수증 프린트 완료
-                isCompletePrintReceipt = true;
             }
         });
 
@@ -181,9 +176,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPrintEventOutputCompleteOccurred(int eventCode) {
                 Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
-
-                // 라벨 프린트 완료
-                isCompletePrintLabel = true;
 
                 // 프린터 출력중 팝업 닫기
                 if (dialog400 != null && dialog400.isShowing()) {
@@ -473,7 +465,8 @@ public class MainActivity extends AppCompatActivity {
                 //popDialog400();
 
                 // 프린트용 데이터 초기화
-                isCompletePrintReceipt = false; isCompletePrintLabel = false;
+                getPrinterInstance().resetPrintData();
+                getPrinterInstance02().resetPrintData();
                 prtAmount = ""; prtTax = ""; prtTotAmount = "";
                 cardInfo = new CardDTO();
 
@@ -521,7 +514,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void popDialog500(){
 
-        dialog500 = new Dialog500(MainActivity.this, isCompletePrintReceipt, isCompletePrintLabel);
+        dialog500 = new Dialog500(MainActivity.this, getPrinterInstance().isCompleted(), getPrinterInstance02().isCompleted());
         dialog500.setDialogListener(new Dialog500.DialogListener() {
             @Override
             public void onPositiveClicked() {
@@ -1098,7 +1091,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
             getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
-            getPrinterInstance().cutPaper();
+//            getPrinterInstance().cutPaper();
 
 
             /**
@@ -1171,7 +1164,7 @@ public class MainActivity extends AppCompatActivity {
 
             getPrinterInstance02().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-            getPrinterInstance02().formFeed();
+//            getPrinterInstance02().formFeed();
 
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();

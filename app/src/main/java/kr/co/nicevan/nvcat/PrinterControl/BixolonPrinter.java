@@ -139,6 +139,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     private String mAddress;
 
     private UserListener userListener;
+    private boolean completed = false;
 
     public interface UserListener{
         public void onPrintEventErrorOccurred(int eventCode);
@@ -1696,6 +1697,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
         Log.d("PrintEvent", "outputCompleteOccurred - outputCompleteEvent : " + outputCompleteEvent.getOutputID());
 
         userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID());
+        completed = true;
 
         Fragment fm = MainActivity.getVisibleFragment();
         if (fm != null) {
@@ -1933,5 +1935,13 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
             default:
                 return "MSR does not support reading track data";
         }
+    }
+
+    public void resetPrintData() {
+        completed = false;
+    }
+
+    public boolean isCompleted() {
+        return completed;
     }
 }
