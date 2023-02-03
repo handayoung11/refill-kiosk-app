@@ -472,6 +472,11 @@ public class MainActivity extends AppCompatActivity {
                 // 프린터 출력중 팝업
                 //popDialog400();
 
+                // 프린트용 데이터 초기화
+                isCompletePrintReceipt = false; isCompletePrintLabel = false;
+                prtAmount = ""; prtTax = ""; prtTotAmount = "";
+                cardInfo = new CardDTO();
+
                 // 영수증 출력
                 printReceipt(cardInfo.getApprovalNo());
 
@@ -588,11 +593,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 응답 전문 데이터 초기화
         strRecv01 = ""; strRecv02 = ""; strRecv03 = ""; strRecv04 = ""; strRecv05 = ""; strRecv06 = ""; strRecv07 = ""; strRecv08 = ""; strRecv09 = ""; strRecv10 = ""; strRecv11 = ""; strRecv12 = ""; strRecv13 = ""; strRecv14 = ""; strRecv15 = ""; strRecv16 = ""; strRecv17 = ""; strRecv18 = ""; strRecv19 = ""; strRecv20 = ""; strRecv21 = ""; strRecv22 = ""; strRecv23 = ""; strRecv24 = ""; strRecv25 = ""; strRecv26 = ""; strRecv27 = ""; strRecv28 = ""; strRecv29 = ""; strRecv30 = "";
-
-        // 프린트용 데이터 초기화
-        isCompletePrintReceipt = false; isCompletePrintLabel = false;
-        prtAmount = ""; prtTax = ""; prtTotAmount = "";
-        cardInfo = new CardDTO();
 
         // WEB 결제정보 파라미터 테스트 데이터
         payAmount = "55000"; // 거래금액
