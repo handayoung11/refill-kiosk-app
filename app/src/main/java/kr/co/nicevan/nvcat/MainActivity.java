@@ -1088,7 +1088,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
             getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
-//            getPrinterInstance().cutPaper();
+            getPrinterInstance().cutPaper();
 
 
             /**
@@ -1161,7 +1161,7 @@ public class MainActivity extends AppCompatActivity {
 
             getPrinterInstance02().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-//            getPrinterInstance02().formFeed();
+            getPrinterInstance02().formFeed();
 
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
