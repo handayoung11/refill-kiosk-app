@@ -42,6 +42,7 @@ import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.DefaultBixolonPrinterUserListener;
 import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.dto.NicepayDTO;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
@@ -75,9 +76,6 @@ public class MainActivity extends AppCompatActivity {
     int SEND_REQUEST_NORMAL = 6;
 
     char fs = 0x1C;
-
-    // 응답 전문 데이터
-    String strRecv01, strRecv02, strRecv03, strRecv04, strRecv05, strRecv06, strRecv07, strRecv08, strRecv09, strRecv10, strRecv11, strRecv12, strRecv13, strRecv14, strRecv15, strRecv16, strRecv17, strRecv18, strRecv19, strRecv20, strRecv21, strRecv22, strRecv23, strRecv24, strRecv25, strRecv26, strRecv27, strRecv28, strRecv29, strRecv30;
 
     // 팝업 다이얼로그
     Dialog100 dialog100; // 결제방법선택
@@ -581,9 +579,6 @@ public class MainActivity extends AppCompatActivity {
         // 데이터 초기화
         signImgString = ""; // 인코딩 서명이미지
 
-        // 응답 전문 데이터 초기화
-        strRecv01 = ""; strRecv02 = ""; strRecv03 = ""; strRecv04 = ""; strRecv05 = ""; strRecv06 = ""; strRecv07 = ""; strRecv08 = ""; strRecv09 = ""; strRecv10 = ""; strRecv11 = ""; strRecv12 = ""; strRecv13 = ""; strRecv14 = ""; strRecv15 = ""; strRecv16 = ""; strRecv17 = ""; strRecv18 = ""; strRecv19 = ""; strRecv20 = ""; strRecv21 = ""; strRecv22 = ""; strRecv23 = ""; strRecv24 = ""; strRecv25 = ""; strRecv26 = ""; strRecv27 = ""; strRecv28 = ""; strRecv29 = ""; strRecv30 = "";
-
         // WEB 결제정보 파라미터 테스트 데이터
         payAmount = "55000"; // 거래금액
         payOrderNo = ""; // 주문번호
@@ -725,173 +720,18 @@ public class MainActivity extends AppCompatActivity {
      * @param recvdata
      */
     private void RecvFS(String recvdata) {
-        int i, j = 0, k = 0;
-        for (i = 0; i < recvdata.length(); i++) {
-            if (recvdata.substring(i, i + 1).equals(String.valueOf(fs))) {
-                k++;
-
-                switch (k) {
-                    case 1: //거래구분
-                        strRecv01 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 2: //거래유형
-                        strRecv02 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 3: //응답코드
-                        strRecv03 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 4: //거래금액
-                        strRecv04 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 5: //부가세
-                        strRecv05 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 6: //봉사료
-                        strRecv06 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 7: //할부
-                        strRecv07 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 8: //승인번호
-                        strRecv08 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 9: //승인일자
-                        strRecv09 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 10: //발급사코드
-                        strRecv10 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 11: //발급사명
-                        strRecv11 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 12: //매입사코드
-                        strRecv12 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 13: //매입사명
-                        strRecv13 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 14: //가맹점번호
-                        strRecv14 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 15: //승인CATID
-                        strRecv15 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 16: //잔액
-                        strRecv16 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 17: //응답메시지
-                        strRecv17 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 18: //카드BIN
-                        strRecv18 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 19: //카드구분
-                        strRecv19 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 20: //전문관리번호
-                        strRecv20 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 21: //거래일련번호
-                        strRecv21 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 22: //발생포인트(할인금액)
-                        strRecv22 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 23: //가용포인트(지불금액)
-                        strRecv23 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 24: //누적포인트(잔액한도)
-                        strRecv24 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 25: //캐시백가맹점
-                        strRecv25 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 26: //캐시백승인번호
-                        strRecv26 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 27:
-                        strRecv27 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 28:
-                        strRecv28 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 29:
-                        strRecv29 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                    case 30:
-                        strRecv30 = recvdata.substring(j, i);
-                        j = i + 1;
-                        break;
-                }
-            }
-        }
-
-        Log.d(TAG, "strRecv01 - 거래구분 : " + strRecv01); // 거래구분
-        Log.d(TAG, "strRecv02 - 거래유형 : " + strRecv02); // 거래유형
-        Log.d(TAG, "strRecv03 - 응답코드 : " + strRecv03); // 응답코드
-        Log.d(TAG, "strRecv04 - 거래금액 : " + strRecv04); // 거래금액 (앞부분 0 제거)
-        Log.d(TAG, "strRecv05 - 부가세 : " + strRecv05); // 부가세 (앞부분 0 제거)
-        Log.d(TAG, "strRecv06 - 봉사료 : " + strRecv06); // 봉사료 (앞부분 0 제거)
-        Log.d(TAG, "strRecv07 - 할부 : " + strRecv07); // 할부
-        Log.d(TAG, "strRecv08 - 승인번호 : " + strRecv08);// 승인번호 (공백제거)
-        Log.d(TAG, "strRecv09 - 승인일자 : " + strRecv09); // 승인일자
-        Log.d(TAG, "strRecv10 - 발급사코드 : " + strRecv10); // 발급사코드
-        Log.d(TAG, "strRecv11 - 발급사명 : " + strRecv11); // 발급사명 (공백제거)
-        Log.d(TAG, "strRecv12 - 매입사코드 : " + strRecv12); // 매입사코드
-        Log.d(TAG, "strRecv13 - 매입사명 : " + strRecv13); // 매입사명 (공백제거)
-        Log.d(TAG, "strRecv14 - 가맹점번호 : " + strRecv14); // 가맹점번호 (공백제거)
-        Log.d(TAG, "strRecv15 - 승인CATID : " + strRecv15); // 승인CATID
-        Log.d(TAG, "strRecv16 - 잔액 : " + strRecv16); // 잔액 (공백제거)
-        Log.d(TAG, "strRecv17 - 응답메시지 : " + strRecv17); // 응답메시지 (공백제거)
-        Log.d(TAG, "strRecv18 - 카드BIN : " + strRecv18); // 카드BIN
-        Log.d(TAG, "strRecv19 - 카드구분 : " + strRecv19); // 카드구분
-        Log.d(TAG, "strRecv20 - 전문관리번호 : " + strRecv20); // 전문관리번호
-        Log.d(TAG, "strRecv21 - 거래일련번호 : " + strRecv21); // 거래일련번호
-        Log.d(TAG, "strRecv22 : " + strRecv22);
-        Log.d(TAG, "strRecv23 : " + strRecv23);
-        Log.d(TAG, "strRecv24 : " + strRecv24);
-        Log.d(TAG, "strRecv25 : " + strRecv25);
-        Log.d(TAG, "strRecv26 : " + strRecv26);
-        Log.d(TAG, "strRecv27 : " + strRecv27);
-        Log.d(TAG, "strRecv28 : " + strRecv28);
-        Log.d(TAG, "strRecv29 : " + strRecv29);
-        Log.d(TAG, "strRecv30 : " + strRecv30);
+        NicepayDTO.CompleteOrdereRespDTO respDTO =
+                new NicepayDTO.CompleteOrdereRespDTO(recvdata);
 
         // 프린트 데이터
-        int tmpAmount = Integer.parseInt(strRecv04) - Integer.parseInt(strRecv05);
-        prtAmount = CommonUtil.convertCommaDecimalFormat(Integer.toString(tmpAmount)); // 금액
-        prtTax = CommonUtil.convertCommaDecimalFormat(strRecv05); // 부가세
-        prtTotAmount = CommonUtil.convertCommaDecimalFormat(strRecv04); // 합계금액
-        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, strRecv18, strRecv07, strRecv19, strRecv08, strRecv09);
+        int surtax = respDTO.getIntData(4); //부가세
+        int totalPrice = respDTO.getIntData(3); //거래금액
+        int tmpAmount = totalPrice - surtax;
+        prtAmount = convertCommaDecimalFormat(tmpAmount + ""); // 금액
+        prtTax = convertCommaDecimalFormat(surtax + ""); // 부가세 포맷
+        prtTotAmount = convertCommaDecimalFormat(totalPrice + ""); // 합계금액
+        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, respDTO.getData(17), respDTO.getData(6),
+                respDTO.getData(18), respDTO.getData(7), respDTO.getData(8));
 
         // 사인 이미지 추출
         signImgString = getSignBitmapString();
@@ -900,26 +740,26 @@ public class MainActivity extends AppCompatActivity {
         String rstResult = "";
         String rstOrderNo = payOrderNo; // 주문번호
         String rstUserId = payUserId; // 주문자 고유 아이디
-        String rstReqType = strRecv01; // 거래구분
-        String rstReqKind = strRecv02; // 거래유형
-        String rstResCode = strRecv03; // 응답코드
-        String rstAmount = Integer.toString(Integer.parseInt(strRecv04)); // 거래금액
-        String rstTax = Integer.toString(Integer.parseInt(strRecv05)); // 부가세
-        String rstBongsa = Integer.toString(Integer.parseInt(strRecv06)); // 봉사료
-        String rstHalbu = strRecv07; // 할부
-        String rstAgreenum = strRecv08.trim(); // 승인번호
-        String rstAgreedate = strRecv09.trim(); // 승인일자
-        String rstBankCd1 = strRecv10; // 발급사코드
-        String rstBankNm1 = strRecv11.trim(); // 발급사명
-        String rstBankCd2 = strRecv12; // 매입사코드
-        String rstBankNm2 = strRecv13.trim(); // 매입사명
-        String rstStoreNo = strRecv14.trim(); // 가맹점번호
-        String rstCatId = strRecv15; // CATID
-        String rstResMsg = strRecv17.trim(); // 응답메세지
-        String rstCardNo = strRecv18; // 카드번호
-        String rstCardGubun = strRecv19; // 카드구분
-        String rstMngNo = strRecv20; // 전문관리번호
-        String rstSeqNo = strRecv21; // 거래일련번호
+        String rstReqType = respDTO.getData(0); // 거래구분
+        String rstReqKind = respDTO.getData(1); // 거래유형
+        String rstResCode = respDTO.getData(2); // 응답코드
+        String rstAmount = Integer.toString(Integer.parseInt(respDTO.getData(3))); // 거래금액
+        String rstTax = Integer.toString(Integer.parseInt(respDTO.getData(4))); // 부가세
+        String rstBongsa = Integer.toString(Integer.parseInt(respDTO.getData(5))); // 봉사료
+        String rstHalbu = respDTO.getData(6); // 할부
+        String rstAgreenum = respDTO.getData(7).trim(); // 승인번호
+        String rstAgreedate = respDTO.getData(8).trim(); // 승인일자
+        String rstBankCd1 = respDTO.getData(9); // 발급사코드
+        String rstBankNm1 = respDTO.getData(10).trim(); // 발급사명
+        String rstBankCd2 = respDTO.getData(11); // 매입사코드
+        String rstBankNm2 = respDTO.getData(12).trim(); // 매입사명
+        String rstStoreNo = respDTO.getData(13).trim(); // 가맹점번호
+        String rstCatId = respDTO.getData(14); // CATID
+        String rstResMsg = respDTO.getData(16).trim(); // 응답메세지
+        String rstCardNo = respDTO.getData(17); // 카드번호
+        String rstCardGubun = respDTO.getData(18); // 카드구분
+        String rstMngNo = respDTO.getData(19); // 전문관리번호
+        String rstSeqNo = respDTO.getData(20); // 거래일련번호
         String rstSignImg = signImgString; // 서명이미지
         String rstJson = "";
 
@@ -957,13 +797,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 승인요청 정상처리
-        if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._승인응답) ) {
+        if(rstResCode.equals("0000") && rstReqType.equals(_승인응답) ) {
             // 응답 거래구분 (승인 : 0210)
             Log.d(TAG, "결제승인 정상 응답");
             rstResult = "정상승인"; // 코드화 할 것
 
         // 취소요청 정상처리
-        }else if( strRecv03.equals("0000") && strRecv01.equals(CommonUtil._취소응답) ){
+        }else if(rstResCode.equals("0000") && rstReqType.equals(_취소응답) ){
             // 응답 거래구분 (취소 : 0430)
             Log.d(TAG, "승인취소 정상 응답");
             rstResult = "정상취소"; // 코드화 할 것
@@ -973,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
             rstResult = "비정상"; // 코드화 할 것
         }
 
-        if( strRecv03.equals("0000") ){
+        if(rstResCode.equals("0000") ){
 
             // 로컬DB 저장
             new Thread(new Runnable() {
