@@ -1,5 +1,7 @@
 package kr.co.nicevan.nvcat;
 
+import static kr.co.nicevan.nvcat.CommonUtil.*;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -195,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // 현재 거래구분(승인)
-                curReqType = CommonUtil._승인요청;
+                curReqType = _승인요청;
 
                 // 결제방법 선택 팝업
                 popDialog100();
@@ -210,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // 현재 거래구분(취소)
-                curReqType = CommonUtil._취소요청;
+                curReqType = _취소요청;
 
                 // 결제방법 선택 팝업
                 popDialog100();
@@ -316,9 +318,9 @@ public class MainActivity extends AppCompatActivity {
 
             // 현재 거래구분(승인/취소)
             if(reqType.equals("승인")) {
-                curReqType = CommonUtil._승인요청;
+                curReqType = _승인요청;
             }else if(reqType.equals("취소")) {
-                curReqType = CommonUtil._취소요청;
+                curReqType = _취소요청;
             }
 
             payAmount = amount; // 거래금액
@@ -365,7 +367,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNegativeClicked() {
                 // 결제종료
-                closePayment(CommonUtil._결제중지);
+                closePayment(_결제중지);
             }
             @Override
             public void onClickedBtn01(){
@@ -417,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
             public void onNegativeClicked() {
                 Log.d(TAG, "popDialog200 - 결제중지");
                 // 결제종료
-                closePayment(CommonUtil._결제중지);
+                closePayment(_결제중지);
             }
         });
         dialog200.setCanceledOnTouchOutside(false);
@@ -438,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onNegativeClicked() {
                 // 결제종료
-                closePayment(CommonUtil._결제중지);
+                closePayment(_결제중지);
             }
         });
         dialog250.setCanceledOnTouchOutside(false);
@@ -554,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
         popDialog200(payType);
 
         // NVCAT 결제요청
-        reqPayment(curReqType, CommonUtil._IC카드);
+        reqPayment(curReqType, _IC카드);
     }
 
     /**
@@ -565,7 +567,7 @@ public class MainActivity extends AppCompatActivity {
         popDialog250();
 
         // NVCAT 결제요청
-        reqPayment(curReqType, CommonUtil._MS카드);
+        reqPayment(curReqType, _MS카드);
     }
 
 
@@ -613,7 +615,7 @@ public class MainActivity extends AppCompatActivity {
         senddata = senddata + spHalbu + fs; // 할부
         senddata = senddata + spAgreenum + fs; // 승인번호
         senddata = senddata + spAgreedate + fs; // 원거래일자(YYMMDD)
-        senddata = senddata + CommonUtil.CATID + fs; // CATID
+        senddata = senddata + CATID + fs; // CATID
         senddata = senddata + "" + fs;
         senddata = senddata + "" + fs;
         senddata = senddata + "" + fs;
@@ -700,7 +702,7 @@ public class MainActivity extends AppCompatActivity {
                 // IC 카드리딩실패 (타임아웃)
                 if(NVCAT_RETURN_CODE == -7) {
                     // 결제중지
-                    closePayment(CommonUtil._대기종료);
+                    closePayment(_대기종료);
                 }
 
                 // FALLBACK 발생 - NVCATRETURNCODE : -9, NVCATRECVDATA : FALLBACK 재시도 사용 안함
@@ -925,7 +927,7 @@ public class MainActivity extends AppCompatActivity {
 
             getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
+            Bitmap stringBitmap = stringToBitmap(signImgString);
             getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
             getPrinterInstance().cutPaper();
@@ -1086,7 +1088,7 @@ public class MainActivity extends AppCompatActivity {
                 signFilePath = files[0].getAbsolutePath();
                 Log.d(TAG, "signFilePath :: " + signFilePath);
                 Bitmap bitmap = BitmapFactory.decodeFile(signFilePath);
-                bitmapString = CommonUtil.bitmapToString(bitmap);
+                bitmapString = bitmapToString(bitmap);
                 Log.d(TAG, "bitmapString :: " + bitmapString);
             }
 
