@@ -104,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
     String payAgreenum = ""; // 승인번호 (취소요청시만 해당)
     String payAgreedate = ""; // 원거래일자(YYMMDD) (취소요청시만 해당)
 
-    // 프린터
-    boolean isPrintOpen = false; // 영수증 프린터 오픈여부
-    boolean isPrintOpen02 = false; // 라벨 프린터 오픈여부
     String prtAmount = ""; // 금액
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
@@ -1037,11 +1034,11 @@ public class MainActivity extends AppCompatActivity {
                 String deviceName = device.getDeviceName();
 
                 if(productName.equals("BK3-3")){ // 영수증 프린터
-                    isPrintOpen = getPrinterInstance().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
+                    getPrinterInstance().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
                 }
 
                 if(productName.equals("BK5-3")){ // 라벨 프린터
-                    isPrintOpen02 = getPrinterInstance02().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
+                    getPrinterInstance02().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
                 }
             }
         }else {
@@ -1056,7 +1053,7 @@ public class MainActivity extends AppCompatActivity {
 
         mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
 
-        if (isPrintOpen) {
+        if (getPrinterInstance().isOpen()) {
             Log.d(TAG, "P-printer open!!!");
 
             prtAmount = "2,700"; // 금액
@@ -1146,7 +1143,7 @@ public class MainActivity extends AppCompatActivity {
 
         mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
 
-        if (isPrintOpen02) {
+        if (getPrinterInstance02().isOpen()) {
             Log.d(TAG, "P-printer02 open!!!");
 
             String strData = "";

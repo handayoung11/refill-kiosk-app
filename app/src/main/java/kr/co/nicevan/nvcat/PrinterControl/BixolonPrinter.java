@@ -139,7 +139,9 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     private String mAddress;
 
     private UserListener userListener;
+
     private boolean completed = false;
+    private boolean open = false;
 
     public interface UserListener{
         public void onPrintEventErrorOccurred(int eventCode);
@@ -196,7 +198,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
                     mPortType = portType;
                     mAddress = address;
-                    return true;
+                    return open = true;
                 } catch (JposException e) {
                     e.printStackTrace();
                     Log.d(TAG, "JposException0:" + e.getMessage());
@@ -209,7 +211,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
                 }
             }
         }
-        return false;
+        return open = false;
     }
 
     public boolean printerClose() {
@@ -1943,5 +1945,9 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     public boolean isCompleted() {
         return completed;
+    }
+
+    public boolean isOpen() {
+        return open;
     }
 }
