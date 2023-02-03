@@ -591,6 +591,9 @@ public class MainActivity extends AppCompatActivity {
         int tax = Integer.parseInt(payAmount) * 10 / 110; // 부가세
 
         // 결제정보 세팅
+        // reqType: 거래구분 (승인:0200, 취소:0420)
+        String spReqStyle = "10"; //거래유형
+        // wcc: WCC(카드:I, FALLBACK:F)
         String spAmount = payAmount; // 거래금액
         String spTax = String.valueOf(tax); // 부가세
         String spBongsa = "0"; // 봉사료
@@ -605,40 +608,17 @@ public class MainActivity extends AppCompatActivity {
         String spSigndata = ""; // 서명데이터 (NVCAT 모듈에서 알아서 전송)
 
         // 전문데이터 세팅
-        String senddata = "";
-        senddata = senddata + reqType + fs; // 거래구분 (승인:0200, 취소:0420)
-        senddata = senddata + "10" + fs; // 거래유형 (신용:10)
-        senddata = senddata + wcc + fs; // WCC(카드:I, FALLBACK:F)
-        senddata = senddata + spAmount + fs; // 거래금액
-        senddata = senddata + spTax + fs; // 부가세
-        senddata = senddata + spBongsa + fs; // 봉사료
-        senddata = senddata + spHalbu + fs; // 할부
-        senddata = senddata + spAgreenum + fs; // 승인번호
-        senddata = senddata + spAgreedate + fs; // 원거래일자(YYMMDD)
-        senddata = senddata + CATID + fs; // CATID
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + spMyunse + fs; // 면세금액
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + spTxtnum + fs; // 전문관리번호(CATID(10) + MMDDhhmmss)
-        senddata = senddata + spFiller + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + spTxt + fs; // 전문TEXT
-        senddata = senddata + spDevicegb + fs; // 기종구분
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + spSigndata + fs; // 서명데이터
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
-        senddata = senddata + "" + fs;
+        String sendDataArr[] = {reqType, spReqStyle, wcc, spAmount, spTax, spBongsa, spHalbu, spAgreenum, spAgreedate, CATID, "",
+        "", "", spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
+        StringBuilder sendData = new StringBuilder();
+
+        for (int i = 0; i < sendDataArr.length; i++) {
+            sendData.append(sendDataArr);
+            sendData.append(fs);
+        }
 
         // 전문 전송
-        send(senddata);
+        send(sendData.toString());
     }
 
     /**
@@ -930,7 +910,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap stringBitmap = stringToBitmap(signImgString);
             getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
 
-            getPrinterInstance().cutPaper();
+//            getPrinterInstance().cutPaper();
 
 
             /**
@@ -1003,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
 
             getPrinterInstance02().printText(strData, alignment, attribute, (spinnerSize + 1));
 
-            getPrinterInstance02().formFeed();
+//            getPrinterInstance02().formFeed();
 
         } else {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
