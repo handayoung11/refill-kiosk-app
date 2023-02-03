@@ -1,46 +1,34 @@
-package kr.co.nicevan.nvcat;
+package kr.co.nicevan.nvcat.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-public class Dialog100 extends Dialog {
+import kr.co.nicevan.nvcat.R;
+
+public class Dialog400 extends Dialog {
 
     String TAG = this.getClass().getSimpleName();
 
     private Context context;
     private DialogListener dialogListener;
 
-    String curReqType = ""; // 현재 거래구분(승인/취소)
-    String payType = ""; // 결제방법(신용카드/삼성페이)
-
-    public Dialog100(@NonNull Context context, String curReqType){
+    public Dialog400(@NonNull Context context){
         super(context);
         this.context = context;
-        this.curReqType = curReqType;
     }
 
     public interface DialogListener{
-        public void onPositiveClicked(String data);
+        public void onPositiveClicked();
         public void onNegativeClicked();
-        public void onClickedBtn01();
-        public void onClickedBtn02();
-        public void choPayType(String payType);
     }
 
     public void setDialogListener(DialogListener dialogListener){
@@ -50,7 +38,7 @@ public class Dialog100 extends Dialog {
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
-        setContentView(R.layout.dialog_100);
+        setContentView(R.layout.dialog_400);
 
         // 다이얼로그 사이즈 조정
         Display display = getWindow().getWindowManager().getDefaultDisplay();
@@ -63,18 +51,6 @@ public class Dialog100 extends Dialog {
         layoutParams.height = (int) (size.y * 0.8f);
         getWindow().setAttributes(layoutParams);
 
-        TextView tv_title = (TextView)findViewById(R.id.tv_title);
-        Button btn_01 = (Button)findViewById(R.id.btn_01);
-        Button btn_02 = (Button)findViewById(R.id.btn_02);
-        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
-
-        if(curReqType.equals(CommonUtil._승인요청)) {
-            tv_title.setText("결제 방법 선택");
-            btn_cancel.setText("결 제 취 소");
-        }else if(curReqType.equals(CommonUtil._취소요청)){
-            tv_title.setText("승인취소 방법 선택");
-            btn_cancel.setText("승인취소종료");
-        }
 
         Button btn_ok = (Button)findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
@@ -83,32 +59,10 @@ public class Dialog100 extends Dialog {
             }
         });
 
-        // 결제취소
+        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogListener.onNegativeClicked();
-                dismiss();
-            }
-        });
-
-        // 신용카드 선택
-        btn_01.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                payType = CommonUtil._신용카드;
-                dialogListener.choPayType(payType);
-                dismiss();
-            }
-        });
-
-        // 삼성페이 선택
-        btn_02.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                payType = CommonUtil._삼성페이;
-                dialogListener.choPayType(payType);
-                dismiss();
             }
         });
     }
@@ -130,4 +84,5 @@ public class Dialog100 extends Dialog {
 
     public void setData(String data){
     }
+
 }

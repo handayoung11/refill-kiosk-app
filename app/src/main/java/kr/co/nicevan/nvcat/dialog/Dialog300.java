@@ -1,4 +1,4 @@
-package kr.co.nicevan.nvcat;
+package kr.co.nicevan.nvcat.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,17 +9,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-public class Dialog400 extends Dialog {
+import kr.co.nicevan.nvcat.R;
+
+public class Dialog300 extends Dialog {
 
     String TAG = this.getClass().getSimpleName();
 
     private Context context;
     private DialogListener dialogListener;
 
-    public Dialog400(@NonNull Context context){
+    public Dialog300(@NonNull Context context){
         super(context);
         this.context = context;
     }
@@ -36,7 +39,7 @@ public class Dialog400 extends Dialog {
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
-        setContentView(R.layout.dialog_400);
+        setContentView(R.layout.dialog_300);
 
         // 다이얼로그 사이즈 조정
         Display display = getWindow().getWindowManager().getDefaultDisplay();
@@ -54,6 +57,8 @@ public class Dialog400 extends Dialog {
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dialogListener.onPositiveClicked();
+                dismiss();
             }
         });
 
@@ -61,6 +66,8 @@ public class Dialog400 extends Dialog {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dialogListener.onNegativeClicked();
+                dismiss();
             }
         });
     }

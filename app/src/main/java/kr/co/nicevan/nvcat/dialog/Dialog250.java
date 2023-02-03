@@ -1,9 +1,8 @@
-package kr.co.nicevan.nvcat;
+package kr.co.nicevan.nvcat.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -16,21 +15,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
-public class Dialog200 extends Dialog {
+import kr.co.nicevan.nvcat.R;
+
+public class Dialog250 extends Dialog {
 
     String TAG = this.getClass().getSimpleName();
 
     private Context context;
     private DialogListener dialogListener;
 
-    String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
-    String payType = ""; // 결제방법(신용카드/삼성페이)
-
-    public Dialog200(@NonNull Context context, String curReqType, String payType){
+    public Dialog250(@NonNull Context context){
         super(context);
         this.context = context;
-        this.curReqType = curReqType;
-        this.payType = payType;
     }
 
     public interface DialogListener{
@@ -45,7 +41,7 @@ public class Dialog200 extends Dialog {
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
-        setContentView(R.layout.dialog_200);
+        setContentView(R.layout.dialog_250);
 
         // 다이얼로그 사이즈 조정
         Display display = getWindow().getWindowManager().getDefaultDisplay();
@@ -62,29 +58,6 @@ public class Dialog200 extends Dialog {
         TextView tv_01 = (TextView)findViewById(R.id.tv_01);
         TextView tv_02 = (TextView)findViewById(R.id.tv_02);
 
-        if(curReqType.equals(CommonUtil._승인요청)){
-            if(payType.equals(CommonUtil._신용카드)) {
-                iv_01.setImageResource(R.drawable.img_01);
-                tv_01.setText(context.getResources().getString(R.string.msg_01));
-                tv_02.setText(context.getResources().getString(R.string.msg_02));
-            }else if(payType.equals(CommonUtil._삼성페이)){
-                iv_01.setImageResource(R.drawable.img_02);
-                tv_01.setText(context.getResources().getString(R.string.msg_01_0));
-                tv_02.setText(context.getResources().getString(R.string.msg_02_0));
-            }
-        }else if(curReqType.equals(CommonUtil._취소요청)){
-            if(payType.equals(CommonUtil._신용카드)) {
-                iv_01.setImageResource(R.drawable.img_01);
-                tv_01.setText(context.getResources().getString(R.string.msg_01));
-                tv_02.setText(context.getResources().getString(R.string.msg_02_01));
-            }else if(payType.equals(CommonUtil._삼성페이)){
-                iv_01.setImageResource(R.drawable.img_02);
-                tv_01.setText(context.getResources().getString(R.string.msg_01_0));
-                tv_02.setText(context.getResources().getString(R.string.msg_02_0_01));
-            }
-        }
-
-
         Button btn_ok = (Button)findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +70,6 @@ public class Dialog200 extends Dialog {
         btn_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Dialog200 - 결제취소");
                 dialogListener.onNegativeClicked();
                 dismiss();
             }

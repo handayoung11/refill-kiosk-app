@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@android:color/transparent"
     android:gravity="center"
-    tools:context=".Dialog400">
+    tools:context=".dialog.Dialog400">
 
     <LinearLayout
         android:layout_width="match_parent"
