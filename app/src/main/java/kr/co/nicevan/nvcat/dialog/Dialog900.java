@@ -1,19 +1,14 @@
 package kr.co.nicevan.nvcat.dialog;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,7 +18,7 @@ import androidx.annotation.NonNull;
 import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.R;
 
-public class Dialog900 extends Dialog {
+public class Dialog900 extends NonCancelableDialog {
 
     String TAG = this.getClass().getSimpleName();
 
@@ -110,21 +105,6 @@ public class Dialog900 extends Dialog {
         });
 
         clockHandler.sendEmptyMessageDelayed(0, 1000);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // OUTSIDE 터치시 닫히지 않도록 처리
-        if(event.getAction() == MotionEvent.ACTION_OUTSIDE){
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        // 네비게이션바 Back 버튼 막기
-        return;
     }
 
     public void setData(String data){

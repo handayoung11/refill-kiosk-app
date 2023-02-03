@@ -1,13 +1,10 @@
 package kr.co.nicevan.nvcat.dialog;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,7 +16,7 @@ import androidx.annotation.NonNull;
 import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.R;
 
-public class Dialog200 extends Dialog {
+public class Dialog200 extends NonCancelableDialog {
 
     String TAG = this.getClass().getSimpleName();
 
@@ -106,21 +103,6 @@ public class Dialog200 extends Dialog {
             }
         });
 
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // OUTSIDE 터치시 닫히지 않도록 처리
-        if(event.getAction() == MotionEvent.ACTION_OUTSIDE){
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        // 네비게이션바 Back 버튼 막기
-        return;
     }
 
     public void setData(String data){

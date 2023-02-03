@@ -388,8 +388,6 @@ public class MainActivity extends AppCompatActivity {
                 payStep200(payType);
             }
         });
-        dialog100.setCanceledOnTouchOutside(false);
-        dialog100.setCancelable(false);
         dialog100.show();
     }
 
@@ -407,8 +405,6 @@ public class MainActivity extends AppCompatActivity {
             public void onNegativeClicked() {
             }
         });
-        dialog900.setCanceledOnTouchOutside(false);
-        dialog900.setCancelable(false);
         dialog900.show();
     }
 
@@ -429,8 +425,6 @@ public class MainActivity extends AppCompatActivity {
                 closePayment(_결제중지);
             }
         });
-        dialog200.setCanceledOnTouchOutside(false);
-        dialog200.setCancelable(false);
         dialog200.show();
     }
 
@@ -450,8 +444,6 @@ public class MainActivity extends AppCompatActivity {
                 closePayment(_결제중지);
             }
         });
-        dialog250.setCanceledOnTouchOutside(false);
-        dialog250.setCancelable(false);
         dialog250.show();
     }
 
@@ -489,8 +481,6 @@ public class MainActivity extends AppCompatActivity {
                 printLabel();
             }
         });
-        dialog300.setCanceledOnTouchOutside(false);
-        dialog300.setCancelable(false);
         dialog300.show();
     }
 
@@ -508,8 +498,6 @@ public class MainActivity extends AppCompatActivity {
             public void onNegativeClicked() {
             }
         });
-        dialog400.setCanceledOnTouchOutside(false);
-        dialog400.setCancelable(false);
         dialog400.show();
     }
 
@@ -527,8 +515,6 @@ public class MainActivity extends AppCompatActivity {
             public void onNegativeClicked() {
             }
         });
-        dialog500.setCanceledOnTouchOutside(false);
-        dialog500.setCancelable(false);
         dialog500.show();
     }
 
