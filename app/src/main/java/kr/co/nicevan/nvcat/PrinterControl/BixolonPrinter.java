@@ -33,13 +33,6 @@ import jpos.events.OutputCompleteListener;
 import jpos.events.StatusUpdateEvent;
 import jpos.events.StatusUpdateListener;
 import kr.co.nicevan.nvcat.MainActivity;
-import kr.co.nicevan.nvcat.Printer.BarcodeFragment;
-import kr.co.nicevan.nvcat.Printer.CashDrawerFragment;
-import kr.co.nicevan.nvcat.Printer.DirectIOFragment;
-import kr.co.nicevan.nvcat.Printer.ImageFragment;
-import kr.co.nicevan.nvcat.Printer.MsrFragment;
-import kr.co.nicevan.nvcat.Printer.PageModeFragment;
-import kr.co.nicevan.nvcat.Printer.TextFragment;
 
 public class BixolonPrinter implements ErrorListener, OutputCompleteListener, StatusUpdateListener, DirectIOListener, DataListener {
 
@@ -1524,15 +1517,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     @Override
     public void directIOOccurred(DirectIOEvent directIOEvent) {
-        Fragment fm = MainActivity.getVisibleFragment();
-        if (fm != null) {
-            if (fm instanceof DirectIOFragment) {
-                ((DirectIOFragment) fm).setDeviceLog("DirectIO: " + directIOEvent + "(" + getBatterStatusString(directIOEvent.getData()) + ")");
-                if (directIOEvent.getObject() != null) {
-                    ((DirectIOFragment) fm).setDeviceLog(new String((byte[]) directIOEvent.getObject()) + "\n");
-                }
-            }
-        }
+
     }
 
     @Override
@@ -1541,36 +1526,6 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
         userListener.onPrintEventErrorOccurred(errorEvent.getErrorCode());
 
-        Fragment fm = MainActivity.getVisibleFragment();
-        if (fm != null) {
-            if (fm instanceof TextFragment) {
-                ((TextFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof ImageFragment) {
-                ((ImageFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof BarcodeFragment) {
-                ((BarcodeFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof PageModeFragment) {
-                ((PageModeFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof DirectIOFragment) {
-                ((DirectIOFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof MsrFragment) {
-                ((MsrFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-
-            if (fm instanceof CashDrawerFragment) {
-                ((CashDrawerFragment) fm).setDeviceLog("Error : " + errorEvent);
-            }
-        }
     }
 
     @Override
@@ -1580,32 +1535,6 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
         userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID());
         completed = true;
 
-        Fragment fm = MainActivity.getVisibleFragment();
-        if (fm != null) {
-            if (fm instanceof TextFragment) {
-                ((TextFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-
-            if (fm instanceof ImageFragment) {
-                ((ImageFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-
-            if (fm instanceof BarcodeFragment) {
-                ((BarcodeFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-
-            if (fm instanceof PageModeFragment) {
-                ((PageModeFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-
-            if (fm instanceof DirectIOFragment) {
-                ((DirectIOFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-
-            if (fm instanceof MsrFragment) {
-                ((MsrFragment) fm).setDeviceLog("outputComplete : " + outputCompleteEvent.getOutputID());
-            }
-        }
     }
 
     @Override
@@ -1614,56 +1543,12 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
         userListener.onPrintEventStatusUpdateOccurred(statusUpdateEvent.getStatus());
 
-        Fragment fm = MainActivity.getVisibleFragment();
-        if (fm != null) {
-            if (fm instanceof TextFragment) {
-                ((TextFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof ImageFragment) {
-                ((ImageFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof BarcodeFragment) {
-                ((BarcodeFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof PageModeFragment) {
-                ((PageModeFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof DirectIOFragment) {
-                ((DirectIOFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof MsrFragment) {
-                ((MsrFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-
-            if (fm instanceof CashDrawerFragment) {
-                ((CashDrawerFragment) fm).setDeviceLog(getSUEMessage(statusUpdateEvent.getStatus()));
-            }
-        }
     }
 
     @Override
     public void dataOccurred(DataEvent dataEvent) {
         Log.d("PrintEvent", "dataOccurred - dataEvent : " + dataEvent.getStatus());
 
-        Fragment fm = MainActivity.getVisibleFragment();
-        if (fm != null) {
-            if (fm instanceof MsrFragment) {
-                String track1Len = Integer.toString(dataEvent.getStatus() & 0xff);
-                String track2Len = Integer.toString((dataEvent.getStatus() & 0xff00) >> 8);
-                String track3Len = Integer.toString((dataEvent.getStatus() & 0xff0000) >> 16);
-
-                String track1 = "Track1(" + track1Len + ") : " + getTrackData(1) + "\n";
-                String track2 = "Track2(" + track2Len + ") : " + getTrackData(2) + "\n";
-                String track3 = "Track3(" + track3Len + ") : " + getTrackData(3) + "\n";
-
-                ((MsrFragment) fm).setDeviceLog(track1 + track2 + track3);
-            }
-        }
     }
 
     private String getERMessage(int status) {

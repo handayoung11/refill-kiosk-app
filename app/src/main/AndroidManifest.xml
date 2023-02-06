@@ -47,11 +47,6 @@
                 android:resource="@xml/device_filter" />
         </activity>
         <activity
-            android:name=".Printer.PrinterConnectActivity"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
             android:name=".BarcodeActivity"
             android:configChanges="orientation|screenSize"
             android:exported="false"

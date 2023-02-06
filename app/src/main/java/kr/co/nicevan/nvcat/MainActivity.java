@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 
-import kr.co.nicevan.nvcat.Printer.TabPagerAdapter;
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.DefaultBixolonPrinterUserListener;
 import kr.co.nicevan.nvcat.dialog.Dialog100;
@@ -73,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
     // 프린터
     private static BixolonPrinter bxlPrinter = null; // 영수증 프린터
     private static BixolonPrinter bxlPrinter02 = null; // 라벨 프린터
-    private static Fragment currentFragment;
-    private static TabPagerAdapter mPagerAdapter = null;
 
     // 전문요청코드
     int SEND_REQUEST_CODE = 1;
@@ -277,11 +274,6 @@ public class MainActivity extends AppCompatActivity {
     }
     public static BixolonPrinter getPrinterInstance02() {
         return bxlPrinter02;
-    }
-
-    public static Fragment getVisibleFragment() {
-        //currentFragment = mPagerAdapter.getRegisteredFragment(currentPosition);
-        return currentFragment;
     }
 
     public class AppUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
