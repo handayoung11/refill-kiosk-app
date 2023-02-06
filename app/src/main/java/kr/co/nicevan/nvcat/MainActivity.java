@@ -606,7 +606,7 @@ public class MainActivity extends AppCompatActivity {
         StringBuilder sendData = new StringBuilder();
 
         for (int i = 0; i < sendDataArr.length; i++) {
-            sendData.append(sendDataArr);
+            sendData.append(sendDataArr[i]);
             sendData.append(fs);
         }
 
