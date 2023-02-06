@@ -3,19 +3,10 @@ package kr.co.nicevan.nvcat.PrinterControl;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-//import androidx.core.app.Fragment;
 import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
-import kr.co.nicevan.nvcat.Printer.BarcodeFragment;
-import kr.co.nicevan.nvcat.Printer.CashDrawerFragment;
-import kr.co.nicevan.nvcat.Printer.DirectIOFragment;
-import kr.co.nicevan.nvcat.Printer.ImageFragment;
-import kr.co.nicevan.nvcat.MainActivity;
-import kr.co.nicevan.nvcat.Printer.MsrFragment;
-import kr.co.nicevan.nvcat.Printer.PageModeFragment;
-import kr.co.nicevan.nvcat.Printer.TextFragment;
 import com.bxl.config.editor.BXLConfigLoader;
 
 import java.nio.ByteBuffer;
@@ -41,6 +32,14 @@ import jpos.events.OutputCompleteEvent;
 import jpos.events.OutputCompleteListener;
 import jpos.events.StatusUpdateEvent;
 import jpos.events.StatusUpdateListener;
+import kr.co.nicevan.nvcat.MainActivity;
+import kr.co.nicevan.nvcat.Printer.BarcodeFragment;
+import kr.co.nicevan.nvcat.Printer.CashDrawerFragment;
+import kr.co.nicevan.nvcat.Printer.DirectIOFragment;
+import kr.co.nicevan.nvcat.Printer.ImageFragment;
+import kr.co.nicevan.nvcat.Printer.MsrFragment;
+import kr.co.nicevan.nvcat.Printer.PageModeFragment;
+import kr.co.nicevan.nvcat.Printer.TextFragment;
 
 public class BixolonPrinter implements ErrorListener, OutputCompleteListener, StatusUpdateListener, DirectIOListener, DataListener {
 
