@@ -252,134 +252,14 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     }
 
     private String getProductName(String name) {
-        String productName = BXLConfigLoader.PRODUCT_NAME_SPP_R200II;
+        String productName = "";
 
-        if ((name.equals("SPP-R200III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R200III;
-        } else if ((name.equals("SPP-R210"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R210;
-        } else if ((name.equals("SPP-R215"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R215;
-        } else if ((name.equals("SPP-R220"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R220;
-        } else if ((name.equals("SPP-C200"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_C200;
-        } else if ((name.equals("SPP-R300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R300;
-        } else if ((name.equals("SPP-R310"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R310;
-        } else if ((name.equals("SPP-R318"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R318;
-        } else if ((name.equals("SPP-C300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_C300;
-        } else if ((name.equals("SPP-R400"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R400;
-        } else if ((name.equals("SPP-R410"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R410;
-        } else if ((name.equals("SPP-R418"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_R418;
-        } else if ((name.equals("SPP-100II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_100II;
-        } else if ((name.equals("SRP-350IIOBE"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_350IIOBE;
-        } else if ((name.equals("SRP-350III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_350III;
-        } else if ((name.equals("SRP-352III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_352III;
-        } else if ((name.equals("SRP-350V"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_350V;
-        } else if ((name.equals("SRP-352V"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_352V;
-        } else if ((name.equals("SRP-350plusIII"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_350PLUSIII;
-        } else if ((name.equals("SRP-352plusIII"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_352PLUSIII;
-        } else if ((name.equals("SRP-350plusV"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_350PLUSV;
-        } else if ((name.equals("SRP-352plusV"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_352PLUSV;
-        } else if ((name.equals("SRP-380"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_380;
-        } else if ((name.equals("SRP-382"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_382;
-        } else if ((name.equals("SRP-383"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_383;
-        } else if ((name.equals("SRP-380II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_380II;
-        } else if ((name.equals("SRP-382II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_382II;
-        } else if ((name.equals("SRP-340II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_340II;
-        } else if ((name.equals("SRP-342II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_342II;
-        } else if ((name.equals("SRP-Q200"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_Q200;
-        } else if ((name.equals("SRP-Q300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_Q300;
-        } else if ((name.equals("SRP-Q302"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_Q302;
-        } else if ((name.equals("SRP-QE300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_QE300;
-        } else if ((name.equals("SRP-QE302"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_QE302;
-        } else if ((name.equals("SRP-E300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_E300;
-        } else if ((name.equals("SRP-E302"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_E302;
-        } else if ((name.equals("SRP-B300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_B300;
-        } else if ((name.equals("SRP-330II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_330II;
-        } else if ((name.equals("SRP-332II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_332II;
-        } else if ((name.equals("SRP-330III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_330III;
-        } else if ((name.equals("SRP-332III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_332III;
-        } else if ((name.equals("SRP-S200"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_S200;
-        } else if ((name.equals("SRP-S300"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_S300;
-        } else if ((name.equals("SRP-S320"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_S320;
-        } else if ((name.equals("SRP-S3000"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_S3000;
-        } else if ((name.equals("SRP-F310"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_F310;
-        } else if ((name.equals("SRP-F312"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_F312;
-        } else if ((name.equals("SRP-F310II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_F310II;
-        } else if ((name.equals("SRP-F312II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_F312II;
-        } else if ((name.equals("SRP-F313II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_F313II;
-        } else if ((name.equals("SRP-275III"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SRP_275III;
-        } else if ((name.equals("BK3-2"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_BK3_2;
-        } else if ((name.equals("BK3-3"))) {
+        if ((name.equals("BK3-3"))) { //영수증 프린터
             productName = BXLConfigLoader.PRODUCT_NAME_BK3_3;
-        } else if ((name.equals("BK5-3"))) {
+        } else if ((name.equals("BK5-3"))) { //라벨 프린터
             productName = BXLConfigLoader.PRODUCT_NAME_BK5_3;
-        } else if ((name.equals("SMB6350"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SMB6350;
-        } else if ((name.equals("SLP X-Series"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SLP_X_SERIES;
-        } else if ((name.equals("SLP-DX420"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SLP_DX420;
-        } else if ((name.equals("SPP-L410II"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SPP_L410II;
-        } else if ((name.equals("XM7-40"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_XM7_40;
-        } else if ((name.equals("MSR"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_MSR;
-        } else if ((name.equals("CashDrawer"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_CASH_DRAWER;
-        } else if ((name.equals("LocalSmartCardRW"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_LOCAL_SMART_CARD_RW;
-        } else if ((name.equals("SmartCardRW"))) {
-            productName = BXLConfigLoader.PRODUCT_NAME_SMART_CARD_RW;
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 타입의 프린터입니다.");
         }
 
         return productName;
