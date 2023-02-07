@@ -5,8 +5,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.fragment.app.Fragment;
-
 import com.bxl.config.editor.BXLConfigLoader;
 
 import java.nio.ByteBuffer;
@@ -32,7 +30,6 @@ import jpos.events.OutputCompleteEvent;
 import jpos.events.OutputCompleteListener;
 import jpos.events.StatusUpdateEvent;
 import jpos.events.StatusUpdateListener;
-import kr.co.nicevan.nvcat.MainActivity;
 
 public class BixolonPrinter implements ErrorListener, OutputCompleteListener, StatusUpdateListener, DirectIOListener, DataListener {
 
@@ -130,15 +127,16 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     private int mPortType;
     private String mAddress;
 
+    private PrinterType type;
     private UserListener userListener;
 
     private boolean completed = false;
     private boolean open = false;
 
     public interface UserListener{
-        public void onPrintEventErrorOccurred(int eventCode);
-        public void onPrintEventOutputCompleteOccurred(int eventCode);
-        public void onPrintEventStatusUpdateOccurred(int eventCode);
+        public void onPrintEventErrorOccurred(int eventCode, BixolonPrinter printer);
+        public void onPrintEventOutputCompleteOccurred(int eventCode, BixolonPrinter printer);
+        public void onPrintEventStatusUpdateOccurred(int eventCode, BixolonPrinter printer);
     }
 
     public void setUserListener(UserListener userListener){
@@ -248,8 +246,10 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
         if ((name.equals("BK3-3"))) { //영수증 프린터
             productName = BXLConfigLoader.PRODUCT_NAME_BK3_3;
+            type = PrinterType.RECEIPT;
         } else if ((name.equals("BK5-3"))) { //라벨 프린터
             productName = BXLConfigLoader.PRODUCT_NAME_BK5_3;
+            type = PrinterType.LABEL;
         } else {
             throw new IllegalArgumentException("지원하지 않는 타입의 프린터입니다.");
         }
@@ -1524,7 +1524,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     public void errorOccurred(ErrorEvent errorEvent) {
         Log.d("PrintEvent", "errorOccurred - errorEvent : " + errorEvent.getErrorCode());
 
-        userListener.onPrintEventErrorOccurred(errorEvent.getErrorCode());
+        userListener.onPrintEventErrorOccurred(errorEvent.getErrorCode(), this);
 
     }
 
@@ -1532,7 +1532,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     public void outputCompleteOccurred(OutputCompleteEvent outputCompleteEvent) {
         Log.d("PrintEvent", "outputCompleteOccurred - outputCompleteEvent : " + outputCompleteEvent.getOutputID());
 
-        userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID());
+        userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID(), this);
         completed = true;
 
     }
@@ -1541,7 +1541,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     public void statusUpdateOccurred(StatusUpdateEvent statusUpdateEvent) {
         Log.d("PrintEvent", "statusUpdateOccurred - statusUpdateEvent : " + statusUpdateEvent.getStatus());
 
-        userListener.onPrintEventStatusUpdateOccurred(statusUpdateEvent.getStatus());
+        userListener.onPrintEventStatusUpdateOccurred(statusUpdateEvent.getStatus(), this);
 
     }
 
@@ -1713,5 +1713,13 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
 
     public boolean isOpen() {
         return open;
+    }
+
+    public PrinterType getType() {
+        return type;
+    }
+
+    public Context getContext() {
+        return context;
     }
 }

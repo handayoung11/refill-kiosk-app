@@ -1,6 +1,17 @@
 package kr.co.nicevan.nvcat;
 
-import static kr.co.nicevan.nvcat.CommonUtil.*;
+import static kr.co.nicevan.nvcat.CommonUtil.CATID;
+import static kr.co.nicevan.nvcat.CommonUtil._IC카드;
+import static kr.co.nicevan.nvcat.CommonUtil._MS카드;
+import static kr.co.nicevan.nvcat.CommonUtil._결제중지;
+import static kr.co.nicevan.nvcat.CommonUtil._대기종료;
+import static kr.co.nicevan.nvcat.CommonUtil._승인요청;
+import static kr.co.nicevan.nvcat.CommonUtil._승인응답;
+import static kr.co.nicevan.nvcat.CommonUtil._취소요청;
+import static kr.co.nicevan.nvcat.CommonUtil._취소응답;
+import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
+import static kr.co.nicevan.nvcat.CommonUtil.convertCommaDecimalFormat;
+import static kr.co.nicevan.nvcat.CommonUtil.stringToBitmap;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +36,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
@@ -162,36 +172,7 @@ public class MainActivity extends AppCompatActivity {
         webView2.loadUrl("https://refillcycle.com/kiosk/webview");
         // webView2 End =============================================================
 
-        // 영수증 프린터
-        bxlPrinter = new BixolonPrinter(getApplicationContext());
-        bxlPrinter.setUserListener(new DefaultBixolonPrinterUserListener("PrintEvent01") {
-            @Override
-            public void onPrintEventOutputCompleteOccurred(int eventCode) {
-                Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
-            }
-        });
-
-        // 라벨 프린터
-        bxlPrinter02 = new BixolonPrinter(getApplicationContext());
-        bxlPrinter02.setUserListener(new DefaultBixolonPrinterUserListener("PrintEvent02") {
-            @Override
-            public void onPrintEventOutputCompleteOccurred(int eventCode) {
-                Log.d(TagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
-
-                // 프린터 출력중 팝업 닫기
-                if (dialog400 != null && dialog400.isShowing()) {
-                    dialog400.dismiss();
-                }
-
-                runOnUiThread(() -> {
-                        Log.d(TAG, "출력 완료");
-                        // 출력완료 팝업
-                        popDialog500();
-                });
-            }
-        });
-
-        printOpen(); // 영수증 & 라벨 프린터 오픈
+        initPrinter();
 
         /**
          * 결제요청 (결제방법선택)
@@ -252,6 +233,20 @@ public class MainActivity extends AppCompatActivity {
                 strPathLOG,
                 "bixolon.log");
 
+    }
+
+    private void initPrinter() {
+        DefaultBixolonPrinterUserListener listener = new DefaultBixolonPrinterUserListener();
+
+        // 영수증 프린터
+        bxlPrinter = new BixolonPrinter(this);
+        bxlPrinter.setUserListener(listener);
+
+        // 라벨 프린터
+        bxlPrinter02 = new BixolonPrinter(this);
+        bxlPrinter02.setUserListener(listener);
+
+        printOpen(); // 영수증 & 라벨 프린터 오픈
     }
 
     @Override
