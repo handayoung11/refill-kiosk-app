@@ -1532,8 +1532,8 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
     public void outputCompleteOccurred(OutputCompleteEvent outputCompleteEvent) {
         Log.d("PrintEvent", "outputCompleteOccurred - outputCompleteEvent : " + outputCompleteEvent.getOutputID());
 
-        userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID(), this);
         completed = true;
+        userListener.onPrintEventOutputCompleteOccurred(outputCompleteEvent.getOutputID(), this);
 
     }
 
