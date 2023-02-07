@@ -11,14 +11,14 @@ import static kr.co.nicevan.nvcat.CommonUtil._취소요청;
 import static kr.co.nicevan.nvcat.CommonUtil._취소응답;
 import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.convertCommaDecimalFormat;
-import static kr.co.nicevan.nvcat.CommonUtil.stringToBitmap;
+import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.LABEL;
+import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.usb.UsbDevice;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -38,9 +38,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bixolon.commonlib.BXLCommonConst;
-import com.bixolon.commonlib.connectivity.searcher.BXLUsbDevice;
 import com.bixolon.commonlib.log.LogService;
-import com.bxl.config.editor.BXLConfigLoader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,10 +46,8 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
-import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
-import kr.co.nicevan.nvcat.PrinterControl.DefaultBixolonPrinterUserListener;
+import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.dialog.Dialog100;
 import kr.co.nicevan.nvcat.dialog.Dialog200;
 import kr.co.nicevan.nvcat.dialog.Dialog250;
@@ -61,9 +57,12 @@ import kr.co.nicevan.nvcat.dialog.Dialog500;
 import kr.co.nicevan.nvcat.dialog.Dialog900;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
+import kr.co.nicevan.nvcat.dto.PrinterDTO;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
+import kr.co.nicevan.nvcat.service.PrinterService;
+import kr.co.nicevan.nvcat.service.PrinterServiceImpl;
 import kr.co.nicevan.nvcat.service.ReceiptService;
 import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
@@ -78,10 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
     RoomDB db;
     PaymentDao paymentDao;
-
-    // 프린터
-    private static BixolonPrinter bxlPrinter = null; // 영수증 프린터
-    private static BixolonPrinter bxlPrinter02 = null; // 라벨 프린터
 
     // 전문요청코드
     int SEND_REQUEST_CODE = 1;
@@ -124,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     //RetrofitService DI.
     ReceiptService receiptService = new ReceiptServiceImpl();
+    PrinterService printerService = new PrinterServiceImpl();
 
     //카드관련 응답데이터 setDTO.
     CardDTO cardInfo = new CardDTO();
@@ -172,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         webView2.loadUrl("https://refillcycle.com/kiosk/webview");
         // webView2 End =============================================================
 
-        initPrinter();
+        PrinterManager.init(this);
 
         /**
          * 결제요청 (결제방법선택)
@@ -235,22 +231,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void initPrinter() {
-        DefaultBixolonPrinterUserListener listener = new DefaultBixolonPrinterUserListener();
-
-        // 영수증 프린터
-        bxlPrinter = new BixolonPrinter(this);
-        bxlPrinter.setUserListener(listener);
-
-        // 라벨 프린터
-        bxlPrinter02 = new BixolonPrinter(this);
-        bxlPrinter02.setUserListener(listener);
-
-        printOpen(); // 영수증 & 라벨 프린터 오픈
-    }
-
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
 
         //hideSystemUI(); // 전체화면
@@ -259,17 +241,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        getPrinterInstance().printerClose();
-        getPrinterInstance02().printerClose();
+        printerService.closeAll();
     }
 
-
-    public static BixolonPrinter getPrinterInstance() {
-        return bxlPrinter;
-    }
-    public static BixolonPrinter getPrinterInstance02() {
-        return bxlPrinter02;
-    }
 
     public class AppUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
         @Override
@@ -304,16 +278,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void requestPayment(String reqType, String amount, String orderNo, String userId, String agreenum, String agreedate){
+        public void requestPayment(String reqType, String amount, String orderNo, String userId, String agreenum, String agreedate) {
             /*
             WEB 자바스크립트에서 아래 형태로 호출
             android.requestPayment('승인', '3000', '2301101234', '01011112222', '', '');
             */
 
             // 현재 거래구분(승인/취소)
-            if(reqType.equals("승인")) {
+            if (reqType.equals("승인")) {
                 curReqType = _승인요청;
-            }else if(reqType.equals("취소")) {
+            } else if (reqType.equals("취소")) {
                 curReqType = _취소요청;
             }
 
@@ -322,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
             payUserId = userId; // 주문자 고유 아이디
             payAgreenum = agreenum; // 승인번호 (취소요청시만 해당)
 
-            if(agreedate.length() >= 6) {
-                payAgreedate = agreedate.substring(0,6); // 원거래일자(YYMMDD) (취소요청시만 해당)
+            if (agreedate.length() >= 6) {
+                payAgreedate = agreedate.substring(0, 6); // 원거래일자(YYMMDD) (취소요청시만 해당)
             }
 
             // 결제방법 선택 팝업
@@ -351,26 +325,30 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog100 (결제방법)
      */
-    public void popDialog100(){
+    public void popDialog100() {
 
         dialog100 = new Dialog100(MainActivity.this, curReqType);
         dialog100.setDialogListener(new Dialog100.DialogListener() {
             @Override
             public void onPositiveClicked(String data) {
             }
+
             @Override
             public void onNegativeClicked() {
                 // 결제종료
                 closePayment(_결제중지);
             }
+
             @Override
-            public void onClickedBtn01(){
+            public void onClickedBtn01() {
             }
+
             @Override
-            public void onClickedBtn02(){
+            public void onClickedBtn02() {
             }
+
             @Override
-            public void choPayType(String payType){
+            public void choPayType(String payType) {
                 // 카드투입 요청
                 payStep200(payType);
             }
@@ -381,13 +359,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog900 (결제종료)
      */
-    public void popDialog900(String curReqType, String cancelType){
+    public void popDialog900(String curReqType, String cancelType) {
 
         dialog900 = new Dialog900(MainActivity.this, curReqType, cancelType);
         dialog900.setDialogListener(new Dialog900.DialogListener() {
             @Override
             public void onPositiveClicked() {
             }
+
             @Override
             public void onNegativeClicked() {
             }
@@ -398,13 +377,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog200 (결제요청 대기)
      */
-    public void popDialog200(String payType){
+    public void popDialog200(String payType) {
 
         dialog200 = new Dialog200(MainActivity.this, curReqType, payType);
         dialog200.setDialogListener(new Dialog200.DialogListener() {
             @Override
             public void onPositiveClicked(String data) {
             }
+
             @Override
             public void onNegativeClicked() {
                 Log.d(TAG, "popDialog200 - 결제중지");
@@ -418,13 +398,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog250 (MS결제요청 대기)
      */
-    public void popDialog250(){
+    public void popDialog250() {
 
         dialog250 = new Dialog250(MainActivity.this);
         dialog250.setDialogListener(new Dialog250.DialogListener() {
             @Override
             public void onPositiveClicked(String data) {
             }
+
             @Override
             public void onNegativeClicked() {
                 // 결제종료
@@ -437,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog300 (결제완료/영수증 출력)
      */
-    public void popDialog300(){
+    public void popDialog300() {
         Log.d(TAG, "popDialog300()");
 
         dialog300 = new Dialog300(MainActivity.this);
@@ -448,9 +429,10 @@ public class MainActivity extends AppCompatActivity {
                 //popDialog400();
 
                 // 프린트용 데이터 초기화
-                getPrinterInstance().resetPrintData();
-                getPrinterInstance02().resetPrintData();
-                prtAmount = ""; prtTax = ""; prtTotAmount = "";
+                printerService.resetPrintData();
+                prtAmount = "";
+                prtTax = "";
+                prtTotAmount = "";
                 cardInfo = new CardDTO();
 
                 // 영수증 출력
@@ -459,6 +441,7 @@ public class MainActivity extends AppCompatActivity {
                 // 라벨 출력
                 printLabel();
             }
+
             @Override
             public void onNegativeClicked() {
                 // 프린터 출력중 팝업
@@ -474,13 +457,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog400 (프린터 출력중)
      */
-    public void popDialog400(){
+    public void popDialog400() {
 
         dialog400 = new Dialog400(MainActivity.this);
         dialog400.setDialogListener(new Dialog400.DialogListener() {
             @Override
             public void onPositiveClicked() {
             }
+
             @Override
             public void onNegativeClicked() {
             }
@@ -491,13 +475,14 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 팝업 Dialog500 (영수증 출력완료)
      */
-    public void popDialog500(){
+    public void popDialog500() {
 
-        dialog500 = new Dialog500(MainActivity.this, getPrinterInstance().isCompleted(), getPrinterInstance02().isCompleted());
+        dialog500 = new Dialog500(MainActivity.this, printerService.isCompleted(RECEIPT), printerService.isCompleted(LABEL));
         dialog500.setDialogListener(new Dialog500.DialogListener() {
             @Override
             public void onPositiveClicked() {
             }
+
             @Override
             public void onNegativeClicked() {
             }
@@ -528,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 결제단계 200 (결제요청)
      */
-    public void payStep200(String payType){
+    public void payStep200(String payType) {
 
         this.curPayType = payType;
 
@@ -542,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 결제단계 250 (MS 결제요청)
      */
-    public void payStep250(){
+    public void payStep250() {
         // MS결제요청 대기 팝업
         popDialog250();
 
@@ -554,7 +539,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * IC결제요청
      */
-    public void reqPayment(String reqType, String wcc){
+    public void reqPayment(String reqType, String wcc) {
 
         Log.d(TAG, "reqType:" + reqType + ", wcc:" + wcc);
 
@@ -589,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 전문데이터 세팅
         String sendDataArr[] = {reqType, spReqStyle, wcc, spAmount, spTax, spBongsa, spHalbu, spAgreenum, spAgreedate, CATID, "",
-        "", "", spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
+                "", "", spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
         StringBuilder sendData = new StringBuilder();
 
         for (int i = 0; i < sendDataArr.length; i++) {
@@ -603,6 +588,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 전문데이터 전송
+     *
      * @param senddata
      */
     private void send(String senddata) {
@@ -618,6 +604,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 전문 응답
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -650,35 +637,36 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "RESULT_OK", Toast.LENGTH_SHORT).show();
 
                 // 요청정상처리
-                if(NVCAT_RETURN_CODE == 1) {
+                if (NVCAT_RETURN_CODE == 1) {
                     // 응답 전문 데이터 추출
                     RecvFS(NVCAT_RECV_DATA);
                 }
 
-            // resultCode == 0
+                // resultCode == 0
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(getApplicationContext(), "RESULT_CANCELED", Toast.LENGTH_SHORT).show();
 
                 // IC 카드리딩실패 (타임아웃)
-                if(NVCAT_RETURN_CODE == -7) {
+                if (NVCAT_RETURN_CODE == -7) {
                     // 결제중지
                     closePayment(_대기종료);
                 }
 
                 // FALLBACK 발생 - NVCATRETURNCODE : -9, NVCATRECVDATA : FALLBACK 재시도 사용 안함
-                if(NVCAT_RETURN_CODE == -9) {
+                if (NVCAT_RETURN_CODE == -9) {
                     // MS 거래 요청
                     payStep250();
                 }
             }
 
-        }else{
+        } else {
             Log.d(TAG, "onActivityResult() - requestCode != SEND_REQUEST_CODE");
         }
     }
 
     /**
      * 응답 전문 데이터 추출
+     *
      * @param recvdata
      */
     private void RecvFS(String recvdata) {
@@ -759,23 +747,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 승인요청 정상처리
-        if(rstResCode.equals("0000") && rstReqType.equals(_승인응답) ) {
+        if (rstResCode.equals("0000") && rstReqType.equals(_승인응답)) {
             // 응답 거래구분 (승인 : 0210)
             Log.d(TAG, "결제승인 정상 응답");
             rstResult = "정상승인"; // 코드화 할 것
 
-        // 취소요청 정상처리
-        }else if(rstResCode.equals("0000") && rstReqType.equals(_취소응답) ){
+            // 취소요청 정상처리
+        } else if (rstResCode.equals("0000") && rstReqType.equals(_취소응답)) {
             // 응답 거래구분 (취소 : 0430)
             Log.d(TAG, "승인취소 정상 응답");
             rstResult = "정상취소"; // 코드화 할 것
 
-        }else{
+        } else {
             Log.d(TAG, "결제승인 비정상 응답");
             rstResult = "비정상"; // 코드화 할 것
         }
 
-        if(rstResCode.equals("0000") ){
+        if (rstResCode.equals("0000")) {
 
             // 로컬DB 저장
             new Thread(new Runnable() {
@@ -820,84 +808,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 프린터 오픈
-     */
-    public void printOpen(){
-
-        int portType = BXLConfigLoader.DEVICE_BUS_USB;
-        Boolean checkBoxAsyncMode = true;
-
-        Set<UsbDevice> usbDevices = BXLUsbDevice.refreshUsbDevicesList(this, false);
-        if (usbDevices != null && !usbDevices.isEmpty()) {
-            for (UsbDevice device : usbDevices) {
-                //logical name
-                String productName = device.getProductName();
-                //address
-                String deviceName = device.getDeviceName();
-
-                if(productName.equals("BK3-3")){ // 영수증 프린터
-                    getPrinterInstance().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
-                }
-
-                if(productName.equals("BK5-3")){ // 라벨 프린터
-                    getPrinterInstance02().printerOpen(portType, productName, deviceName, checkBoxAsyncMode);
-                }
-            }
-        }else {
-            Log.d(TAG, "Not found USB devices");
-        }
-    }
-
-    /**
      * 영수증 출력
      */
-    public void printReceipt(String approvalNo){
-
-        mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
-
-        if (getPrinterInstance().isOpen()) {
-            Log.d(TAG, "P-printer open!!!");
-
-            prtAmount = "2,700"; // 금액
-            prtTax = "300"; // 부가세
-            prtTotAmount = "3,000"; // 합계금액
-
-            String strData = "";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "====================\n";
-            strData = strData + "영 수 증\n";
-            strData = strData + "금  액 : " + prtAmount + "원\n";
-            strData = strData + "부가세 : " + prtTax + "원\n";
-            strData = strData + "합  계 : " + prtTotAmount + "원\n";
-            strData = strData + "====================";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "\n";
-            strData = strData + "\n";
-
-            int alignment = 1;
-            int attribute = 1;
-            int spinnerSize = 0;
-
-            Log.d(TAG, "P-strData : " + strData);
-            Log.d(TAG, "P-alignment : " + alignment);
-            Log.d(TAG, "P-attribute : " + attribute);
-            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
-
-            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
-
-            Bitmap stringBitmap = stringToBitmap(signImgString);
-            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
-
-            getPrinterInstance().cutPaper();
+    public void printReceipt(String approvalNo) {
+        mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
 
 
-            /**
-             * <프린터 출력 기능 개발완료>
-             * 개발환경이 상이하여 해당 코드 사용시 일부 환경에서 error 발생됨.
-             * 개발완료한 코드 우선 주석처리.
-             */
+        prtAmount = "2,700"; // 금액
+        prtTax = "300"; // 부가세
+        prtTotAmount = "3,000"; // 합계금액
+        boolean printed = printerService.printCommonReceipt(new PrinterDTO.CommonReceipt(prtAmount, prtTax, prtTotAmount, signImgString));
+
+        if (!printed) {
+            mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
+        }
+        /**
+         * <프린터 출력 기능 개발완료>
+         * 개발환경이 상이하여 해당 코드 사용시 일부 환경에서 error 발생됨.
+         * 개발완료한 코드 우선 주석처리.
+         */
 //            RequestDTO.ReceiptDTO request = new RequestDTO.ReceiptDTO();
 //            request.setApprovalNo(approvalNo);
 //            receiptService.printReceiptByOrder(
@@ -933,39 +862,17 @@ public class MainActivity extends AppCompatActivity {
 //                            Log.d(this.getClass().getSimpleName(), throwable.toString());
 //                        }
 //                    });
-        } else {
-            mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
-        }
     }
 
     /**
      * 라벨 출력
      */
-    public void printLabel(){
+    public void printLabel() {
 
-        mToastHandler.obtainMessage(0,0,0,"print Start").sendToTarget();
+        mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
 
-        if (getPrinterInstance02().isOpen()) {
-            Log.d(TAG, "P-printer02 open!!!");
-
-            String strData = "";
-            strData = strData + "====================\n";
-            strData = strData + "라벨출력\n";
-
-            int alignment = 1;
-            int attribute = 1;
-            int spinnerSize = 0;
-
-            Log.d(TAG, "P-strData : " + strData);
-            Log.d(TAG, "P-alignment : " + alignment);
-            Log.d(TAG, "P-attribute : " + attribute);
-            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
-
-            getPrinterInstance02().printText(strData, alignment, attribute, (spinnerSize + 1));
-
-            getPrinterInstance02().formFeed();
-
-        } else {
+        boolean printed = printerService.printCommonLabel(new PrinterDTO.CommonLabel());
+        if (!printed) {
             mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
         }
     }
@@ -974,7 +881,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 결제결과 WEB 전달
      */
-    public void returnPaymentResult(String rstResult, String rstAmount, String rstOrderNo, String rstUserId, String rstAgreenum, String rstAgreedate, String rstJson){
+    public void returnPaymentResult(String rstResult, String rstAmount, String rstOrderNo, String rstUserId, String rstAgreenum, String rstAgreedate, String rstJson) {
         Log.d(TAG, "returnPayResult()");
 
         // 결제결과 전달
@@ -1020,7 +927,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 사인 이미지 인코딩 문자 가져오기
      */
-    public String getSignBitmapString(){
+    public String getSignBitmapString() {
 
         String bitmapString = ""; // 변환된 인코딩 문자
 
@@ -1056,7 +963,7 @@ public class MainActivity extends AppCompatActivity {
                 f.delete();
             }
 
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "Exception : " + e.getMessage());
             return "";
         }
@@ -1073,7 +980,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    public void testFunction(){
+    public void testFunction() {
     }
 
 }
