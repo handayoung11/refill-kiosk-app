@@ -1,9 +1,5 @@
 package kr.co.nicevan.nvcat;
 
-import static kr.co.nicevan.nvcat.CommonUtil.CATID;
-import static kr.co.nicevan.nvcat.CommonUtil._IC카드;
-import static kr.co.nicevan.nvcat.CommonUtil._MS카드;
-import static kr.co.nicevan.nvcat.CommonUtil._결제중지;
 import static kr.co.nicevan.nvcat.CommonUtil._대기종료;
 import static kr.co.nicevan.nvcat.CommonUtil._승인요청;
 import static kr.co.nicevan.nvcat.CommonUtil._승인응답;
@@ -11,8 +7,6 @@ import static kr.co.nicevan.nvcat.CommonUtil._취소요청;
 import static kr.co.nicevan.nvcat.CommonUtil._취소응답;
 import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.convertCommaDecimalFormat;
-import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.LABEL;
-import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
 
 import android.content.Context;
 import android.content.Intent;
@@ -48,16 +42,14 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
-import kr.co.nicevan.nvcat.dialog.Dialog100;
-import kr.co.nicevan.nvcat.dialog.Dialog200;
-import kr.co.nicevan.nvcat.dialog.Dialog250;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
 import kr.co.nicevan.nvcat.dialog.Dialog400;
 import kr.co.nicevan.nvcat.dialog.Dialog500;
-import kr.co.nicevan.nvcat.dialog.Dialog900;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
 import kr.co.nicevan.nvcat.dto.PrinterDTO;
+import kr.co.nicevan.nvcat.main_activity_manger.MainDialogManager;
+import kr.co.nicevan.nvcat.main_activity_manger.NicepayManager;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
@@ -86,19 +78,9 @@ public class MainActivity extends AppCompatActivity {
     int SEND_REQUEST_CHKMEMBERSHIP = 5;
     int SEND_REQUEST_NORMAL = 6;
 
-    char fs = 0x1C;
-
-    // 팝업 다이얼로그
-    Dialog100 dialog100; // 결제방법선택
-    Dialog200 dialog200; // 카드투입대기
-    Dialog250 dialog250; // MS결제투입대기
     Dialog300 dialog300; // 결제완료/영수증출력
     Dialog400 dialog400; // 프린터 출력중
     Dialog500 dialog500; // 영수증 출력완료
-    Dialog900 dialog900; // 결제종료
-
-    String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
-    String curPayType = ""; // 현재 진행중인 결제방법(신용카드/삼성페이)
 
     int waitTimeCnt = 30; // 제한시간(초)
     boolean isTimeout = false; // 제한시간 초과여부
@@ -120,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
     //RetrofitService DI.
     ReceiptService receiptService = new ReceiptServiceImpl();
     PrinterService printerService = new PrinterServiceImpl();
+
+    MainDialogManager mainDialogManager;
+    NicepayManager nicePayManager;
 
     //카드관련 응답데이터 setDTO.
     CardDTO cardInfo = new CardDTO();
@@ -169,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
         // webView2 End =============================================================
 
         PrinterManager.init(this);
+        mainDialogManager = MainDialogManager.init(this);
+        nicePayManager = NicepayManager.init(this);
 
         /**
          * 결제요청 (결제방법선택)
@@ -176,12 +163,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_01).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // 현재 거래구분(승인)
-                curReqType = _승인요청;
-
                 // 결제방법 선택 팝업
-                popDialog100();
+                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
             }
         });
 
@@ -191,25 +174,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_02).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // 현재 거래구분(취소)
-                curReqType = _취소요청;
-
                 // 결제방법 선택 팝업
-                popDialog100();
+                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117"));
             }
         });
-
-        /**
-         * 테스트
-         */
-        findViewById(R.id.btn_03).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                testFunction();
-            }
-        });
-
 
         String strPathLOG = "";
         File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
@@ -261,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         return webView;
     }
 
-
     /**
      * JavascriptInterface
      */
@@ -284,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
             android.requestPayment('승인', '3000', '2301101234', '01011112222', '', '');
             */
 
+            String curReqType = "";
             // 현재 거래구분(승인/취소)
             if (reqType.equals("승인")) {
                 curReqType = _승인요청;
@@ -301,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // 결제방법 선택 팝업
-            popDialog100();
+            nicePayManager.selectPayMethod(curReqType, new NicepayDTO.ReqPaymentDTO(payAmount, payAgreenum, payAgreedate));
         }
     }
 
@@ -320,99 +288,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    /**
-     * 팝업 Dialog100 (결제방법)
-     */
-    public void popDialog100() {
-
-        dialog100 = new Dialog100(MainActivity.this, curReqType);
-        dialog100.setDialogListener(new Dialog100.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-                // 결제종료
-                closePayment(_결제중지);
-            }
-
-            @Override
-            public void onClickedBtn01() {
-            }
-
-            @Override
-            public void onClickedBtn02() {
-            }
-
-            @Override
-            public void choPayType(String payType) {
-                // 카드투입 요청
-                payStep200(payType);
-            }
-        });
-        dialog100.show();
-    }
-
-    /**
-     * 팝업 Dialog900 (결제종료)
-     */
-    public void popDialog900(String curReqType, String cancelType) {
-
-        dialog900 = new Dialog900(MainActivity.this, curReqType, cancelType);
-        dialog900.setDialogListener(new Dialog900.DialogListener() {
-            @Override
-            public void onPositiveClicked() {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-            }
-        });
-        dialog900.show();
-    }
-
-    /**
-     * 팝업 Dialog200 (결제요청 대기)
-     */
-    public void popDialog200(String payType) {
-
-        dialog200 = new Dialog200(MainActivity.this, curReqType, payType);
-        dialog200.setDialogListener(new Dialog200.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-                Log.d(TAG, "popDialog200 - 결제중지");
-                // 결제종료
-                closePayment(_결제중지);
-            }
-        });
-        dialog200.show();
-    }
-
-    /**
-     * 팝업 Dialog250 (MS결제요청 대기)
-     */
-    public void popDialog250() {
-
-        dialog250 = new Dialog250(MainActivity.this);
-        dialog250.setDialogListener(new Dialog250.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-                // 결제종료
-                closePayment(_결제중지);
-            }
-        });
-        dialog250.show();
     }
 
     /**
@@ -455,143 +330,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 팝업 Dialog400 (프린터 출력중)
-     */
-    public void popDialog400() {
-
-        dialog400 = new Dialog400(MainActivity.this);
-        dialog400.setDialogListener(new Dialog400.DialogListener() {
-            @Override
-            public void onPositiveClicked() {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-            }
-        });
-        dialog400.show();
-    }
-
-    /**
-     * 팝업 Dialog500 (영수증 출력완료)
-     */
-    public void popDialog500() {
-
-        dialog500 = new Dialog500(MainActivity.this, printerService.isCompleted(RECEIPT), printerService.isCompleted(LABEL));
-        dialog500.setDialogListener(new Dialog500.DialogListener() {
-            @Override
-            public void onPositiveClicked() {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-            }
-        });
-        dialog500.show();
-    }
-
-
-    /**
-     * 결제종료
-     */
-    public void closePayment(String cancelType) {
-        Log.d(TAG, "closePayment()");
-        //Toast.makeText(getApplicationContext(), "결제가 취소되었습니다.", Toast.LENGTH_SHORT).show();
-
-        // 결제취소 전달
-        webView.loadUrl("javascript:cancelPayment('" + cancelType + "', '" + payOrderNo + "', '" + payUserId + "')");
-        /*
-        WEB 자바스크립트에서 아래 형태로 처리
-        function cancelPayment(cancelType, payOrderNo, payUserId) {
-        }
-        */
-
-        // 결제종료 팝업
-        popDialog900(curReqType, cancelType);
-    }
-
-    /**
-     * 결제단계 200 (결제요청)
-     */
-    public void payStep200(String payType) {
-
-        this.curPayType = payType;
-
-        // 결제요청 대기 팝업
-        popDialog200(payType);
-
-        // NVCAT 결제요청
-        reqPayment(curReqType, _IC카드);
-    }
-
-    /**
-     * 결제단계 250 (MS 결제요청)
-     */
-    public void payStep250() {
-        // MS결제요청 대기 팝업
-        popDialog250();
-
-        // NVCAT 결제요청
-        reqPayment(curReqType, _MS카드);
-    }
-
-
-    /**
-     * IC결제요청
-     */
-    public void reqPayment(String reqType, String wcc) {
-
-        Log.d(TAG, "reqType:" + reqType + ", wcc:" + wcc);
-
-        // 데이터 초기화
-        signImgString = ""; // 인코딩 서명이미지
-
-        // WEB 결제정보 파라미터 테스트 데이터
-        payAmount = "55000"; // 거래금액
-        payOrderNo = ""; // 주문번호
-        payUserId = ""; // 주문자 고유 아이디
-        payAgreenum = "11586893"; // 승인번호 (취소요청시만 해당)
-        payAgreedate = "230117"; // 원거래일자(YYMMDD) (취소요청시만 해당)
-
-        int tax = Integer.parseInt(payAmount) * 10 / 110; // 부가세
-
-        // 결제정보 세팅
-        // reqType: 거래구분 (승인:0200, 취소:0420)
-        String spReqStyle = "10"; //거래유형
-        // wcc: WCC(카드:I, FALLBACK:F)
-        String spAmount = payAmount; // 거래금액
-        String spTax = String.valueOf(tax); // 부가세
-        String spBongsa = "0"; // 봉사료
-        String spHalbu = "00"; // 할부
-        String spAgreenum = payAgreenum; // 승인번호
-        String spAgreedate = payAgreedate; // 원거래일자(YYMMDD)
-        String spMyunse = "0"; // 면세금액
-        String spTxtnum = ""; // 전문관리번호(CATID(10) + MMDDhhmmss)
-        String spFiller = ""; // Filler
-        String spTxt = ""; // 전문TEXT
-        String spDevicegb = ""; // 기종구분
-        String spSigndata = ""; // 서명데이터 (NVCAT 모듈에서 알아서 전송)
-
-        // 전문데이터 세팅
-        String sendDataArr[] = {reqType, spReqStyle, wcc, spAmount, spTax, spBongsa, spHalbu, spAgreenum, spAgreedate, CATID, "",
-                "", "", spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
-        StringBuilder sendData = new StringBuilder();
-
-        for (int i = 0; i < sendDataArr.length; i++) {
-            sendData.append(sendDataArr[i]);
-            sendData.append(fs);
-        }
-
-        // 전문 전송
-        send(sendData.toString());
-    }
-
-    /**
      * 전문데이터 전송
      *
      * @param senddata
      */
-    private void send(String senddata) {
+    public void send(String senddata) {
 
         Log.d(TAG, "send() - senddata : " + senddata);
 
@@ -625,12 +368,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SEND_REQUEST_CODE) {
 
             // 카드투입 대기팝업 닫기
-            if (dialog200 != null && dialog200.isShowing()) {
-                dialog200.dismiss();
-            }
-            if (dialog250 != null && dialog250.isShowing()) {
-                dialog250.dismiss();
-            }
+            mainDialogManager.closeICDialog();
+            mainDialogManager.closeMsDialog();
 
             // resultCode == -1
             if (resultCode == RESULT_OK) {
@@ -649,13 +388,14 @@ public class MainActivity extends AppCompatActivity {
                 // IC 카드리딩실패 (타임아웃)
                 if (NVCAT_RETURN_CODE == -7) {
                     // 결제중지
-                    closePayment(_대기종료);
+                    NicepayManager.getInstance().closePayment(_대기종료);
                 }
 
                 // FALLBACK 발생 - NVCATRETURNCODE : -9, NVCATRECVDATA : FALLBACK 재시도 사용 안함
                 if (NVCAT_RETURN_CODE == -9) {
                     // MS 거래 요청
-                    payStep250();
+                    String sendData = nicePayManager.msPay();
+                    send(sendData);
                 }
             }
 
@@ -979,8 +719,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
-    public void testFunction() {
-    }
-
 }

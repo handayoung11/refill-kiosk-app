@@ -3,10 +3,10 @@ package kr.co.nicevan.nvcat.dto;
 import android.util.Log;
 
 public class NicepayDTO {
+    static public char fs = 0x1C;
 
     public static class CompleteOrdereRespDTO {
         private String strRecv[] = new String[30];
-        private char fs = 0x1C;
         private String TAG = this.getClass().getSimpleName();
 
          /*
@@ -60,6 +60,31 @@ public class NicepayDTO {
 
         public int getIntData(int idx) {
             return Integer.parseInt(strRecv[idx]);
+        }
+    }
+
+    public static class ReqPaymentDTO {
+
+        String payAmount; // 거래금액
+        String payAgreenum; // 승인번호 (취소요청시만 해당)
+        String payAgreedate; // 원거래일자(YYMMDD) (취소요청시만 해당)
+
+        public ReqPaymentDTO(String payAmount, String payAgreenum, String payAgreedate) {
+            this.payAmount = payAmount;
+            this.payAgreenum = payAgreenum;
+            this.payAgreedate = payAgreedate;
+        }
+
+        public String getPayAmount() {
+            return payAmount;
+        }
+
+        public String getPayAgreenum() {
+            return payAgreenum;
+        }
+
+        public String getPayAgreedate() {
+            return payAgreedate;
         }
     }
 }
