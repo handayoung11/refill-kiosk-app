@@ -1,8 +1,9 @@
 package kr.co.nicevan.nvcat.PrinterControl;
 
+import android.app.Activity;
 import android.util.Log;
 
-import kr.co.nicevan.nvcat.MainActivity;
+import kr.co.nicevan.nvcat.main_activity_manger.MainDialogManager;
 
 public class DefaultBixolonPrinterUserListener implements BixolonPrinter.UserListener {
 
@@ -68,8 +69,8 @@ public class DefaultBixolonPrinterUserListener implements BixolonPrinter.UserLis
         Log.d(tagPrint, "onPrintEventOutputCompleteOccurred : " + eventCode);
 
         if (printer.getType() == PrinterType.LABEL) {
-            if (printer.getContext() instanceof MainActivity){
-                MainActivity activity = (MainActivity) printer.getContext();
+            if (printer.getContext() instanceof Activity){
+                Activity activity = (Activity) printer.getContext();
                 // 프린터 출력중 팝업 닫기
 //            Dialog400 dialog400 = ((MainActivity) printer.getContext()).dialog400
 //            if (dialog400 != null && dialog400.isShowing()) {
@@ -79,7 +80,7 @@ public class DefaultBixolonPrinterUserListener implements BixolonPrinter.UserLis
                 activity.runOnUiThread(() -> {
                     Log.d(tagPrint, "출력 완료");
                     // 출력완료 팝업
-                    activity.popDialog500();
+                    MainDialogManager.getInstance().popDialog500();
                 });
             }
         }
