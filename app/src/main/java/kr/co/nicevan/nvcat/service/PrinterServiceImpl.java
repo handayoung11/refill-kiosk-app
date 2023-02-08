@@ -7,6 +7,8 @@ import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.*;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.util.List;
+
 import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterType;
@@ -34,76 +36,6 @@ public class PrinterServiceImpl implements PrinterService {
      * 영수증 출력
      */
     @Override
-    public boolean printCommonReceipt(PrinterDTO.CommonReceipt receipt) {
-
-        BixolonPrinter printer = getInstance().getRecPrt();
-        if (!printer.isOpen()) {
-            return false;
-        }
-
-        Log.d(TAG, "Receipt Printer open!!!");
-
-        int alignment = 1;
-        int attribute = 1;
-        int spinnerSize = 0;
-
-        String strData = "";
-        strData = strData + "\n";
-        strData = strData + "\n";
-        strData = strData + "====================\n";
-        strData = strData + "영 수 증\n";
-        strData = strData + "금  액 : " + receipt.getPrtAmount() + "원\n";
-        strData = strData + "부가세 : " + receipt.getPrtTax() + "원\n";
-        strData = strData + "합  계 : " + receipt.getPrtTotAmount() + "원\n";
-        strData = strData + "====================";
-        strData = strData + "\n";
-        strData = strData + "\n";
-        strData = strData + "\n";
-        strData = strData + "\n";
-
-        Log.d(TAG, "P-strData : " + strData);
-        Log.d(TAG, "P-alignment : " + alignment);
-        Log.d(TAG, "P-attribute : " + attribute);
-        Log.d(TAG, "P-spinnerSize : " + spinnerSize);
-
-        printer.printText(strData, alignment, attribute, (spinnerSize + 1));
-        Bitmap stringBitmap = stringToBitmap(receipt.getSignImgString());
-        printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
-
-        printer.cutPaper();
-
-        return true;
-    }
-
-    @Override
-    public boolean printCommonLabel(PrinterDTO.CommonLabel label) {
-        BixolonPrinter printer = getInstance().getLabPrt();
-
-        if (!printer.isOpen()) {
-            return false;
-        }
-        Log.d(TAG, "Label Printer open!!!");
-
-        String strData = "";
-        strData = strData + "====================\n";
-        strData = strData + "라벨출력\n";
-
-        int alignment = 1;
-        int attribute = 1;
-        int spinnerSize = 0;
-
-        Log.d(TAG, "P-strData : " + strData);
-        Log.d(TAG, "P-alignment : " + alignment);
-        Log.d(TAG, "P-attribute : " + attribute);
-        Log.d(TAG, "P-spinnerSize : " + spinnerSize);
-
-        printer.printText(strData, alignment, attribute, (spinnerSize + 1));
-        printer.formFeed();
-
-        return true;
-    }
-
-    @Override
     public boolean isCompleted(PrinterType type) {
         PrinterManager instance = getInstance();
         if (type == LABEL) {
@@ -114,4 +46,50 @@ public class PrinterServiceImpl implements PrinterService {
             throw new IllegalArgumentException("지원하지 않는 PrinterType입니다.");
         }
     }
+
+    /**
+     *
+     * 프린트 공통함수
+     */
+    @Override
+    public boolean printOut(PrinterDTO printerDTO, PrinterType type) {
+
+        // Printer 객체 취득.
+        BixolonPrinter printer;
+        if(type.equals(PrinterType.RECEIPT)) printer = getInstance().getRecPrt();
+        else if(type.equals(PrinterType.LABEL)) printer = getInstance().getLabPrt();
+        else return false;
+
+        //프린트 출력.
+        if(!printer.isOpen()) return false;
+        print(printer, printerDTO.getOutput());
+
+        //프린트 이미지 출력 - [영수증:사인],[라벨:친환경마크]
+        Bitmap stringBitmap = stringToBitmap(printerDTO.getImg());
+        printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+
+
+        //프린트 종료.
+        if(type.equals(PrinterType.RECEIPT)) printer.cutPaper();
+        else if(type.equals(PrinterType.LABEL)) printer.formFeed();
+        return true;
+    }
+
+    /**
+     * 출력 공통 함수
+     */
+    @Override
+    public void print(BixolonPrinter printer,List<String> output){
+        int alignment = 1;
+        int attribute = 1;
+        int spinnerSize = 0;
+        Log.d(TAG, "P-alignment : " + alignment);
+        Log.d(TAG, "P-attribute : " + attribute);
+        Log.d(TAG, "P-spinnerSize : " + spinnerSize);
+        for(String s : output) {
+            Log.d(TAG, "P-strData : " + s);
+            printer.printText(s, 1, 1, 1);
+        }
+    }
+
 }

@@ -1,38 +1,25 @@
 package kr.co.nicevan.nvcat.dto;
 
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PrinterDTO {
 
-    public static class CommonReceipt {
-        String prtAmount; // 금액
-        String prtTax; // 부가세
-        String prtTotAmount; // 합계금액
-        String signImgString;
+    private List<String> output;
+    private String img;
 
-        public CommonReceipt(String prtAmount, String prtTax, String prtTotAmount, String signImgString) {
-            this.prtAmount = prtAmount;
-            this.prtTax = prtTax;
-            this.prtTotAmount = prtTotAmount;
-            this.signImgString = signImgString;
-        }
-
-        public String getPrtAmount() {
-            return prtAmount;
-        }
-
-        public String getPrtTax() {
-            return prtTax;
-        }
-
-        public String getPrtTotAmount() {
-            return prtTotAmount;
-        }
-
-        public String getSignImgString() {
-            return signImgString;
-        }
+    public PrinterDTO(final List<String> strings, final String img) {
+        this.output = strings;
+        this.img = img;
     }
-
-    public static class CommonLabel {
-
+    public PrinterDTO(@NonNull String string, String img) {
+        List<String> init = new ArrayList<>();
+        init.add(string);
+        this.output = init;
+        this.img = img;
     }
+    public List<String> getOutput() {return output;}
+    public String getImg() {return img;}
 }

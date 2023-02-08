@@ -1,15 +1,15 @@
-package kr.co.nicevan.nvcat.service;
+package kr.co.nicevan.nvcat.service.receipt;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.dto.CardDTO;
-import kr.co.nicevan.nvcat.dto.RequestDTO;
-import kr.co.nicevan.nvcat.dto.ResponseDTO;
+import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.retrofit.RetrofitClient;
 import kr.co.nicevan.nvcat.retrofit.RetrofitResponseAPI;
 import kr.co.nicevan.nvcat.retrofit.RevealStringCallbacks;
+import kr.co.nicevan.nvcat.service.common.CommonService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -19,7 +19,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 
     private RetrofitClient retrofitClient;
     private RetrofitResponseAPI callAPI;
+    private final CommonService commonService;
 
+    public ReceiptServiceImpl(CommonService commonService) {
+        this.commonService = commonService;
+    }
 
     /**  2022-01-30 작성자 : 염에녹
      * refillcycle.com/kiosk/order/receipt 통신.
@@ -28,17 +32,17 @@ public class ReceiptServiceImpl implements ReceiptService {
      * respone : shopName, companyNo, address, owner, tell, <List>items
      * return : String */
     @Override
-    public void printReceiptByOrder(RequestDTO.ReceiptDTO request, CardDTO card, @NonNull RevealStringCallbacks callbacks) {
+    public void printReceiptByOrder(CardDTO card, @NonNull RevealStringCallbacks callbacks) {
         retrofitClient = RetrofitClient.getInstance();
         callAPI = RetrofitClient.getRetrofitInterface();
-        callAPI.postReceipt(request).enqueue(new Callback<ResponseDTO.ReceiptDTO>() {
+        callAPI.postReceipt(card.getApprovalNo()).enqueue(new Callback<ReceiptDTO.ReceiptResp>() {
             @Override
-            public void onResponse(Call<ResponseDTO.ReceiptDTO> call, Response<ResponseDTO.ReceiptDTO> response) {
+            public void onResponse(Call<ReceiptDTO.ReceiptResp> call, Response<ReceiptDTO.ReceiptResp> response) {
                 Log.d(this.getClass().getSimpleName(), "Data fetch success");
 
                 //통신성공
                 if(response.isSuccessful()) {
-                    ResponseDTO.ReceiptDTO receiptDTO = response.body();
+                    ReceiptDTO.ReceiptResp receiptDTO = response.body();
                     String s = outStringForReceipt(receiptDTO, card);
                     callbacks.onSuccess(s);
                 }
@@ -47,10 +51,9 @@ public class ReceiptServiceImpl implements ReceiptService {
                 }
             }
             @Override
-            public void onFailure(Call<ResponseDTO.ReceiptDTO> call, Throwable t) {
-                Log.d(this.getClass().getSimpleName(), "[오류발생] : "+t.toString());
-                if (callbacks != null)
-                    callbacks.onError(t);
+            public void onFailure(Call<ReceiptDTO.ReceiptResp> call, Throwable t) {
+                if (callbacks != null) callbacks.onError(t);
+                else Log.d(this.getClass().getSimpleName(), "[오류발생] : "+t.toString());
             }
         });
     }
@@ -60,7 +63,7 @@ public class ReceiptServiceImpl implements ReceiptService {
      * 기능 : 영수증 formatter.
      */
     @Override
-    public String outStringForReceipt(ResponseDTO.ReceiptDTO response, CardDTO card) {
+    public String outStringForReceipt(ReceiptDTO.ReceiptResp response, CardDTO card) {
         String strData = "영수증\n";
         strData += "[매장명] "+response.getShopName()+"\n";
         strData += "[사업자번호] "+response.getCompanyNo()+"\n";
@@ -70,10 +73,10 @@ public class ReceiptServiceImpl implements ReceiptService {
         strData += "=======================================\n";
         strData += "\t\t상품명\t\t단가\t\t수량\t\t금액\t\n ";
         strData += "---------------------------------------\n";
-        for(ResponseDTO.ReceiptDTO.ItemDTO i : response.getItems()){
-            String name = formatterByLeftSpace(i.getItemName(), 11);
-            String unitPrice = formatterByLeftSpace(String.valueOf((i.getPrice()/i.getQuantity())), 7);
-            String quantity = formatterByLeftSpace(i.getQuantity()+i.getUnit(), 5);
+        for(ReceiptDTO.ReceiptResp.ItemDTO i : response.getItems()){
+            String name = commonService.formatterByLeftSpace(i.getItemName(), 11);
+            String unitPrice = commonService.formatterByLeftSpace(String.valueOf((i.getPrice() / i.getQuantity())), 7);
+            String quantity = commonService.formatterByLeftSpace(i.getQuantity() + i.getUnit(), 5);
             String price = CommonUtil.convertCommaDecimalFormat(String.valueOf(i.getPrice()));
             strData += name+"\t"+unitPrice+"\t"+quantity+"\t"+price+"\n";
         }
@@ -92,23 +95,5 @@ public class ReceiptServiceImpl implements ReceiptService {
         strData += "[결제금액]\t\t\t\t\t\t"+card.getTotPrice()+"\n";
         strData += "---------------------------------------\n";
         return strData;
-    }
-
-    /**  2022-01-30 작성자 : 염에녹
-     * 기능 : 문자열을 원하는 길이만큼 subString.
-     * Ex1) formatterByLeftSpace("안녕하세요", 3) -> "안녕하"
-     * Ex2) formatterByLeftSpace("안녕하세요", 10) -> "     안녕하세요"
-     */
-    @Override
-    public String formatterByLeftSpace(String inputString, int length) {
-        if (inputString.length() >= length) {
-            return inputString.substring(0, length);
-        }
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < length - inputString.length()) {
-            sb.append(' ');
-        }
-        sb.append(inputString);
-        return sb.toString();
     }
 }

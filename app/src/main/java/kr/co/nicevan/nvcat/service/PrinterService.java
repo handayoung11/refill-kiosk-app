@@ -1,12 +1,15 @@
 package kr.co.nicevan.nvcat.service;
 
+import java.util.List;
+
+import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterType;
 import kr.co.nicevan.nvcat.dto.PrinterDTO;
 
 public interface PrinterService {
     void closeAll();
     void resetPrintData();
-    boolean printCommonReceipt(PrinterDTO.CommonReceipt receipt);
-    boolean printCommonLabel(PrinterDTO.CommonLabel label);
+    void print(BixolonPrinter printer, List<String> output);
+    boolean printOut(PrinterDTO printerDTO, PrinterType type);
     boolean isCompleted(PrinterType printerType);
 }

@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
     private static RetrofitResponseAPI responseAPI;
     //사용하고 있는 서버 BASE 주소
-    private static String BASE_URL = "http://10.0.2.2:8080/";
-//    private static String BASE_URL = "http://192.168.0.6:8080/";
+//    private static String BASE_URL = "http://10.0.2.2:8080/";
+    private static String BASE_URL = "http://192.168.0.6:8080/";
 //    private static String BASE_URL = "https://refillcycle.com/";
 
     private static RetrofitClient instance;

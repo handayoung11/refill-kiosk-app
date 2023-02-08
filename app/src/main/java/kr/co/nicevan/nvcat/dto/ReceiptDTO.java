@@ -1,12 +1,13 @@
 package kr.co.nicevan.nvcat.dto;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
+public class ReceiptDTO {
 
-public class ResponseDTO {
-
-    public static class ReceiptDTO {
+    public static class ReceiptResp {
         @SerializedName("shopName")
         @Expose
         private String shopName; //매장명
