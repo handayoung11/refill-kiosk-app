@@ -66,11 +66,12 @@ public class PrinterServiceImpl implements PrinterService {
         Log.d(TAG, "P-attribute : " + attribute);
         Log.d(TAG, "P-spinnerSize : " + spinnerSize);
 
+        printer.beginTransactionPrint();
         printer.printText(strData, alignment, attribute, (spinnerSize + 1));
         Bitmap stringBitmap = stringToBitmap(receipt.getSignImgString());
         printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
-
         printer.cutPaper();
+        printer.endTransactionPrint();
 
         return true;
     }
@@ -97,8 +98,10 @@ public class PrinterServiceImpl implements PrinterService {
         Log.d(TAG, "P-attribute : " + attribute);
         Log.d(TAG, "P-spinnerSize : " + spinnerSize);
 
+        printer.beginTransactionPrint();
         printer.printText(strData, alignment, attribute, (spinnerSize + 1));
         printer.formFeed();
+        printer.endTransactionPrint();
 
         return true;
     }
