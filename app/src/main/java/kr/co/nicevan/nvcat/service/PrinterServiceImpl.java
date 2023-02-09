@@ -93,6 +93,7 @@ public class PrinterServiceImpl implements PrinterService {
     private void print(BixolonPrinter printer, PrinterDTO p){
         //프린트 텍스트 출력
         for(String s : p.getOutput()) {
+            Log.d(TAG, s);
             printer.printText(
                     s,
                     p.getConfig().getAlignment(),
@@ -110,39 +111,37 @@ public class PrinterServiceImpl implements PrinterService {
     public boolean labelPrint(List<LabelDTO.LabelResp> resps) {
         List<String> res = new ArrayList<>();
         for(LabelDTO.LabelResp label : resps) res.add(outStringForLabel(label));
+        for(String s : res) Log.d(TAG, s);
         return printOut(PrinterDTO.of(res, "", LABEL));
     }
 
     public boolean receiptPrint(ReceiptDTO.ReceiptResp resp, CardDTO card) {
         List<String> res = new ArrayList<>();
         res.add(outStringForReceipt(resp, card));
+        for(String s : res) Log.d(TAG, s);
         return printOut(PrinterDTO.of(res, card.getSingImg(), RECEIPT));
     }
-
 
     /**  2022-01-30 작성자 : 염에녹
      * 기능 : 라벨 formatter.
      */
     private String outStringForLabel(LabelDTO.LabelResp response) {
         String strData = "";
-        strData += "[상품명] "+response.getLiquidName()+"\t\t\t"+"[용량] "+ response.getOdExAmount()+"\n";
-        strData += "[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n";
-        strData += "--------------------------------------------------------\n";
+        strData += response.getLiquidName()+"\t\t"+response.getOdExAmount()+"g\n";
+        strData += "[제조일] "+ response.getLiquidDateOfManufacture()+"\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n";
+        strData += "------------------------------------------------\n";
         strData += "[전성분]\n";
-        strData += commonService.formatterByRightEnter(response.getLiquidIngredients(),40)+"\n";
-        strData += "\n\n";
+        strData += response.getLiquidIngredients()+"\n";
+        strData += "\n";
         strData += "[사용시 주의사항]\n";
-        strData += commonService.formatterByRightEnter(response.getLiquidCaution(),40)+"\n";
-        strData += "\n\n";
-        strData += "[제조업체]\n";
-        strData += response.getLiquidDateOfManufacture()+"\n";
-        strData += "\n\n";
-        strData += "[책임판매업체]\n";
-        strData += response.getLiquidResponsibleSalesBusiness()+"\n";
-        strData += "\n\n";
-        strData += "[맞춤판매업체]\n";
-        strData += response.getLiquidSellerName()+"\n";
-        strData += "--------------------------------------------------------\n";
+        strData += response.getLiquidCaution()+"\n";
+        strData += "\n";
+        strData += "[제조업체] "+response.getLiquidManufacturer()+"\n";
+        strData += "\n";
+        strData += "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\n";
+        strData += "\n";
+        strData += "[맞춤판매업체] "+response.getLiquidSellerName()+"\n";
+        strData += "------------------------------------------------\n";
         return strData;
     }
 
