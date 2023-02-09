@@ -153,7 +153,7 @@ public class MainDialogManager {
     }
 
     public void closeDialog400() {
-        if (dialog400.isShowing()) {
+        if (dialog400 != null && dialog400.isShowing()) {
             dialog400.dismiss();
         }
     }
