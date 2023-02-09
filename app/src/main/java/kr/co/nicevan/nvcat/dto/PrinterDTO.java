@@ -24,11 +24,10 @@ public class PrinterDTO {
         this.type = type;
     }
 
-    public static PrinterDTO of(@NonNull List<String> strings, @Nullable String img, PrinterType type){
-        PrintConfig attribute = PrintConfig.of(type);
-        return new PrinterDTO(strings, img, attribute, type);
+    public static PrinterDTO of(@NonNull List<String> strings, @Nullable String img, @Nullable PrinterType type){
+        PrintConfig config = PrintConfig.of(type);
+        return new PrinterDTO(strings, img, config, type);
     }
-
     public List<String> getOutput() {return output;}
     public String getImg() {return img;}
     public PrintConfig getConfig() {return config;}
