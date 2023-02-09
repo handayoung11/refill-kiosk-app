@@ -169,16 +169,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
-
-                //프린트 테스트 용도요
-//                cardInfo = new CardDTO("", "", "", "", "",
-//                        "", "Test123", "", signImgString);
-
-                // 영수증 출력
-                printReceipt(cardInfo);
-
-                // 라벨 출력
-                printLabel(cardInfo);
             }
         });
 
@@ -309,13 +299,11 @@ public class MainActivity extends AppCompatActivity {
      */
     public void popDialog300() {
         Log.d(TAG, "popDialog300()");
-
-        dialog300 = new Dialog300(MainActivity.this);
-
         //프린트 테스트 용도요
 //        cardInfo = new CardDTO("", "", "", "", "",
 //                "", "Test123", "", signImgString);
 
+        dialog300 = new Dialog300(MainActivity.this);
         dialog300.setDialogListener(new Dialog300.DialogListener() {
             @Override
             public void onPositiveClicked() {
