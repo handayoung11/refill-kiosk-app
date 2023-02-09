@@ -78,8 +78,10 @@ public class PrinterServiceImpl implements PrinterService {
         print(printer, printerDTO.getOutput());
 
         //프린트 이미지 출력 - [영수증:사인],[라벨:친환경마크]
-        Bitmap stringBitmap = stringToBitmap(printerDTO.getImg());
-        printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+        if(printerDTO.getImg() != ""){
+            Bitmap stringBitmap = stringToBitmap(printerDTO.getImg());
+            printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+        }
 
         //프린트 종료.
         if(type.equals(PrinterType.RECEIPT)) printer.cutPaper();
@@ -108,7 +110,7 @@ public class PrinterServiceImpl implements PrinterService {
     public boolean labelPrint(List<LabelDTO.LabelResp> resps) {
         List<String> res = new ArrayList<>();
         for(LabelDTO.LabelResp label : resps) res.add(outStringForLabel(label));
-        PrinterDTO printerDTO = new PrinterDTO(res, "친환경 마크");
+        PrinterDTO printerDTO = new PrinterDTO(res, "");
         return printOut(printerDTO, LABEL);
     }
 
