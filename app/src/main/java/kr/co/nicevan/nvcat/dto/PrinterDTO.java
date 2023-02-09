@@ -23,14 +23,6 @@ public class PrinterDTO {
         this.config = config;
         this.type = type;
     }
-    public PrinterDTO(@NonNull String string, @Nullable String img, PrinterType type) {
-        List<String> init = new ArrayList<>();
-        init.add(string);
-        this.output = init;
-        this.img = img;
-        this.config = PrinterDTO.PrintConfig.of(null);
-        this.type = type;
-    }
 
     public static PrinterDTO of(@NonNull List<String> strings, @Nullable String img, PrinterType type){
         PrintConfig attribute = PrintConfig.of(type);
@@ -51,10 +43,6 @@ public class PrinterDTO {
             this.alignment = alignment;
             this.attribute = attribute;
             this.spinnerSize = spinnerSize;
-        }
-
-        public static PrintConfig of(int alignment, int attribute, int spinnerSize){
-            return new PrintConfig(alignment, attribute, spinnerSize);
         }
 
         private static PrintConfig of(@Nullable PrinterType type){
