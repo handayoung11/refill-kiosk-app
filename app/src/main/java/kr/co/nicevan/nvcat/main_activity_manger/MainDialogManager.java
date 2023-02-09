@@ -6,6 +6,7 @@ import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
 
 import android.util.Log;
 
+import kr.co.nicevan.nvcat.AppConfig;
 import kr.co.nicevan.nvcat.MainActivity;
 import kr.co.nicevan.nvcat.dialog.Dialog100;
 import kr.co.nicevan.nvcat.dialog.Dialog200;
@@ -24,7 +25,8 @@ public class MainDialogManager {
     Dialog200 dialog200;
     Dialog250 dialog250;
 
-    PrinterService printerService = new PrinterServiceImpl();
+    AppConfig appConfig = new AppConfig();
+    PrinterService printerService = appConfig.printerService();
 
     private String TAG = this.getClass().getSimpleName();
 

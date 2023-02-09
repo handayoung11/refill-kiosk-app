@@ -27,36 +27,37 @@ import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.log.LogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
 import kr.co.nicevan.nvcat.dialog.Dialog400;
 import kr.co.nicevan.nvcat.dialog.Dialog500;
 import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
-import kr.co.nicevan.nvcat.dto.PrinterDTO;
+import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.main_activity_manger.MainDialogManager;
 import kr.co.nicevan.nvcat.main_activity_manger.NicepayManager;
+import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
 import kr.co.nicevan.nvcat.service.PrinterService;
-import kr.co.nicevan.nvcat.service.PrinterServiceImpl;
-import kr.co.nicevan.nvcat.service.ReceiptService;
-import kr.co.nicevan.nvcat.service.ReceiptServiceImpl;
+import kr.co.nicevan.nvcat.service.label.LabelService;
+import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
+import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
+import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -99,9 +100,12 @@ public class MainActivity extends AppCompatActivity {
     String prtTax = ""; // 부가세
     String prtTotAmount = ""; // 합계금액
 
-    //RetrofitService DI.
-    ReceiptService receiptService = new ReceiptServiceImpl();
-    PrinterService printerService = new PrinterServiceImpl();
+    //Service DI.
+    AppConfig appConfig = new AppConfig();
+    ReceiptService receiptService = appConfig.receiptService();
+    LabelService labelService = appConfig.labelService();
+    PrinterService printerService = appConfig.printerService();
+
 
     MainDialogManager mainDialogManager;
     NicepayManager nicePayManager;
@@ -129,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
-        // NVCAT 모듈앱 재시작요청
+//         NVCAT 모듈앱 재시작요청
         Intent sendIntent = new Intent();
         sendIntent.setAction("NICEVCAT");
         sendIntent.putExtra("NVCATSENDDATA", "RESTART");
@@ -165,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
+                cardInfo = new CardDTO("", "", "", "", "",
+                        "", "Test12345", "", signImgString);
+                printReceipt(cardInfo);
             }
         });
 
@@ -301,29 +308,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPositiveClicked() {
                 // 프린터 출력중 팝업
-                //popDialog400();
+                mainDialogManager.popDialog400();
 
                 // 프린트용 데이터 초기화
                 printerService.resetPrintData();
-                prtAmount = "";
-                prtTax = "";
-                prtTotAmount = "";
-                cardInfo = new CardDTO();
 
                 // 영수증 출력
-                printReceipt(cardInfo.getApprovalNo());
+                printReceipt(cardInfo);
 
                 // 라벨 출력
-                printLabel();
+                printLabel(cardInfo);
             }
 
             @Override
             public void onNegativeClicked() {
                 // 프린터 출력중 팝업
-                //popDialog400();
+                mainDialogManager.popDialog400();
 
                 // 라벨 출력
-                printLabel();
+                printLabel(cardInfo);
             }
         });
         dialog300.show();
@@ -420,11 +423,10 @@ public class MainActivity extends AppCompatActivity {
         prtAmount = convertCommaDecimalFormat(tmpAmount + ""); // 금액
         prtTax = convertCommaDecimalFormat(surtax + ""); // 부가세 포맷
         prtTotAmount = convertCommaDecimalFormat(totalPrice + ""); // 합계금액
-        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, respDTO.getData(17), respDTO.getData(6),
-                respDTO.getData(18), respDTO.getData(7), respDTO.getData(8));
-
-        // 사인 이미지 추출
         signImgString = getSignBitmapString();
+        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, respDTO.getData(17), respDTO.getData(6),
+                respDTO.getData(18), respDTO.getData(7), respDTO.getData(8), signImgString);
+
 
         // WEB 결과 데이터
         String rstResult = "";
@@ -550,71 +552,52 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 영수증 출력
      */
-    public void printReceipt(String approvalNo) {
+    public void printReceipt(CardDTO cardInfo) {
         mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
+        receiptService.printReceiptByOrder(cardInfo, new RevealReceiptRespCallbacks() {
+            @Override
+            public void onSuccess(@NonNull ReceiptDTO.ReceiptResp value) {
+                Log.d("RevealCallbacks","onSuccess");
+                boolean printed = printerService.receiptPrint(value, cardInfo);
+                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
+            }
 
-
-        prtAmount = "2,700"; // 금액
-        prtTax = "300"; // 부가세
-        prtTotAmount = "3,000"; // 합계금액
-        boolean printed = printerService.printCommonReceipt(new PrinterDTO.CommonReceipt(prtAmount, prtTax, prtTotAmount, signImgString));
-
-        if (!printed) {
-            mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
-        }
-        /**
-         * <프린터 출력 기능 개발완료>
-         * 개발환경이 상이하여 해당 코드 사용시 일부 환경에서 error 발생됨.
-         * 개발완료한 코드 우선 주석처리.
-         */
-//            RequestDTO.ReceiptDTO request = new RequestDTO.ReceiptDTO();
-//            request.setApprovalNo(approvalNo);
-//            receiptService.printReceiptByOrder(
-//                    request,
-//                    cardInfo,
-//                    new RevealStringCallbacks() {
-//                        @Override
-//                        public void onSuccess(@NonNull String value) {
-//                            Log.d("RevealCallbacks","onSuccess");
-//
-//                            String strData = "출력데이터: " + value;
-//                            int alignment = 1;
-//                            int attribute = 1;
-//                            int spinnerSize = 0;
-//
-//                            Log.d(TAG, "P-strData : " + strData);
-//                            Log.d(TAG, "P-alignment : " + alignment);
-//                            Log.d(TAG, "P-attribute : " + attribute);
-//                            Log.d(TAG, "P-spinnerSize : " + spinnerSize);
-//
-//                            getPrinterInstance().printText(strData, alignment, attribute, (spinnerSize + 1));
-//
-//                            Bitmap stringBitmap = CommonUtil.stringToBitmap(signImgString);
-//                            getPrinterInstance().printImage(stringBitmap, 384, -1, 50, 0, 1);
-//
-//                            getPrinterInstance().cutPaper();
-//                        }
-//
-//                        @Override
-//                        public void onError(@NonNull Throwable throwable) {
-//                            Log.d("RevealCallbacks","onError");
-//                            Log.d(this.getClass().getSimpleName(),"RevealReceiptPlaceCallbacks");
-//                            Log.d(this.getClass().getSimpleName(), throwable.toString());
-//                        }
-//                    });
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                Log.d("","==================================================");
+                Log.d(this.getClass().getSimpleName(),"RevealReceiptRespCallbacks");
+                Log.d("[error code] : ", String.valueOf(errorResponse.getStatus()));
+                Log.d("[error title] : ", errorResponse.getTitle());
+                Log.d("[error msg] : ", errorResponse.getMsg());
+                Log.d("","==================================================");
+                mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
+            }
+        });
     }
 
     /**
      * 라벨 출력
      */
-    public void printLabel() {
-
+    public void printLabel(CardDTO cardInfo) {
         mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
+        labelService.printLabelByOrder(cardInfo.getApprovalNo(), new RevealLabelRespCallbacks() {
+            @Override
+            public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
 
-        boolean printed = printerService.printCommonLabel(new PrinterDTO.CommonLabel());
-        if (!printed) {
-            mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
-        }
+                boolean printed = printerService.labelPrint(value);
+                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
+            }
+            @Override
+            public void onError(@NonNull ErrorResponse errorResponse) {
+                Log.d("","==================================================");
+                Log.d(this.getClass().getSimpleName(),"RevealReceiptRespCallbacks");
+                Log.d("[error code] : ", String.valueOf(errorResponse.getStatus()));
+                Log.d("[error title] : ", errorResponse.getTitle());
+                Log.d("[error msg] : ", errorResponse.getMsg());
+                Log.d("","==================================================");
+                mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
+            }
+        });
     }
 
 

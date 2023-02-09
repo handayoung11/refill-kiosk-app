@@ -9,6 +9,7 @@ public class CardDTO {
         private String cardName;//카드사명
         private String approvalNo; //승인번호
         private String approvalDate; //승인일자
+        private String singImg; //서명이미지
 
         public String getDutiableVal() {
             return dutiableVal;
@@ -34,11 +35,12 @@ public class CardDTO {
         public String getApprovalDate() {
             return approvalDate;
         }
+        public String getSingImg() {return singImg;}
 
     public CardDTO() {
     }
 
-    public CardDTO(String dutiableVal, String tax, String totPrice, String cardBin, String installment, String cardName, String approvalNo, String approvalDate) {
+    public CardDTO(String dutiableVal, String tax, String totPrice, String cardBin, String installment, String cardName, String approvalNo, String approvalDate, String signImg) {
             this.dutiableVal = dutiableVal;
             this.tax = tax;
             this.totPrice = totPrice;
@@ -47,5 +49,6 @@ public class CardDTO {
             this.cardName = cardName;
             this.approvalNo = approvalNo;
             this.approvalDate = approvalDate;
+            this.singImg = signImg;
         }
 }
