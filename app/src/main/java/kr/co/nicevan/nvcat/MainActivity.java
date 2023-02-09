@@ -169,11 +169,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
-
-                //프린트 테스트 용도
-//                cardInfo = new CardDTO("", "", "", "", "",
-//                        "", "Test12345", "", signImgString);
-//                printReceipt(cardInfo);
             }
         });
 
@@ -306,6 +301,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "popDialog300()");
 
         dialog300 = new Dialog300(MainActivity.this);
+
+        //프린트 테스트 용도요
+//        cardInfo = new CardDTO("", "", "", "", "",
+//                "", "Test123", "", signImgString);
+
         dialog300.setDialogListener(new Dialog300.DialogListener() {
             @Override
             public void onPositiveClicked() {
@@ -554,14 +554,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 영수증 출력
      */
-    public void printReceipt(CardDTO cardInfo) {
+    public  void printReceipt(CardDTO cardInfo) {
         mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
         receiptService.printReceiptByOrder(cardInfo, new RevealReceiptRespCallbacks() {
             @Override
             public void onSuccess(@NonNull ReceiptDTO.ReceiptResp value) {
                 Log.d("RevealCallbacks","onSuccess");
                 boolean printed = printerService.receiptPrint(value, cardInfo);
-                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
+                if (!printed) {
+                    mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
+                    mainDialogManager.closeDialog400();
+                }
             }
 
             @Override
@@ -573,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("[error msg] : ", errorResponse.getMsg());
                 Log.d("","==================================================");
                 mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
-                Log.d("","==================================================");
+                mainDialogManager.closeDialog400();
             }
         });
     }
@@ -588,17 +591,21 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
 
                 boolean printed = printerService.labelPrint(value);
-                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
+                if (!printed) {
+                    mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
+                    mainDialogManager.closeDialog400();
+                }
             }
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
                 Log.d("","==================================================");
-                Log.d(this.getClass().getSimpleName(),"RevealReceiptRespCallbacks");
+                Log.d(this.getClass().getSimpleName(),"RevealLabelRespCallbacks");
                 Log.d("[error code] : ", String.valueOf(errorResponse.getStatus()));
                 Log.d("[error title] : ", errorResponse.getTitle());
                 Log.d("[error msg] : ", errorResponse.getMsg());
                 Log.d("","==================================================");
                 mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
+                mainDialogManager.closeDialog400();
             }
         });
     }

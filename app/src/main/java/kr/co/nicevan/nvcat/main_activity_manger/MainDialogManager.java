@@ -24,6 +24,7 @@ public class MainDialogManager {
 
     Dialog200 dialog200;
     Dialog250 dialog250;
+    Dialog400 dialog400;
 
     AppConfig appConfig = new AppConfig();
     PrinterService printerService = appConfig.printerService();
@@ -138,7 +139,7 @@ public class MainDialogManager {
      */
     public void popDialog400() {
 
-        Dialog400 dialog400 = new Dialog400(mainActivity);
+        dialog400 = new Dialog400(mainActivity);
         dialog400.setDialogListener(new Dialog400.DialogListener() {
             @Override
             public void onPositiveClicked() {
@@ -149,6 +150,12 @@ public class MainDialogManager {
             }
         });
         dialog400.show();
+    }
+
+    public void closeDialog400() {
+        if (dialog400.isShowing()) {
+            dialog400.dismiss();
+        }
     }
 
     /**

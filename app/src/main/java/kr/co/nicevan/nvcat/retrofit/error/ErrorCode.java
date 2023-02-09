@@ -2,7 +2,7 @@ package kr.co.nicevan.nvcat.retrofit.error;
 
 public enum ErrorCode {
     /** 공통 */
-    RETROFIT_NETWORK_FAILED(400, "NET01", "네트워크 상태가 원활하지 않습니다. 관리자에게 문의 바랍니다."), //retrofit2 네트워크 연결 실패.
+    RETROFIT_NETWORK_FAILED(503, "NET01", "네트워크 상태가 원활하지 않습니다. 관리자에게 문의 바랍니다."), //retrofit2 네트워크 연결 실패.
     ;
     private int status;
     private final String message;
