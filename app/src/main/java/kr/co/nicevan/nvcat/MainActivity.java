@@ -169,9 +169,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
-                cardInfo = new CardDTO("", "", "", "", "",
-                        "", "Test12345", "", signImgString);
-                printReceipt(cardInfo);
+
+                //프린트 테스트 용도
+//                cardInfo = new CardDTO("", "", "", "", "",
+//                        "", "Test12345", "", signImgString);
+//                printReceipt(cardInfo);
             }
         });
 
@@ -571,6 +573,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("[error msg] : ", errorResponse.getMsg());
                 Log.d("","==================================================");
                 mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
+                Log.d("","==================================================");
             }
         });
     }
