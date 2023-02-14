@@ -1,5 +1,7 @@
 package kr.co.nicevan.nvcat;
 
+import static kr.co.nicevan.nvcat.CommonUtil.BASE_URL;
+import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_LOGIN_URL;
 import static kr.co.nicevan.nvcat.CommonUtil._대기종료;
 import static kr.co.nicevan.nvcat.CommonUtil._승인요청;
 import static kr.co.nicevan.nvcat.CommonUtil._승인응답;
@@ -58,6 +60,7 @@ import kr.co.nicevan.nvcat.roomdb.RoomDB;
 import kr.co.nicevan.nvcat.service.PrinterService;
 import kr.co.nicevan.nvcat.service.label.LabelService;
 import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
+import kr.co.nicevan.nvcat.service.login.LoginService;
 import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
 import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     ReceiptService receiptService = appConfig.receiptService();
     LabelService labelService = appConfig.labelService();
     PrinterService printerService = appConfig.printerService();
+    LoginService loginService = appConfig.loginService();
 
 
     MainDialogManager mainDialogManager;
@@ -152,9 +156,15 @@ public class MainActivity extends AppCompatActivity {
         webView = findWebViewByIdWithSettings(R.id.webView);
         webView.addJavascriptInterface(new WebViewInterface(this), "android");
 
-        String url = CommonUtil.BASE_URL;
+        String url = BASE_URL;
+        //ID, PW 정보 없는 경우 로그인 화면으로 이동
         if (!keyStoreUtil.getData(KeyStoreUtil.PW_KEY).isPresent()) {
-            url += "kiosk/login";
+            url = KIOSK_LOGIN_URL;
+        } else {
+            String id = keyStoreUtil.getData(KeyStoreUtil.ID_KEY).orElse(null);
+            String pw = keyStoreUtil.getData(KeyStoreUtil.PW_KEY).orElse(null);
+            //login 실패 시 로그인 페이지로 이동
+            loginService.login(id, pw, () -> webView.loadUrl(KIOSK_LOGIN_URL));
         }
         webView.loadUrl(url);
         // webView End =============================================================
