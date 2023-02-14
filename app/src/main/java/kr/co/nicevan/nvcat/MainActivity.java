@@ -27,22 +27,24 @@ import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.bixolon.commonlib.BXLCommonConst;
 import com.bixolon.commonlib.log.LogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
-import kr.co.nicevan.nvcat.dialog.Dialog400;
-import kr.co.nicevan.nvcat.dialog.Dialog500;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
@@ -80,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
     int SEND_REQUEST_NORMAL = 6;
 
     Dialog300 dialog300; // 결제완료/영수증출력
-    Dialog400 dialog400; // 프린터 출력중
-    Dialog500 dialog500; // 영수증 출력완료
 
     int waitTimeCnt = 30; // 제한시간(초)
     boolean isTimeout = false; // 제한시간 초과여부
