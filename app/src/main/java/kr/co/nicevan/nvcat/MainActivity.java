@@ -252,8 +252,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void showToast(String toast) {
-            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
+        public void completeLogin(String id, String pw) {
+            keyStoreUtil.storeData(KeyStoreUtil.ID_KEY, id);
+            keyStoreUtil.storeData(KeyStoreUtil.PW_KEY, pw);
         }
 
         @JavascriptInterface
