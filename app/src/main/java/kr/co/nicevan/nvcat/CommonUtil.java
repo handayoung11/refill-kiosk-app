@@ -13,6 +13,7 @@ import java.util.Base64;
 public class CommonUtil {
 
     public static String TAG = "CommonUtil";
+    public static String BASE_URL = "http://192.168.219.100:8080/";
 
     // 키오스크 정보 (키오스크 정보 관리자 화면에서 저장한 값 가져오기)
     public static String CATID = "2393300001"; // CATID
