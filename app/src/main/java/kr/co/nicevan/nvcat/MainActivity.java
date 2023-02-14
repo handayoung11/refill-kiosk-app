@@ -61,6 +61,7 @@ import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
 import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
 import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
+import kr.co.nicevan.nvcat.util.KeyStoreUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
 
     //카드관련 응답데이터 setDTO.
     CardDTO cardInfo = new CardDTO();
+    KeyStoreUtil keyStoreUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         context = this;
+        keyStoreUtil = new KeyStoreUtil(this);
 
         final int ANDROID_NOUGAT = 24;
         if (Build.VERSION.SDK_INT >= ANDROID_NOUGAT) {
@@ -148,13 +151,18 @@ public class MainActivity extends AppCompatActivity {
         // webView Start =============================================================
         webView = findWebViewByIdWithSettings(R.id.webView);
         webView.addJavascriptInterface(new WebViewInterface(this), "android");
-        webView.loadUrl("https://refillcycle.com");
+
+        String url = CommonUtil.BASE_URL;
+        if (!keyStoreUtil.getData(KeyStoreUtil.PW_KEY).isPresent()) {
+            url += "kiosk/login";
+        }
+        webView.loadUrl(url);
         // webView End =============================================================
 
         // webView2 Start =============================================================
         webView2 = findWebViewByIdWithSettings(R.id.webView2);
         webView2.addJavascriptInterface(new WebViewInterface2(this), "android2");
-        webView2.loadUrl("https://refillcycle.com/kiosk/webview");
+        webView2.loadUrl(CommonUtil.BASE_URL + "kiosk/webview");
         // webView2 End =============================================================
 
         PrinterManager.init(this);
