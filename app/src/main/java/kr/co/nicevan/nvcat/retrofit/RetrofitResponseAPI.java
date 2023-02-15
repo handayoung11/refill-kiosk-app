@@ -2,10 +2,12 @@ package kr.co.nicevan.nvcat.retrofit;
 
 import java.util.List;
 
+import kr.co.nicevan.nvcat.dto.KioskOrderDTO;
 import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -19,4 +21,6 @@ public interface RetrofitResponseAPI {
     Call<List<LabelDTO.LabelResp>> postLabel(@Path(value = "id") String approvalNo);
     @POST("/login")
     Call<ResponseBody> login(@Query("username") String id, @Query("password") String pw);
+    @POST("/kiosk/order")
+    Call<ResponseBody> saveKioskOrders(@Body KioskOrderDTO.SaveOrders saveOrders);
 }
