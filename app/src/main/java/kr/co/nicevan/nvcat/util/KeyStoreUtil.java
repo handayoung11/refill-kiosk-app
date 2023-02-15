@@ -35,8 +35,9 @@ public class KeyStoreUtil {
     private static final String TRANSFORMATION = KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7;
     public static String ID_KEY = "id";
     public static String PW_KEY = "pw";
+    private static KeyStoreUtil instance;
 
-    public KeyStoreUtil(Context context) {
+    private KeyStoreUtil(Context context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         try {
             keyStore = KeyStore.getInstance(ANDROID_KEY_STORE);
@@ -49,6 +50,21 @@ public class KeyStoreUtil {
             e.printStackTrace();
         }
         getData("id");
+    }
+
+    public static KeyStoreUtil init(Context context) {
+        if (instance != null) {
+            return instance;
+        }
+        instance = new KeyStoreUtil(context);
+        return instance;
+    }
+
+    public static KeyStoreUtil getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("KeyStoreUtil이 초기화되지 않았습니다.");
+        }
+        return instance;
     }
 
     public void createUserCredentialKey() {

@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         context = this;
-        keyStoreUtil = new KeyStoreUtil(this);
+        keyStoreUtil = KeyStoreUtil.init(this);
 
         final int ANDROID_NOUGAT = 24;
         if (Build.VERSION.SDK_INT >= ANDROID_NOUGAT) {
