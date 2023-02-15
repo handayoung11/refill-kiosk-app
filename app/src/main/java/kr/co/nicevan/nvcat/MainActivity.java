@@ -158,11 +158,11 @@ public class MainActivity extends AppCompatActivity {
 
         String url = BASE_URL;
         //ID, PW 정보 없는 경우 로그인 화면으로 이동
-        if (!keyStoreUtil.getData(KeyStoreUtil.PW_KEY).isPresent()) {
+        String id = keyStoreUtil.getData(KeyStoreUtil.ID_KEY, null);
+        String pw = keyStoreUtil.getData(KeyStoreUtil.PW_KEY, null);
+        if (pw == null || id == null) {
             url = KIOSK_LOGIN_URL;
         } else {
-            String id = keyStoreUtil.getData(KeyStoreUtil.ID_KEY).orElse(null);
-            String pw = keyStoreUtil.getData(KeyStoreUtil.PW_KEY).orElse(null);
             //login 실패 시 로그인 페이지로 이동
             loginService.login(id, pw, () -> webView.loadUrl(KIOSK_LOGIN_URL));
         }

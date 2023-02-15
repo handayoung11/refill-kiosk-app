@@ -135,4 +135,8 @@ public class KeyStoreUtil {
             return Optional.empty();
         }
     }
+
+    public String getData(String key, String defaultValue) {
+        return getData(key).orElse(defaultValue);
+    }
 }
