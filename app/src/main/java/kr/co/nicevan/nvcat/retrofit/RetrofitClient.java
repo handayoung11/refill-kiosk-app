@@ -2,6 +2,11 @@ package kr.co.nicevan.nvcat.retrofit;
 
 import static kr.co.nicevan.nvcat.CommonUtil.BASE_URL;
 
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+
+import okhttp3.CookieJar;
+import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -18,7 +23,12 @@ public class RetrofitClient {
         //로그를 보기 위한 Interceptor
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        //retrofit cookie config
+        CookieManager cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
+        CookieJar cookieJar = new JavaNetCookieJar(cookieManager);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).cookieJar(cookieJar).build();
+
         //retrofit 객체 생성.
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
