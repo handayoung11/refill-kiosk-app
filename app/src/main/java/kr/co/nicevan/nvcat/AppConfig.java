@@ -1,5 +1,8 @@
 package kr.co.nicevan.nvcat;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import kr.co.nicevan.nvcat.service.PrinterService;
 import kr.co.nicevan.nvcat.service.PrinterServiceImpl;
 import kr.co.nicevan.nvcat.service.label.LabelService;
@@ -14,17 +17,73 @@ import kr.co.nicevan.nvcat.service.common.CommonService;
 import kr.co.nicevan.nvcat.service.common.CommonServiceImpl;
 
 public class AppConfig {
-    public ReceiptService receiptService(){return new ReceiptServiceImpl();}
-    public LabelService labelService(){
-        return new LabelServiceImpl();
+
+    private static AppConfig instance;
+
+    private ReceiptService receiptService;
+    private LabelService labelService;
+    private CommonService commonService;
+    private PrinterService printerService;
+    private LoginService loginService;
+    private OrderService orderService;
+
+    private AppConfig() {
     }
-    public CommonService commonService(){
-        return new CommonServiceImpl();
+
+    public static AppConfig getInstance() {
+        if (instance == null) {
+            instance = new AppConfig();
+        }
+        return instance;
     }
-    public PrinterService printerService(){ return new PrinterServiceImpl(commonService()); }
-    public LoginService loginService(){ return new LoginServiceImpl(); }
+
+    public ReceiptService receiptService() {
+        return (ReceiptService) getObject(receiptService, ReceiptServiceImpl.class);
+    }
+
+    public LabelService labelService() {
+        return (LabelService) getObject(labelService, LabelServiceImpl.class);
+    }
+
+    public CommonService commonService() {
+        return (CommonService) getObject(commonService, CommonServiceImpl.class);
+    }
+
+    public PrinterService printerService() {
+        return (PrinterService) getObject(printerService, PrinterServiceImpl.class, new Object[]{commonService()}, new Class[]{CommonService.class});
+    }
+
+    public LoginService loginService() {
+        return (LoginService) getObject(loginService, LoginServiceImpl.class);
+    }
 
     public OrderService orderService() {
-        return new OrderServiceImpl();
+        return (OrderService) getObject(orderService, OrderServiceImpl.class);
+    }
+
+    public Object getObject(Object object, Class clazz) {
+        try {
+            if (object == null) {
+                object = clazz.newInstance();
+            }
+            return object;
+        } catch (IllegalAccessException | InstantiationException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Object getObject(Object object, Class clazz, Object[] params, Class clazzes[]) {
+        try {
+            if (object == null) {
+                Constructor con = clazz.getConstructor(clazzes);
+                con.newInstance(params);
+            }
+            return object;
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException |
+                 InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

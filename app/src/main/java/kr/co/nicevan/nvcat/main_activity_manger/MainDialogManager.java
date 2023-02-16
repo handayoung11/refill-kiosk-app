@@ -15,7 +15,6 @@ import kr.co.nicevan.nvcat.dialog.Dialog400;
 import kr.co.nicevan.nvcat.dialog.Dialog500;
 import kr.co.nicevan.nvcat.dialog.Dialog900;
 import kr.co.nicevan.nvcat.service.PrinterService;
-import kr.co.nicevan.nvcat.service.PrinterServiceImpl;
 
 public class MainDialogManager {
     MainActivity mainActivity;
@@ -26,7 +25,7 @@ public class MainDialogManager {
     Dialog250 dialog250;
     Dialog400 dialog400;
 
-    AppConfig appConfig = new AppConfig();
+    AppConfig appConfig = AppConfig.getInstance();
     PrinterService printerService = appConfig.printerService();
 
     private String TAG = this.getClass().getSimpleName();

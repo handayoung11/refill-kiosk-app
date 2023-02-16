@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
     String prtTotAmount = ""; // 합계금액
 
     //Service DI.
-    AppConfig appConfig = new AppConfig();
+    AppConfig appConfig = AppConfig.getInstance();
     ReceiptService receiptService = appConfig.receiptService();
     LabelService labelService = appConfig.labelService();
     PrinterService printerService = appConfig.printerService();

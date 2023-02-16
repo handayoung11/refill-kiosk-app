@@ -14,7 +14,7 @@ import retrofit2.Response;
 
 public class OrderServiceImpl implements OrderService {
 
-    LoginService loginService = new AppConfig().loginService();
+    LoginService loginService = AppConfig.getInstance().loginService();
 
     @Override
     public void saveKioskOrders(KioskOrderDTO.SaveOrders saveOrders) {
