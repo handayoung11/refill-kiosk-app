@@ -183,6 +183,7 @@ gen/
 out/
 
 # Gradle files
+gradle/
 
 # Signing files
 .signing/
