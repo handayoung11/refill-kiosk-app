@@ -1,8 +1,8 @@
 package kr.co.nicevan.nvcat.service.login;
 
-import android.util.Log;
-
 import kr.co.nicevan.nvcat.retrofit.RetrofitClient;
+import kr.co.nicevan.nvcat.retrofit.callback.LoginDefaultCallback;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -13,31 +13,31 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public void login(String id, String pw) {
-        RetrofitClient.getDefaultResponseAPI().login(id, pw).enqueue(new DefaultCallback());
+        login(id, pw, new LoginDefaultCallback());
     }
 
     @Override
-    public void login(String id, String pw, Runnable onFailure) {
-        RetrofitClient.getDefaultResponseAPI().login(id, pw)
-                .enqueue(new DefaultCallback() {
-                    @Override
-                    public void onFailure(Call call, Throwable t) {
-                        super.onFailure(call, t);
-                        onFailure.run();
-                    }
-                });
+    public void login(String id, String pw, Runnable onSuccess, Runnable onFailure) {
+        login(id, pw, new LoginDefaultCallback() {
+            @Override
+            public void onResponse(Call call, Response response) {
+                super.onResponse(call, response);
+                if (onSuccess != null)  {
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                super.onFailure(call, t);
+                if (onFailure != null) {
+                    onFailure.run();
+                }
+            }
+        });
     }
 
-    class DefaultCallback implements Callback {
-
-        @Override
-        public void onResponse(Call call, Response response) {
-            Log.d(tag, "login 성공");
-        }
-
-        @Override
-        public void onFailure(Call call, Throwable t) {
-            Log.d(tag, "login 실패");
-        }
+    public void login(String id, String pw, Callback<ResponseBody> callback) {
+        RetrofitClient.getDefaultResponseAPI().login(id, pw).enqueue(callback);
     }
 }
