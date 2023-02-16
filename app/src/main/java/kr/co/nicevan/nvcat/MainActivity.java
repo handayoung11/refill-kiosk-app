@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -48,6 +49,7 @@ import java.util.Locale;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
 import kr.co.nicevan.nvcat.dto.CardDTO;
+import kr.co.nicevan.nvcat.dto.KioskOrderDTO;
 import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
@@ -61,6 +63,7 @@ import kr.co.nicevan.nvcat.service.PrinterService;
 import kr.co.nicevan.nvcat.service.label.LabelService;
 import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
 import kr.co.nicevan.nvcat.service.login.LoginService;
+import kr.co.nicevan.nvcat.service.order.OrderService;
 import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
 import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
@@ -110,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
     LabelService labelService = appConfig.labelService();
     PrinterService printerService = appConfig.printerService();
     LoginService loginService = appConfig.loginService();
+    OrderService orderService = appConfig.orderService();
 
 
     MainDialogManager mainDialogManager;
@@ -164,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             url = KIOSK_LOGIN_URL;
         } else {
             //login 실패 시 로그인 페이지로 이동
-            loginService.login(id, pw, () -> webView.loadUrl(KIOSK_LOGIN_URL));
+            loginService.login(id, pw, null, () -> webView.loadUrl(KIOSK_LOGIN_URL));
         }
         webView.loadUrl(url);
         // webView End =============================================================
@@ -643,7 +647,13 @@ public class MainActivity extends AppCompatActivity {
         */
 
         // 결제정보 저장
-        webView2.loadUrl("javascript:savePayment('" + rstJson + "')");
+//        webView2.loadUrl("javascript:savePayment('" + rstJson + "')");
+        ArrayList<Long> itemOfShopIdList = new ArrayList<>();
+        itemOfShopIdList.add(55L);
+        ArrayList<Integer> volumes = new ArrayList<>();
+        volumes.add(300);
+
+        orderService.saveKioskOrders(new KioskOrderDTO.SaveOrders(itemOfShopIdList, volumes, "010testtest", rstAgreenum, null));
     }
 
     public final Handler mToastHandler = new Handler(new Handler.Callback() {

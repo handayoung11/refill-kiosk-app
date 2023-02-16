@@ -4,11 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-import lombok.Getter;
-
 public class KioskOrderDTO {
 
-    @Getter
     public static class SaveOrders {
         @SerializedName("itemOfShopIdList")
         private ArrayList<Long> itemOfShopIdList;
@@ -17,5 +14,33 @@ public class KioskOrderDTO {
         private String pNum;
         private String approvementId;
         private Long memberId;
+
+        public SaveOrders(ArrayList<Long> itemOfShopIdList, ArrayList<Integer> volumes, String pNum, String approvementId, Long memberId) {
+            this.itemOfShopIdList = itemOfShopIdList;
+            this.volumes = volumes;
+            this.pNum = pNum;
+            this.approvementId = approvementId;
+            this.memberId = memberId;
+        }
+
+        public ArrayList<Long> getItemOfShopIdList() {
+            return itemOfShopIdList;
+        }
+
+        public ArrayList<Integer> getVolumes() {
+            return volumes;
+        }
+
+        public String getpNum() {
+            return pNum;
+        }
+
+        public String getApprovementId() {
+            return approvementId;
+        }
+
+        public Long getMemberId() {
+            return memberId;
+        }
     }
 }

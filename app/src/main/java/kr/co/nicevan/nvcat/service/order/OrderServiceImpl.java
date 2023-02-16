@@ -12,15 +12,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     LoginService loginService = new AppConfig().loginService();
-    KeyStoreUtil keyStoreUtil = KeyStoreUtil.getInstance();
 
     @Override
     public void saveKioskOrders(KioskOrderDTO.SaveOrders saveOrders) {
-        //login 실행
-        loginService.login(keyStoreUtil.getData("id", null), keyStoreUtil.getData("pw", null));
+        KeyStoreUtil keyStoreUtil = KeyStoreUtil.getInstance();
+
+        //login 실행 후 api 호출
+        loginService.login(keyStoreUtil.getData("id", null), keyStoreUtil.getData("pw", null),
+                () -> saveKioskOrdersApi(saveOrders), null);
+
+    }
+
+    private void saveKioskOrdersApi(KioskOrderDTO.SaveOrders saveOrders) {
         RetrofitClient.getDefaultResponseAPI().saveKioskOrders(saveOrders)
                 .enqueue(new Callback<ResponseBody>() {
                     @Override
@@ -30,7 +36,7 @@ public class OrderServiceImpl implements OrderService{
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                        Log.d("결제", "결제 실패");
                     }
                 });
     }
