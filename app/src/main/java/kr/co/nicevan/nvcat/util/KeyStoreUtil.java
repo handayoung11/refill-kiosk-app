@@ -49,7 +49,6 @@ public class KeyStoreUtil {
                  NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        getData("id");
     }
 
     public static KeyStoreUtil init(Context context) {
@@ -108,7 +107,10 @@ public class KeyStoreUtil {
 
     public Optional<String> getData(String key) {
         try {
-            String encryptedData = sharedPreferences.getString(key, "");
+            String encryptedData = sharedPreferences.getString(key, null);
+            if (encryptedData == null) {
+                return Optional.empty();
+            }
             String[] split = encryptedData.substring(1, encryptedData.length() - 1).split(", ");
             byte[] encryptedDataBytes = new byte[split.length];
             for (int i = 0; i < split.length; i++) {
