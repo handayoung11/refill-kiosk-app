@@ -7,7 +7,7 @@ import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
 import android.util.Log;
 
 import kr.co.nicevan.nvcat.AppConfig;
-import kr.co.nicevan.nvcat.MainActivity;
+import kr.co.nicevan.nvcat.activity.MainActivity;
 import kr.co.nicevan.nvcat.dialog.Dialog100;
 import kr.co.nicevan.nvcat.dialog.Dialog200;
 import kr.co.nicevan.nvcat.dialog.Dialog250;

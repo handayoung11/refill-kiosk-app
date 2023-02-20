@@ -1,4 +1,4 @@
-package kr.co.nicevan.nvcat;
+package kr.co.nicevan.nvcat.activity;
 
 import static kr.co.nicevan.nvcat.CommonUtil.BASE_URL;
 import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_LOGIN_URL;
@@ -46,7 +46,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import kr.co.nicevan.nvcat.AppConfig;
+import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
+import kr.co.nicevan.nvcat.R;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.KioskOrderDTO;

@@ -7,7 +7,7 @@ import static kr.co.nicevan.nvcat.dto.NicepayDTO.fs;
 
 import android.util.Log;
 
-import kr.co.nicevan.nvcat.MainActivity;
+import kr.co.nicevan.nvcat.activity.MainActivity;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
 
 public class NicepayManager {
