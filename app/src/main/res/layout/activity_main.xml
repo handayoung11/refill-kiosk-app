@@ -65,9 +65,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="테스트"
+            android:text="캣id 설정"
             android:textSize="20dp"
-            android:visibility="gone"/>
+            android:visibility="visible" />
 
     </LinearLayout>
 

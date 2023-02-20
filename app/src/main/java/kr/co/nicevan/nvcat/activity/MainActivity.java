@@ -213,6 +213,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.btn_03).setOnClickListener(v -> {
+            Intent intent = new Intent(this, CatIdActivity.class);
+            startActivity(intent);
+        });
+
         String strPathLOG = "";
         File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
         if (mediaDirs != null && mediaDirs.length > 0) {
