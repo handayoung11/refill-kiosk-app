@@ -5,11 +5,9 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Base64;
 
