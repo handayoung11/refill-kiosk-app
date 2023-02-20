@@ -32,9 +32,12 @@ public class KeyStoreUtil {
     private static final String USER_CREDENTIAL_KEY = "USER_CREDENTIALS_KEY";
     private KeyStore keyStore;
     private SharedPreferences sharedPreferences;
+
     private static final String TRANSFORMATION = KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7;
     public static String ID_KEY = "id";
     public static String PW_KEY = "pw";
+    public static String CAT_ID_KEY = "cat_id";
+
     private static KeyStoreUtil instance;
 
     private KeyStoreUtil(Context context) {
