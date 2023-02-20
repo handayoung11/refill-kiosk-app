@@ -116,34 +116,28 @@ public class PrinterServiceImpl implements PrinterService {
      * 출력 공통 함수
      */
     private void print(BixolonPrinter printer, PrinterDTO p){
-        int width = 600;
         //프린트 텍스트 출력
         for(String s : p.getOutput()){
             Log.d("",s);
-//            printer.printText(s, p.getConfig().getAlignment(), p.getConfig().getAttribute(), p.getConfig().getSpinnerSize());
+            printer.printText(s, p.getConfig().getAlignment(), p.getConfig().getAttribute(), p.getConfig().getSpinnerSize());
+
+//            텍스트를 이미지로 변환 후 출력 테스트 코드
+//            int width = 600;
 //            Bitmap bitmap = getBitMapText(s, width);
 //            saveBitmapToJpg(bitmap, "label","labelTest");
 //            printer.printImage(bitmap, width-50, -1, 50, 0, 1);
         }
-        LabelTestService test = new LabelTestService();
-        printer.printImage(test.getBitMap(),
-                test.getConfig().getWidth(),
-                test.getConfig().getAlignment(),
-                test.getConfig().getBrightness(),
-                test.getConfig().getDither(),
-                test.getConfig().getCompress());
-
         //프린트 이미지 출력 - [영수증:사인],[라벨:친환경마크]
-//        if(p.getImg() == ""){
-//            Bitmap stringBitmap = stringToBitmap(p.getImg());
-//            printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
-//        }
+        if(p.getImg() == ""){
+            Bitmap stringBitmap = stringToBitmap(p.getImg());
+            printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+        }
     }
 
     public boolean labelPrint(List<LabelDTO.LabelResp> resps) {
         List<String> res = new ArrayList<>();
         for(LabelDTO.LabelResp label : resps) res.add(outStringForLabel(label));
-        return printOut(PrinterDTO.of(res, "", RECEIPT));
+        return printOut(PrinterDTO.of(res, "", LABEL));
     }
 
     public boolean receiptPrint(ReceiptDTO.ReceiptResp resp, CardDTO card) {
@@ -158,8 +152,8 @@ public class PrinterServiceImpl implements PrinterService {
     private String outStringForLabel(LabelDTO.LabelResp response) {
         StringBuilder sb = new StringBuilder();
         sb.append(response.getLiquidName()+" "+response.getOdExAmount()+"g\n");
-//        strData += "[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n";
-        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
+        sb.append("[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n");
+//        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
         sb.append("---------------------------------------------------------------------------------------------------------------------------------------\n");
         sb.append("[전성분]\n");
         sb.append(response.getLiquidIngredients()+"\n\n");
