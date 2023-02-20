@@ -5,8 +5,11 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Base64;
 
@@ -68,7 +71,7 @@ public class CommonUtil {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             byteArray = Base64.getDecoder().decode(data);
         }
-        ByteArrayInputStream stream = new ByteArrayInputStream(byteArray);
+        InputStream stream = new ByteArrayInputStream(byteArray);
         bitmap = BitmapFactory.decodeStream(stream);
         return bitmap;
     }

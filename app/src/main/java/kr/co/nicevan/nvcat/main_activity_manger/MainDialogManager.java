@@ -14,6 +14,7 @@ import kr.co.nicevan.nvcat.dialog.Dialog250;
 import kr.co.nicevan.nvcat.dialog.Dialog400;
 import kr.co.nicevan.nvcat.dialog.Dialog500;
 import kr.co.nicevan.nvcat.dialog.Dialog900;
+import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.service.PrinterService;
 
 public class MainDialogManager {
@@ -188,5 +189,9 @@ public class MainDialogManager {
             }
         });
         dialog900.show();
+    }
+
+    public void popDialogError(ErrorResponse errorResponse){
+
     }
 }

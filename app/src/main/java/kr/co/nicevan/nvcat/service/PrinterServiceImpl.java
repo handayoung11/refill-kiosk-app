@@ -1,13 +1,37 @@
 package kr.co.nicevan.nvcat.service;
 
+import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.stringToBitmap;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterManager.*;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.*;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.os.Environment;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import kr.co.nicevan.nvcat.CommonUtil;
@@ -19,6 +43,7 @@ import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.PrinterDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.service.common.CommonService;
+import kr.co.nicevan.nvcat.service.label.LabelService;
 
 public class PrinterServiceImpl implements PrinterService {
 
@@ -80,8 +105,8 @@ public class PrinterServiceImpl implements PrinterService {
         print(printer, printerDTO);
 
         //프린트 종료.
-        if(printerDTO.getType().equals(PrinterType.RECEIPT)) printer.cutPaper();
-        else if(printerDTO.getType().equals(PrinterType.LABEL)) printer.formFeed();
+        if(printerDTO.getType().equals(RECEIPT)) printer.cutPaper();
+        else if(printerDTO.getType().equals(LABEL)) printer.formFeed();
         printer.endTransactionPrint();
 
         return true;
@@ -91,34 +116,39 @@ public class PrinterServiceImpl implements PrinterService {
      * 출력 공통 함수
      */
     private void print(BixolonPrinter printer, PrinterDTO p){
+        int width = 600;
         //프린트 텍스트 출력
-        for(String s : p.getOutput()) {
-            Log.d(TAG, s);
-            printer.printText(
-                    s,
-                    p.getConfig().getAlignment(),
-                    p.getConfig().getAttribute(),
-                    p.getConfig().getSpinnerSize()
-            );
+        for(String s : p.getOutput()){
+            Log.d("",s);
+//            printer.printText(s, p.getConfig().getAlignment(), p.getConfig().getAttribute(), p.getConfig().getSpinnerSize());
+//            Bitmap bitmap = getBitMapText(s, width);
+//            saveBitmapToJpg(bitmap, "label","labelTest");
+//            printer.printImage(bitmap, width-50, -1, 50, 0, 1);
         }
+        LabelTestService test = new LabelTestService();
+        printer.printImage(test.getBitMap(),
+                test.getConfig().getWidth(),
+                test.getConfig().getAlignment(),
+                test.getConfig().getBrightness(),
+                test.getConfig().getDither(),
+                test.getConfig().getCompress());
+
         //프린트 이미지 출력 - [영수증:사인],[라벨:친환경마크]
-            if(p.getImg() != ""){
-                Bitmap stringBitmap = stringToBitmap(p.getImg());
-                printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
-            }
+//        if(p.getImg() == ""){
+//            Bitmap stringBitmap = stringToBitmap(p.getImg());
+//            printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+//        }
     }
 
     public boolean labelPrint(List<LabelDTO.LabelResp> resps) {
         List<String> res = new ArrayList<>();
         for(LabelDTO.LabelResp label : resps) res.add(outStringForLabel(label));
-        for(String s : res) Log.d(TAG, s);
-        return printOut(PrinterDTO.of(res, "", LABEL));
+        return printOut(PrinterDTO.of(res, "", RECEIPT));
     }
 
     public boolean receiptPrint(ReceiptDTO.ReceiptResp resp, CardDTO card) {
         List<String> res = new ArrayList<>();
         res.add(outStringForReceipt(resp, card));
-        for(String s : res) Log.d(TAG, s);
         return printOut(PrinterDTO.of(res, card.getSingImg(), RECEIPT));
     }
 
@@ -126,23 +156,18 @@ public class PrinterServiceImpl implements PrinterService {
      * 기능 : 라벨 formatter.
      */
     private String outStringForLabel(LabelDTO.LabelResp response) {
-        String strData = "";
-        strData += response.getLiquidName()+"\t\t"+response.getOdExAmount()+"g\n";
-        strData += "[제조일] "+ response.getLiquidDateOfManufacture()+"\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n";
-        strData += "------------------------------------------------\n";
-        strData += "[전성분]\n";
-        strData += response.getLiquidIngredients()+"\n";
-        strData += "\n";
-        strData += "[사용시 주의사항]\n";
-        strData += response.getLiquidCaution()+"\n";
-        strData += "\n";
-        strData += "[제조업체] "+response.getLiquidManufacturer()+"\n";
-        strData += "\n";
-        strData += "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\n";
-        strData += "\n";
-        strData += "[맞춤판매업체] "+response.getLiquidSellerName()+"\n";
-        strData += "------------------------------------------------\n";
-        return strData;
+        StringBuilder sb = new StringBuilder();
+        sb.append(response.getLiquidName()+" "+response.getOdExAmount()+"g\n");
+//        strData += "[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n";
+        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
+        sb.append("---------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("[전성분]\n");
+        sb.append(response.getLiquidIngredients()+"\n\n");
+        sb.append("[사용시 주의사항]\n");
+        sb.append(response.getLiquidCaution()+"\n\n");
+        sb.append("[제조업체] "+response.getLiquidManufacturer()+"\t\t"+ "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\t\t"+"[맞춤판매업체] "+response.getLiquidSellerName()+"\n");
+        sb.append("---------------------------------------------------------------------------------------------------------------------------------------\n");
+        return sb.toString();
     }
 
 
@@ -183,4 +208,51 @@ public class PrinterServiceImpl implements PrinterService {
         return strData;
     }
 
+    private Bitmap getBitMapText(String text, int width){
+        //new paint
+        Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(16);
+        //draw text with paint to layout
+        TextPaint textPaint = new TextPaint(paint);
+        StaticLayout textLayout = StaticLayout
+                .Builder
+                .obtain(text, 0 ,text.length(), textPaint, width)
+                .setAlignment(Layout.Alignment.ALIGN_LEFT)
+                .setLineSpacing(0f, 1.2f)
+                .setIncludePad(true)
+                .build();
+
+        int height = textLayout.getHeight();
+        if(height < 400) height = 400;
+        //new bitmap
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //new canvas set bitmap
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        textLayout.draw(canvas);
+        return bitmap;
+    }
+
+    private void saveBitmapToJpg(Bitmap bitmap, String folder, String name) {
+        String ex_storage = Environment.getExternalStorageDirectory().getAbsolutePath();
+        // Get Absolute Path in External Sdcard
+        String foler_name = "/"+folder+"/";
+        String file_name = name+".jpg";
+        String string_path = ex_storage+foler_name;
+
+        File file_path;
+        try{
+            file_path = new File(string_path);
+            if(!file_path.isDirectory()) file_path.mkdirs();
+            FileOutputStream out = new FileOutputStream(string_path+file_name, true);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.close();
+
+        }catch(FileNotFoundException exception){
+            Log.e("FileNotFoundException", exception.getMessage());
+        }catch(IOException exception){
+            Log.e("IOException", exception.getMessage());
+        }
+    }
 }
