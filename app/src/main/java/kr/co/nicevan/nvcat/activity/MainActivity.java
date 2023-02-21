@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        hideSystemUI();
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE); // 앱 타이틀 제거
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //세로 화면으로 고정
@@ -241,8 +242,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        //hideSystemUI(); // 전체화면
+        hideSystemUI(); // 전체화면
     }
 
     @Override
