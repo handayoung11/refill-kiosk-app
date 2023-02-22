@@ -2,14 +2,11 @@ package kr.co.nicevan.nvcat.dialog;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -53,17 +50,6 @@ public class Dialog500 extends NonCancelableDialog {
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
         setContentView(R.layout.dialog_500);
-
-        // 다이얼로그 사이즈 조정
-        Display display = getWindow().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-        layoutParams.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-        layoutParams.dimAmount = 0.8f;
-        layoutParams.width = (int) (size.x * 0.9f);
-        layoutParams.height = (int) (size.y * 0.8f);
-        getWindow().setAttributes(layoutParams);
 
         tv_01 = (TextView)findViewById(R.id.tv_01);
         tv_02 = (TextView)findViewById(R.id.tv_02);
