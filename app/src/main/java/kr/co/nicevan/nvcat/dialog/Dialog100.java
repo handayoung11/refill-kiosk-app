@@ -51,18 +51,11 @@ public class Dialog100 extends NonCancelableDialog {
 
         if(curReqType.equals(CommonUtil._승인요청)) {
             tv_title.setText("결제 방법 선택");
-            btn_cancel.setText("결 제 취 소");
+            btn_cancel.setText("결제취소");
         }else if(curReqType.equals(CommonUtil._취소요청)){
             tv_title.setText("승인취소 방법 선택");
             btn_cancel.setText("승인취소종료");
         }
-
-        Button btn_ok = (Button)findViewById(R.id.btn_ok);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            }
-        });
 
         // 결제취소
         btn_cancel.setOnClickListener(new View.OnClickListener() {
