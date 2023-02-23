@@ -17,9 +17,9 @@ public abstract class NonCancelableDialog extends Dialog {
         setCanceledOnTouchOutside(false);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState, int contentViewId) {
         super.onCreate(savedInstanceState);
+        setContentView(contentViewId);
 
         // 다이얼로그 사이즈 조정
         Display display = getWindow().getWindowManager().getDefaultDisplay();

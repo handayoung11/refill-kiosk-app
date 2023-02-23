@@ -41,8 +41,7 @@ public class Dialog100 extends NonCancelableDialog {
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState);
-        setContentView(R.layout.dialog_100);
+        super.onCreate(saveInstanceState, R.layout.dialog_100);
 
         TextView tv_title = (TextView)findViewById(R.id.tv_title);
         Button btn_01 = (Button)findViewById(R.id.btn_01);
