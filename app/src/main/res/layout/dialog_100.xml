@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            app:scale_base_height="100"
+            app:scale_base_height="95"
             app:scale_base_width="100">
 
             <Button
@@ -51,7 +51,7 @@
                 app:scale_height="56"
                 app:scale_left="8"
                 app:scale_textsize="6.5"
-                app:scale_top="25"
+                app:scale_top="20"
                 app:scale_width="37.5" />
 
             <Button
@@ -62,7 +62,7 @@
                 app:scale_height="56"
                 app:scale_left="54.5"
                 app:scale_textsize="6.5"
-                app:scale_top="25"
+                app:scale_top="20"
                 app:scale_width="37.5" />
 
         </com.ssomai.android.scalablelayout.ScalableLayout>
@@ -89,7 +89,7 @@
                 android:layout_height="wrap_content"
                 app:scale_height="10"
                 app:scale_left="8"
-                app:scale_top="5"
+                app:scale_top="7"
                 app:scale_width="84">
 
                 <TextView
@@ -112,7 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:scale_left="8"
-                app:scale_top="9"
+                app:scale_top="11"
                 app:scale_width="84"
                 app:scale_height="7">
 
