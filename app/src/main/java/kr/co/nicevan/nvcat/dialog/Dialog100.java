@@ -22,7 +22,7 @@ public class Dialog100 extends NonCancelableDialog {
     String payType = ""; // 결제방법(신용카드/삼성페이)
 
     public Dialog100(@NonNull Context context, String curReqType){
-        super(context);
+        super(context, R.layout.dialog_100);
         this.context = context;
         this.curReqType = curReqType;
     }
@@ -41,7 +41,7 @@ public class Dialog100 extends NonCancelableDialog {
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
-        super.onCreate(saveInstanceState, R.layout.dialog_100);
+        super.onCreate(saveInstanceState);
 
         TextView tv_title = (TextView)findViewById(R.id.tv_title);
         Button btn_01 = (Button)findViewById(R.id.btn_01);

@@ -10,6 +10,8 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
+import kr.co.nicevan.nvcat.CommonUtil;
+
 public abstract class NonCancelableDialog extends Dialog {
 
     public NonCancelableDialog(@NonNull Context context) {
@@ -17,9 +19,14 @@ public abstract class NonCancelableDialog extends Dialog {
         setCanceledOnTouchOutside(false);
     }
 
-    protected void onCreate(Bundle savedInstanceState, int contentViewId) {
-        super.onCreate(savedInstanceState);
+    public NonCancelableDialog(@NonNull Context context, int contentViewId) {
+        super(context);
         setContentView(contentViewId);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         CommonUtil.hideSystemUI(this);
 
         // 다이얼로그 사이즈 조정
