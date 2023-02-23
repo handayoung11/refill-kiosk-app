@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="0dp"
-            app:scale_base_height="142"
+            app:scale_base_height="100"
             app:scale_base_width="100">
 
             <Button
@@ -48,29 +48,95 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/credit_card_bt"
-                android:text="        신용카드"
-                android:textColor="#202020"
-                app:scale_height="35"
-                app:scale_left="20"
+                app:scale_height="56"
+                app:scale_left="8"
                 app:scale_textsize="6.5"
                 app:scale_top="25"
-                app:scale_width="60" />
+                app:scale_width="37.5" />
 
             <Button
                 android:id="@+id/btn_02"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/samsung_pay_bt"
-                android:text="        삼성페이"
-                android:textColor="#202020"
-                app:scale_height="35"
-                app:scale_left="20"
+                app:scale_height="56"
+                app:scale_left="54.5"
                 app:scale_textsize="6.5"
-                app:scale_top="65"
-                app:scale_width="60" />
+                app:scale_top="25"
+                app:scale_width="37.5" />
 
         </com.ssomai.android.scalablelayout.ScalableLayout>
 
+        <com.ssomai.android.scalablelayout.ScalableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:scale_base_width="100"
+            app:scale_base_height="22">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/dotted"
+                app:scale_height="3"
+                app:scale_left="8"
+                app:scale_top="0"
+                app:scale_width="84" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:scale_height="10"
+                app:scale_left="8"
+                app:scale_top="5"
+                app:scale_width="84">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="주문 금액"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/order_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="4000원"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:scale_left="8"
+                app:scale_top="9"
+                app:scale_width="84"
+                app:scale_height="7">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="총 결제 금액"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="4000원"
+                    android:textColor="#FE6414"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+
+        </com.ssomai.android.scalablelayout.ScalableLayout>
 
     </LinearLayout>
 
