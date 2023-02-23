@@ -9,6 +9,7 @@ import static kr.co.nicevan.nvcat.CommonUtil._취소요청;
 import static kr.co.nicevan.nvcat.CommonUtil._취소응답;
 import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.convertCommaDecimalFormat;
+import static kr.co.nicevan.nvcat.CommonUtil.hideSystemUI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideSystemUI();
+        hideSystemUI(this);
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE); // 앱 타이틀 제거
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); //세로 화면으로 고정
@@ -242,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        hideSystemUI(); // 전체화면
+        hideSystemUI(this); // 전체화면
     }
 
     @Override
@@ -682,16 +683,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     });
-
-
-    /**
-     * 전체화면
-     */
-    private void hideSystemUI() {
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        decorView.requestLayout();
-    }
 
     /**
      * 사인 이미지 인코딩 문자 가져오기

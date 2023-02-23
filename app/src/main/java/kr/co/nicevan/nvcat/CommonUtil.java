@@ -1,9 +1,12 @@
 package kr.co.nicevan.nvcat;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -119,5 +122,22 @@ public class CommonUtil {
         return rtnVal;
     }
 
+    /**
+     * 전체화면
+     */
+    public static void hideSystemUI(Object context) {
+        View decorView;
+        if (context instanceof Activity) {
+            decorView = ((Activity) context).getWindow().getDecorView();
+        } else if (context instanceof Dialog) {
+            decorView = ((Dialog) context).getWindow().getDecorView();
+        } else {
+            return;
+        }
 
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE);
+//        decorView.requestLayout();
+    }
 }

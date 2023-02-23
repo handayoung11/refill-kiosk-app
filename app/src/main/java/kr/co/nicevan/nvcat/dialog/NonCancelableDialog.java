@@ -20,6 +20,7 @@ public abstract class NonCancelableDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState, int contentViewId) {
         super.onCreate(savedInstanceState);
         setContentView(contentViewId);
+        CommonUtil.hideSystemUI(this);
 
         // 다이얼로그 사이즈 조정
         Display display = getWindow().getWindowManager().getDefaultDisplay();
