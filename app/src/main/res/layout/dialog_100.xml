@@ -11,15 +11,8 @@
 
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/dialog_title_bg"
-        android:fontFamily="casual"
-        android:gravity="center"
-        android:text="결제 방법 선택"
-        android:textColor="#ffffff"
-        android:textSize="24sp" />
+        style="@style/title_text"
+        android:text="결제 방법 선택" />
 
 
     <LinearLayout
@@ -71,8 +64,8 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/dotted"
                 android:contentDescription="dotted line"
+                android:src="@drawable/dotted"
                 app:scale_height="3"
                 app:scale_left="8"
                 app:scale_top="0"
