@@ -31,7 +31,6 @@ public class Dialog200 extends NonCancelableDialog {
     }
 
     public interface DialogListener{
-        public void onPositiveClicked(String data);
         public void onNegativeClicked();
     }
 
@@ -70,14 +69,6 @@ public class Dialog200 extends NonCancelableDialog {
             }
         }
 
-
-        Button btn_ok = (Button)findViewById(R.id.btn_ok);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialogListener.onPositiveClicked("OK");
-            }
-        });
 
         Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
         btn_cancel.setOnClickListener(new View.OnClickListener() {
