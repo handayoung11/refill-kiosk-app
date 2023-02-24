@@ -28,10 +28,7 @@ public class Dialog100 extends NonCancelableDialog {
     }
 
     public interface DialogListener{
-        public void onPositiveClicked(String data);
         public void onNegativeClicked();
-        public void onClickedBtn01();
-        public void onClickedBtn02();
         public void choPayType(String payType);
     }
 

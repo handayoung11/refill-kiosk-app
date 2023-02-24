@@ -70,22 +70,11 @@ public class MainDialogManager {
 
         Dialog100 dialog100 = new Dialog100(mainActivity, reqType);
         dialog100.setDialogListener(new Dialog100.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
 
             @Override
             public void onNegativeClicked() {
                 // 결제종료
                 NicepayManager.getInstance().closePayment(_결제중지);
-            }
-
-            @Override
-            public void onClickedBtn01() {
-            }
-
-            @Override
-            public void onClickedBtn02() {
             }
 
             @Override
@@ -104,9 +93,6 @@ public class MainDialogManager {
 
         dialog200 = new Dialog200(mainActivity, curReqType, payType);
         dialog200.setDialogListener(new Dialog200.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
 
             @Override
             public void onNegativeClicked() {
