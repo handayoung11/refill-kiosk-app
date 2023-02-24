@@ -49,7 +49,7 @@ public class Dialog200 extends NonCancelableDialog {
 
         if(curReqType.equals(CommonUtil._승인요청)){
             if(payType.equals(CommonUtil._신용카드)) {
-                iv_01.setImageResource(R.drawable.img_01);
+                iv_01.setImageResource(R.drawable.insert_credit_card);
                 tv_01.setText(context.getResources().getString(R.string.msg_01));
                 tv_02.setText(context.getResources().getString(R.string.msg_02));
             }else if(payType.equals(CommonUtil._삼성페이)){
@@ -59,7 +59,7 @@ public class Dialog200 extends NonCancelableDialog {
             }
         }else if(curReqType.equals(CommonUtil._취소요청)){
             if(payType.equals(CommonUtil._신용카드)) {
-                iv_01.setImageResource(R.drawable.img_01);
+                iv_01.setImageResource(R.drawable.insert_credit_card);
                 tv_01.setText(context.getResources().getString(R.string.msg_01));
                 tv_02.setText(context.getResources().getString(R.string.msg_02_01));
             }else if(payType.equals(CommonUtil._삼성페이)){
