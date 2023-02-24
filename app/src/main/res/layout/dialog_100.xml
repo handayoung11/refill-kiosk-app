@@ -60,13 +60,6 @@
 
     <Button
         android:id="@+id/btn_cancel"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/dialog_bottom_bg"
-        android:gravity="center"
-        android:text="결제취소"
-        android:textColor="#ffffff"
-        android:textSize="20sp" />
+        style="@style/cancel_order_btn" />
 
 </LinearLayout>
