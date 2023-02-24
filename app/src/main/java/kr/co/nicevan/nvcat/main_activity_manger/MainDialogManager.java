@@ -22,12 +22,12 @@ public class MainDialogManager {
 
     private static MainDialogManager instance;
 
-    Dialog200 dialog200;
-    Dialog250 dialog250;
-    Dialog400 dialog400;
+    private Dialog200 dialog200;
+    private Dialog250 dialog250;
+    private Dialog400 dialog400;
 
-    AppConfig appConfig = AppConfig.getInstance();
-    PrinterService printerService = appConfig.printerService();
+    private AppConfig appConfig = AppConfig.getInstance();
+    private PrinterService printerService = appConfig.printerService();
 
     private String TAG = this.getClass().getSimpleName();
 
