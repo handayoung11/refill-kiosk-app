@@ -42,9 +42,9 @@ public class Dialog200 extends NonCancelableDialog {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.dialog_200);
 
-        ImageView iv_01 = (ImageView)findViewById(R.id.iv_01);
-        TextView tv_01 = (TextView)findViewById(R.id.tv_01);
-        TextView tv_02 = (TextView)findViewById(R.id.tv_02);
+        ImageView iv_01 = findViewById(R.id.iv_01);
+        TextView tv_01 = findViewById(R.id.tv_01);
+        TextView tv_02 = findViewById(R.id.tv_02);
 
         if(curReqType.equals(CommonUtil._승인요청)){
             if(payType.equals(CommonUtil._신용카드)) {
