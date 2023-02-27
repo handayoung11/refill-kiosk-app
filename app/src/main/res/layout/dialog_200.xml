@@ -73,7 +73,7 @@
 
 
     <Button
-        android:id="@+id/btn_cancel"
+        android:id="@+id/ic_modal_btn_cancel"
         style="@style/cancel_order_btn" />
 
 

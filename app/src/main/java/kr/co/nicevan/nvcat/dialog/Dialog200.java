@@ -3,7 +3,6 @@ package kr.co.nicevan.nvcat.dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -70,14 +69,11 @@ public class Dialog200 extends NonCancelableDialog {
         }
 
 
-        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "Dialog200 - 결제취소");
-                dialogListener.onNegativeClicked();
-                dismiss();
-            }
+        Button btn_cancel = findViewById(R.id.ic_modal_btn_cancel);
+        btn_cancel.setOnClickListener(view -> {
+            Log.d(TAG, "Dialog200 - 결제취소");
+            dialogListener.onNegativeClicked();
+            dismiss();
         });
 
     }
