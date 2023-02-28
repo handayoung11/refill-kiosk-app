@@ -17,7 +17,7 @@
     <string name="msg_cancel_pay_03_01">대기시간이 지나 승인취소가 중지되었습니다. \n다시 진행해 주세요.</string>
     <string name="msg_01">신용카드를 그림과 같이 \nIC 카드리더기에 투입하여 주세요.</string>
     <string name="msg_02">결제가 완료될 때까지 카드를 빼지 마세요. \n30초 이내로 결제하지 않으면 자동으로 취소됩니다.</string>
-    <string name="msg_02_01">취소가 완료될 때까지 카드를 뽑지 마세요. \n\n30초 이내로 처리하지 않으면 자동으로 종료됩니다.</string>
+    <string name="msg_02_01">취소가 완료될 때까지 카드를 뽑지 마세요. \n30초 이내로 처리하지 않으면 자동으로 종료됩니다.</string>
     <string name="msg_01_0">삼성페이 스마트폰을 그림과 같이 \n카드리더기에 접촉해 주세요.</string>
     <string name="msg_02_0">30초 이내로 결제하지 않으면 자동으로 취소됩니다.</string>
     <string name="msg_02_0_01">30초 이내로 처리하지 않으면 자동으로 종료됩니다.</string>
