@@ -67,7 +67,7 @@
 
         </com.ssomai.android.scalablelayout.ScalableLayout>
 
-        <include layout="@layout/layout_price"/>
+        <include layout="@layout/layout_price" />
 
     </LinearLayout>
 
@@ -75,6 +75,5 @@
     <Button
         android:id="@+id/ic_modal_btn_cancel"
         style="@style/cancel_order_btn" />
-
-
+    
 </LinearLayout>
