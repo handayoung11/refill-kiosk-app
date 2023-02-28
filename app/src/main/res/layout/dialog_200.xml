@@ -72,8 +72,8 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/ic_modal_btn_cancel"
-        style="@style/cancel_order_btn" />
-    
+<!--    <Button-->
+<!--        android:id="@+id/ic_modal_btn_cancel"-->
+<!--        style="@style/cancel_order_btn" />-->
+    <include layout="@layout/layout_empty_rd_bottom" />
 </LinearLayout>
