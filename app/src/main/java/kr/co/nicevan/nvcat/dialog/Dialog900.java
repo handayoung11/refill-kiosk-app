@@ -40,8 +40,7 @@ public class Dialog900 extends NonCancelableDialog {
     }
 
     public interface DialogListener{
-        public void onPositiveClicked();
-        public void onNegativeClicked();
+        void onPositiveClicked();
     }
 
     public void setDialogListener(DialogListener dialogListener){
@@ -80,13 +79,6 @@ public class Dialog900 extends NonCancelableDialog {
                 clockHandler.removeMessages(0);
                 dialogListener.onPositiveClicked();
                 dismiss();
-            }
-        });
-
-        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
             }
         });
 

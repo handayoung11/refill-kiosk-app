@@ -169,10 +169,6 @@ public class MainDialogManager {
             @Override
             public void onPositiveClicked() {
             }
-
-            @Override
-            public void onNegativeClicked() {
-            }
         });
         dialog900.show();
     }
