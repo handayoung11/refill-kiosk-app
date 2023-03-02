@@ -55,27 +55,32 @@ public class Dialog900 extends NonCancelableDialog {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.dialog_900);
 
-        tv_title = (TextView)findViewById(R.id.tv_title);
-        tv_01 = (TextView)findViewById(R.id.tv_01);
-        tv_02 = (TextView)findViewById(R.id.tv_02);
+        tv_title = findViewById(R.id.tv_title);
+        tv_01 = findViewById(R.id.tv_01);
+        tv_02 = findViewById(R.id.tv_02);
+        ImageView iv = findViewById(R.id.md_od_fail_iv);
+        Glide.with(this.context).load(R.drawable.md_od_fail_hourgrass).into(iv);
+        Button btn_ok = findViewById(R.id.modal_od_fail_btn_cancel);
 
-        if(curReqType.equals(CommonUtil._승인요청)){
-            tv_title.setText("결 제 종 료");
-            if(cancelType.equals(CommonUtil._결제중지)){
-                tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_02));
-            }else if(cancelType.equals(CommonUtil._대기종료)){
+        if (curReqType.equals(CommonUtil._승인요청)) {
+            if (cancelType.equals(CommonUtil._대기종료)) {
+                tv_title.setText("대기시간 만료");
                 tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_03));
             }
-        }else if(curReqType.equals(CommonUtil._취소요청)){
-            tv_title.setText("승인취소종료");
-            if(cancelType.equals(CommonUtil._결제중지)){
+        } else if (curReqType.equals(CommonUtil._취소요청)) {
+            TextView repayTv = findViewById(R.id.md_od_fail_repay_tv);
+            repayTv.setText(R.string.md_od_fail_cancel_pay_repay);
+            btn_ok.setText("승인취소 종료");
+
+            if (cancelType.equals(CommonUtil._결제중지)) {
+                tv_title.setText("승인취소 중지");
                 tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_02_01));
             } else if (cancelType.equals(CommonUtil._대기종료)) {
+                tv_title.setText("대기시간 만료");
                 tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_03_01));
             }
         }
 
-        Button btn_ok = (Button)findViewById(R.id.btn_ok);
         btn_ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,7 +104,7 @@ public class Dialog900 extends NonCancelableDialog {
             tv_02.setText(waitTimeCnt + "초 후 자동 종료됩니다.");
             Log.d(TAG, "waitTimeCnt : " + waitTimeCnt);
 
-            if(waitTimeCnt > -1) {
+            if (waitTimeCnt > 0) {
                 clockHandler.sendEmptyMessageDelayed(0, 1000);
             } else {
                 // 대기시간 종료
