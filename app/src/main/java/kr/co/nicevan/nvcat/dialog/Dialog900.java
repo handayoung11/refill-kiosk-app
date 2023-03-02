@@ -8,9 +8,12 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import com.bumptech.glide.Glide;
 
 import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.R;
@@ -32,23 +35,23 @@ public class Dialog900 extends NonCancelableDialog {
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
     public String cancelType = ""; // 종료구분
 
-    public Dialog900(@NonNull Context context, String curReqType, String cancelType){
+    public Dialog900(@NonNull Context context, String curReqType, String cancelType) {
         super(context);
         this.context = context;
         this.curReqType = curReqType;
         this.cancelType = cancelType;
     }
 
-    public interface DialogListener{
+    public interface DialogListener {
         void onPositiveClicked();
     }
 
-    public void setDialogListener(DialogListener dialogListener){
+    public void setDialogListener(DialogListener dialogListener) {
         this.dialogListener = dialogListener;
     }
 
     @Override
-    protected void onCreate(Bundle saveInstanceState){
+    protected void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.dialog_900);
 
@@ -67,7 +70,7 @@ public class Dialog900 extends NonCancelableDialog {
             tv_title.setText("승인취소종료");
             if(cancelType.equals(CommonUtil._결제중지)){
                 tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_02_01));
-            }else if(cancelType.equals(CommonUtil._대기종료)){
+            } else if (cancelType.equals(CommonUtil._대기종료)) {
                 tv_01.setText(context.getResources().getString(R.string.msg_cancel_pay_03_01));
             }
         }
@@ -85,7 +88,7 @@ public class Dialog900 extends NonCancelableDialog {
         clockHandler.sendEmptyMessageDelayed(0, 1000);
     }
 
-    public void setData(String data){
+    public void setData(String data) {
     }
 
     @SuppressLint("HandlerLeak")
@@ -98,7 +101,7 @@ public class Dialog900 extends NonCancelableDialog {
 
             if(waitTimeCnt > -1) {
                 clockHandler.sendEmptyMessageDelayed(0, 1000);
-            }else{
+            } else {
                 // 대기시간 종료
                 isTimeout = true;
                 clockHandler.removeMessages(0);
