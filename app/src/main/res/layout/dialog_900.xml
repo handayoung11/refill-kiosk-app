@@ -18,70 +18,28 @@
         android:background="#E6E6E6">
 
         <com.ssomai.android.scalablelayout.ScalableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            app:scale_base_height="122"
-            app:scale_base_width="100">
+            style="@style/gif_info_md_scalable">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/md_od_fail_hourgrass_circle"
-                app:scale_height="25"
-                app:scale_left="37.5"
-                app:scale_top="15"
-                app:scale_width="25" />
+            <ImageView style="@style/gif_info_md_white_cir" />
 
             <ImageView
                 android:id="@+id/md_od_fail_iv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:scale_height="25"
-                app:scale_left="37.5"
-                app:scale_top="15"
-                app:scale_width="25" />
+                style="@style/gif_info_md_gif_img" />
 
             <TextView
                 android:id="@+id/tv_01"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="결제가 중지되었습니다."
-                android:textColor="#000000"
-                android:textStyle="bold"
-                app:scale_height="20"
-                app:scale_left="0"
-                app:scale_textsize="5"
-                app:scale_top="50"
-                app:scale_width="100" />
+                style="@style/gif_info_md_body_text" />
 
             <TextView
                 android:id="@+id/md_od_fail_repay_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="결제를 다시 진행해주세요"
-                android:textColor="#656565"
-                android:textStyle="bold"
-                app:scale_height="20"
-                app:scale_left="0"
-                app:scale_textsize="3.5"
-                app:scale_top="70"
-                app:scale_width="100" />
+                style="@style/gif_info_md_sm_text" />
 
             <TextView
                 android:id="@+id/tv_02"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="10초 후 자동 종료됩니다."
-                android:textColor="@color/red"
-                app:scale_height="20"
-                app:scale_left="1"
-                app:scale_textsize="3"
-                app:scale_top="90"
-                app:scale_width="100" />
+                style="@style/gif_info_md_red_text" />
 
         </com.ssomai.android.scalablelayout.ScalableLayout>
 

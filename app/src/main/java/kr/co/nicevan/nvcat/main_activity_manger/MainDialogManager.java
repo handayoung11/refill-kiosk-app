@@ -33,19 +33,7 @@ public class MainDialogManager {
 
     private MainDialogManager(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-
         dialog250 = new Dialog250(mainActivity);
-        dialog250.setDialogListener(new Dialog250.DialogListener() {
-            @Override
-            public void onPositiveClicked(String data) {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-                // 결제종료
-                NicepayManager.getInstance().closePayment(_결제중지);
-            }
-        });
     }
 
     public static MainDialogManager init(MainActivity mainActivity) {
