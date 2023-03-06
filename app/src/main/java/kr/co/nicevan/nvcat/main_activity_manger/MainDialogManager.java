@@ -57,19 +57,9 @@ public class MainDialogManager {
     public void popDialog100(String reqType) {
 
         Dialog100 dialog100 = new Dialog100(mainActivity, reqType);
-        dialog100.setDialogListener(new Dialog100.DialogListener() {
-
-            @Override
-            public void onNegativeClicked() {
-                // 결제종료
-                NicepayManager.getInstance().closePayment(_결제중지);
-            }
-
-            @Override
-            public void choPayType(String payType) {
-                // 카드투입 요청
-                NicepayManager.getInstance().icPay(payType);
-            }
+        dialog100.setDialogListener(payType -> {
+            // 카드투입 요청
+            NicepayManager.getInstance().icPay(payType);
         });
         dialog100.show();
     }

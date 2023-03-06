@@ -2,7 +2,6 @@ package kr.co.nicevan.nvcat.dialog;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,8 +27,7 @@ public class Dialog100 extends NonCancelableDialog {
     }
 
     public interface DialogListener{
-        public void onNegativeClicked();
-        public void choPayType(String payType);
+        void choPayType(String payType);
     }
 
     public void setDialogListener(DialogListener dialogListener){
@@ -54,13 +52,7 @@ public class Dialog100 extends NonCancelableDialog {
         }
 
         // 결제취소
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialogListener.onNegativeClicked();
-                dismiss();
-            }
-        });
+        btn_cancel.setOnClickListener(view -> dismiss());
 
         // 신용카드 선택
         btn_01.setOnClickListener(view -> {
