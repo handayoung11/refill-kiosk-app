@@ -15,7 +15,6 @@ public class Dialog200 extends NonCancelableDialog {
     String TAG = this.getClass().getSimpleName();
 
     private Context context;
-    private DialogListener dialogListener;
 
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
     String payType = ""; // 결제방법(신용카드/삼성페이)
@@ -25,14 +24,6 @@ public class Dialog200 extends NonCancelableDialog {
         this.context = context;
         this.curReqType = curReqType;
         this.payType = payType;
-    }
-
-    public interface DialogListener{
-        void onNegativeClicked();
-    }
-
-    public void setDialogListener(DialogListener dialogListener){
-        this.dialogListener = dialogListener;
     }
 
     @Override

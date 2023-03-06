@@ -1,10 +1,7 @@
 package kr.co.nicevan.nvcat.main_activity_manger;
 
-import static kr.co.nicevan.nvcat.CommonUtil._결제중지;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.LABEL;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
-
-import android.util.Log;
 
 import kr.co.nicevan.nvcat.AppConfig;
 import kr.co.nicevan.nvcat.activity.MainActivity;
@@ -70,15 +67,6 @@ public class MainDialogManager {
     public void popICDialog(String curReqType, String payType) {
 
         dialog200 = new Dialog200(mainActivity, curReqType, payType);
-        dialog200.setDialogListener(new Dialog200.DialogListener() {
-
-            @Override
-            public void onNegativeClicked() {
-                Log.d(TAG, "popDialog200 - 결제중지");
-                // 결제종료
-                NicepayManager.getInstance().closePayment(_결제중지);
-            }
-        });
         dialog200.show();
     }
 
