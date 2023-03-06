@@ -103,7 +103,6 @@
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/red</item>
         <item name="scale_height">20</item>
-        <item name="scale_left">1</item>
         <item name="scale_textsize">3</item>
         <item name="scale_top">90</item>
         <item name="scale_width">100</item>
