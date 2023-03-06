@@ -422,12 +422,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "RESULT_CANCELED", Toast.LENGTH_SHORT).show();
 
                 // IC 카드리딩실패 (타임아웃)
-                if (NVCAT_RETURN_CODE == -7) {
-                    // 결제중지
+                String errorCode = NVCAT_RECV_DATA.substring(NVCAT_RECV_DATA.length() - 2);
+                if (NVCAT_RETURN_CODE == -7 || (NVCAT_RETURN_CODE == -8 && errorCode.equals("F2"))) {
+                    // 대기시간 만료 안내모달
                     NicepayManager.getInstance().closePayment(_대기종료);
                 }
 
-                // FALLBACK 발생 - NVCATRETURNCODE : -9, NVCATRECVDATA : FALLBACK 재시도 사용 안함
                 if (NVCAT_RETURN_CODE == -9) {
                     // MS 거래 요청
                     String sendData = nicePayManager.msPay();
