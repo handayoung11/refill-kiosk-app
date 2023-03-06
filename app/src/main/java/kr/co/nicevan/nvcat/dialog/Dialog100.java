@@ -40,10 +40,10 @@ public class Dialog100 extends NonCancelableDialog {
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
 
-        TextView tv_title = (TextView)findViewById(R.id.tv_title);
-        Button btn_01 = (Button)findViewById(R.id.btn_01);
-        Button btn_02 = (Button)findViewById(R.id.btn_02);
-        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
+        TextView tv_title = findViewById(R.id.tv_title);
+        Button btn_01 = findViewById(R.id.btn_01);
+        Button btn_02 = findViewById(R.id.btn_02);
+        Button btn_cancel = findViewById(R.id.btn_cancel);
 
         if(curReqType.equals(CommonUtil._승인요청)) {
             tv_title.setText("결제 방법 선택");
@@ -63,23 +63,17 @@ public class Dialog100 extends NonCancelableDialog {
         });
 
         // 신용카드 선택
-        btn_01.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                payType = CommonUtil._신용카드;
-                dialogListener.choPayType(payType);
-                dismiss();
-            }
+        btn_01.setOnClickListener(view -> {
+            payType = CommonUtil._신용카드;
+            dialogListener.choPayType(payType);
+            dismiss();
         });
 
         // 삼성페이 선택
-        btn_02.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                payType = CommonUtil._삼성페이;
-                dialogListener.choPayType(payType);
-                dismiss();
-            }
+        btn_02.setOnClickListener(view -> {
+            payType = CommonUtil._삼성페이;
+            dialogListener.choPayType(payType);
+            dismiss();
         });
     }
 
