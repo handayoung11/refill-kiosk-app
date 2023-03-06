@@ -249,7 +249,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        printerService.closeAll();
+        try {
+            printerService.closeAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
