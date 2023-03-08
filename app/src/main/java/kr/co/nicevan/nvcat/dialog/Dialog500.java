@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -38,8 +37,7 @@ public class Dialog500 extends NonCancelableDialog {
     }
 
     public interface DialogListener{
-        public void onPositiveClicked();
-        public void onNegativeClicked();
+        void onPositiveClicked();
     }
 
     public void setDialogListener(DialogListener dialogListener){
@@ -61,23 +59,10 @@ public class Dialog500 extends NonCancelableDialog {
         }
 
         Button btn_ok = (Button)findViewById(R.id.btn_ok);
-        btn_ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clockHandler.removeMessages(0);
-                dialogListener.onPositiveClicked();
-                dismiss();
-            }
-        });
-
-        Button btn_cancel = (Button)findViewById(R.id.btn_cancel);
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clockHandler.removeMessages(0);
-                dialogListener.onNegativeClicked();
-                dismiss();
-            }
+        btn_ok.setOnClickListener(view -> {
+            clockHandler.removeMessages(0);
+            dialogListener.onPositiveClicked();
+            dismiss();
         });
 
         clockHandler.sendEmptyMessageDelayed(0, 1000);

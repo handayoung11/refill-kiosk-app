@@ -116,14 +116,7 @@ public class MainDialogManager {
     public void popDialog500() {
 
         Dialog500 dialog500 = new Dialog500(mainActivity, printerService.isCompleted(RECEIPT), printerService.isCompleted(LABEL));
-        dialog500.setDialogListener(new Dialog500.DialogListener() {
-            @Override
-            public void onPositiveClicked() {
-            }
-
-            @Override
-            public void onNegativeClicked() {
-            }
+        dialog500.setDialogListener(() -> {
         });
         dialog500.show();
     }
