@@ -9,38 +9,19 @@
     android:gravity="center"
     tools:context=".dialog.Dialog500">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="horizontal">
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/title_text"
+        android:text="출력 완료" />
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:background="#34925f"
-            android:text="출력 완료"
-            android:textColor="#ffffff"
-            android:textSize="55dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
-        android:orientation="vertical">
+    <LinearLayout style="@style/md_body">
 
         <com.ssomai.android.scalablelayout.ScalableLayout
             android:layout_marginTop="0dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:scale_base_width="100"
-            app:scale_base_height="142" >
+            app:scale_base_height="122" >
 
             <ImageView
                 android:id="@+id/iv_01"
@@ -83,37 +64,9 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#213429"
-            android:gravity="center"
-            android:text="결 제 취 소"
-            android:textSize="50dp"
-            android:textColor="#ffffff"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btn_ok"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#213429"
-            android:gravity="center"
-            android:text="확 인"
-            android:textSize="50dp"
-            android:textColor="#ffffff"
-            android:visibility="visible" />
-
-    </LinearLayout>
-
+    <Button
+        android:id="@+id/btn_ok"
+        style="@style/cancel_order_btn"
+        android:background="@drawable/dialog_bottom_green_btn"
+        android:text="확인"/>
 </LinearLayout>
