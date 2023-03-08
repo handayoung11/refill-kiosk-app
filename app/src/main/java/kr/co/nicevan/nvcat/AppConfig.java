@@ -77,7 +77,7 @@ public class AppConfig {
         try {
             if (object == null) {
                 Constructor con = clazz.getConstructor(clazzes);
-                con.newInstance(params);
+                object = con.newInstance(params);
             }
             return object;
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException |
