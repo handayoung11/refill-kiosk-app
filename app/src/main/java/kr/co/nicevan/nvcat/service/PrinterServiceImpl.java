@@ -1,37 +1,26 @@
 package kr.co.nicevan.nvcat.service;
 
-import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.stringToBitmap;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterManager.*;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.*;
 
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import kr.co.nicevan.nvcat.CommonUtil;
@@ -43,7 +32,6 @@ import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.PrinterDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.service.common.CommonService;
-import kr.co.nicevan.nvcat.service.label.LabelService;
 
 public class PrinterServiceImpl implements PrinterService {
 
@@ -102,35 +90,38 @@ public class PrinterServiceImpl implements PrinterService {
         Log.d(TAG, "P-alignment : " + printerDTO.getConfig().getAlignment());
         Log.d(TAG, "P-attribute : " + printerDTO.getConfig().getAttribute());
         Log.d(TAG, "P-spinnerSize : " + printerDTO.getConfig().getSpinnerSize());
-        print(printer, printerDTO);
+        if(printerDTO.getType().equals(RECEIPT)) printByText(printer, printerDTO);
+        else if(printerDTO.getType().equals(LABEL)) printByBitMap(printer, printerDTO);
 
         //프린트 종료.
         if(printerDTO.getType().equals(RECEIPT)) printer.cutPaper();
         else if(printerDTO.getType().equals(LABEL)) printer.formFeed();
         printer.endTransactionPrint();
-
         return true;
     }
 
     /**
      * 출력 공통 함수
      */
-    private void print(BixolonPrinter printer, PrinterDTO p){
+    private void printByText(BixolonPrinter printer, PrinterDTO p){
         //프린트 텍스트 출력
         for(String s : p.getOutput()){
             Log.d("",s);
             printer.printText(s, p.getConfig().getAlignment(), p.getConfig().getAttribute(), p.getConfig().getSpinnerSize());
-
-//            텍스트를 이미지로 변환 후 출력 테스트 코드
-//            int width = 600;
-//            Bitmap bitmap = getBitMapText(s, width);
-//            saveBitmapToJpg(bitmap, "label","labelTest");
-//            printer.printImage(bitmap, width-50, -1, 50, 0, 1);
         }
-        //프린트 이미지 출력 - [영수증:사인],[라벨:친환경마크]
         if(p.getImg() == ""){
             Bitmap stringBitmap = stringToBitmap(p.getImg());
             printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
+        }
+    }
+
+    private void printByBitMap(BixolonPrinter printer, PrinterDTO p){
+        //프린트 텍스트 출력
+        for(String s : p.getOutput()){
+            Log.d("",s);
+            Bitmap bitmap = getBitMapText(s, printer.getPrinterMaxWidth(), printer.getContext().getAssets());
+//            saveBitmapToJpg(bitmap, "label","labelTest");
+            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
         }
     }
 
@@ -153,14 +144,14 @@ public class PrinterServiceImpl implements PrinterService {
         StringBuilder sb = new StringBuilder();
         sb.append(response.getLiquidName()+" "+response.getOdExAmount()+"g\n");
         sb.append("[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n");
-//        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
-        sb.append("---------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
+        sb.append("-----------------------------------------------------------------\n");
         sb.append("[전성분]\n");
         sb.append(response.getLiquidIngredients()+"\n\n");
         sb.append("[사용시 주의사항]\n");
         sb.append(response.getLiquidCaution()+"\n\n");
         sb.append("[제조업체] "+response.getLiquidManufacturer()+"\t\t"+ "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\t\t"+"[맞춤판매업체] "+response.getLiquidSellerName()+"\n");
-        sb.append("---------------------------------------------------------------------------------------------------------------------------------------\n");
+        sb.append("-----------------------------------------------------------------\n");
         return sb.toString();
     }
 
@@ -202,11 +193,17 @@ public class PrinterServiceImpl implements PrinterService {
         return strData;
     }
 
-    private Bitmap getBitMapText(String text, int width){
+    private Bitmap getBitMapText(String text, int width, AssetManager am){
         //new paint
         Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG);
         paint.setColor(Color.BLACK);
         paint.setTextSize(16);
+
+        //set font
+
+        Typeface typeface = Typeface.createFromAsset(am, "fonts/hline.ttf");
+        paint.setTypeface(typeface);
+
         //draw text with paint to layout
         TextPaint textPaint = new TextPaint(paint);
         StaticLayout textLayout = StaticLayout

@@ -196,11 +196,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
-
-                // 라벨 출력 테스트
-//                cardInfo = new CardDTO("", "", "", "", "",
-//                        "", "Test123", "", signImgString);
-//                printLabel(cardInfo);
             }
         });
 
@@ -624,7 +619,6 @@ public class MainActivity extends AppCompatActivity {
         labelService.printLabelByOrder(cardInfo.getApprovalNo(), new RevealLabelRespCallbacks() {
             @Override
             public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
-
                 boolean printed = printerService.labelPrint(value);
                 if (!printed) {
                     mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
