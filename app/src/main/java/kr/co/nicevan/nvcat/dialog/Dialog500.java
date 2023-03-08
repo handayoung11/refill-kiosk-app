@@ -79,7 +79,7 @@ public class Dialog500 extends NonCancelableDialog {
             tv_02.setText(waitTimeCnt + "초 후 자동 종료됩니다.");
             Log.d(TAG, "waitTimeCnt : " + waitTimeCnt);
 
-            if(waitTimeCnt > -1) {
+            if(waitTimeCnt > 0) {
                 clockHandler.sendEmptyMessageDelayed(0, 1000);
             }else{
                 // 대기시간 종료
