@@ -21,7 +21,6 @@
     <string name="msg_01_0">삼성페이 스마트폰을 그림과 같이 \n카드리더기에 접촉해 주세요.</string>
     <string name="msg_02_0">30초 이내로 결제하지 않으면 자동으로 취소됩니다.</string>
     <string name="msg_02_0_01">30초 이내로 처리하지 않으면 자동으로 종료됩니다.</string>
-    <string name="msg_03">결제가 완료되었습니다. \n카드를 회수해 주세요. \n\n영수증을 출력 하시겠습니까?</string>
     <string name="msg_04">영수증을 출력 중 입니다. \n\n잠시만 기다려 주세요.</string>
     <string name="msg_05">영수증과 라벨이 출력 되었습니다. \n\n라벨은 용기에 부착해주세요.</string>
     <string name="msg_05_01">라벨이 출력 되었습니다. \n\n라벨은 용기에 부착해주세요.</string>
