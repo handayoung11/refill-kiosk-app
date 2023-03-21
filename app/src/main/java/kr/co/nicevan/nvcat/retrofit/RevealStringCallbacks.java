@@ -2,7 +2,8 @@ package kr.co.nicevan.nvcat.retrofit;
 
 import androidx.annotation.NonNull;
 
+import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
+
 public interface RevealStringCallbacks {
-    void onSuccess(@NonNull String value);
-    void onError(@NonNull Throwable throwable);
+    void on(@NonNull String value);
 }
