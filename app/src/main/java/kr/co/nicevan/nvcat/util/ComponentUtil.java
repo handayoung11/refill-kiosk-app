@@ -41,6 +41,9 @@ public class ComponentUtil {
         webViewSettings.setSupportZoom(false);
         // 줌인 아이콘을 사용할 수 있도록 설정
         webViewSettings.setBuiltInZoomControls(false);
+        //화면비율 설정
+        webViewSettings.setUseWideViewPort(true);
+        webViewSettings.setLoadWithOverviewMode(true);
         webView.setWebViewClient(new WebViewClient() {
             //@TargetApi(Build.VERSION_CODES.N)
             @Override
