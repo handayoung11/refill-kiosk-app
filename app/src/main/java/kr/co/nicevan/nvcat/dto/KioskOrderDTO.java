@@ -11,14 +11,14 @@ public class KioskOrderDTO {
         private ArrayList<Long> itemOfShopIdList;
         @SerializedName("volumes")
         private ArrayList<Integer> volumes;
-        private String pNum;
+        private String phone;
         private String approvementId;
         private Long memberId;
 
-        public SaveOrders(ArrayList<Long> itemOfShopIdList, ArrayList<Integer> volumes, String pNum, String approvementId, Long memberId) {
+        public SaveOrders(ArrayList<Long> itemOfShopIdList, ArrayList<Integer> volumes, String phone, String approvementId, Long memberId) {
             this.itemOfShopIdList = itemOfShopIdList;
             this.volumes = volumes;
-            this.pNum = pNum;
+            this.phone = phone;
             this.approvementId = approvementId;
             this.memberId = memberId;
         }
@@ -31,9 +31,7 @@ public class KioskOrderDTO {
             return volumes;
         }
 
-        public String getpNum() {
-            return pNum;
-        }
+        public String getPhone() {return phone;}
 
         public String getApprovementId() {
             return approvementId;

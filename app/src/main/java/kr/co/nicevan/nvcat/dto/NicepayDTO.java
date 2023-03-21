@@ -68,16 +68,16 @@ public class NicepayDTO {
         String payAmount; // 거래금액
         String payAgreenum; // 승인번호 (취소요청시만 해당)
         String payAgreedate; // 원거래일자(YYMMDD) (취소요청시만 해당)
+        String payAmountFormat; //포맷된 거래금액 (#,###원)
 
-        public ReqPaymentDTO(String payAmount, String payAgreenum, String payAgreedate) {
+        public ReqPaymentDTO(String payAmount, String payAgreenum, String payAgreedate, String payAmountFormat) {
             this.payAmount = payAmount;
             this.payAgreenum = payAgreenum;
             this.payAgreedate = payAgreedate;
+            this.payAmountFormat = payAmountFormat;
         }
 
-        public String getPayAmount() {
-            return payAmount;
-        }
+        public String getPayAmount() { return payAmount; }
 
         public String getPayAgreenum() {
             return payAgreenum;
@@ -86,5 +86,7 @@ public class NicepayDTO {
         public String getPayAgreedate() {
             return payAgreedate;
         }
+
+        public String getPayAmountFormat() { return payAmountFormat; }
     }
 }
