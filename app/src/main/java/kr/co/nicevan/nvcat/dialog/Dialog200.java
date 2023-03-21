@@ -18,12 +18,14 @@ public class Dialog200 extends NonCancelableDialog {
 
     String curReqType = ""; // 현재 진행중인 거래구분(승인요청/취소요청)
     String payType = ""; // 결제방법(신용카드/삼성페이)
+    String totPrice; // 결제금액
 
-    public Dialog200(@NonNull Context context, String curReqType, String payType){
+    public Dialog200(@NonNull Context context, String curReqType, String payType, String totPrice){
         super(context);
         this.context = context;
         this.curReqType = curReqType;
         this.payType = payType;
+        this.totPrice = totPrice;
     }
 
     @Override
@@ -34,6 +36,11 @@ public class Dialog200 extends NonCancelableDialog {
         ImageView iv_01 = findViewById(R.id.iv_01);
         TextView tv_01 = findViewById(R.id.tv_01);
         TextView tv_02 = findViewById(R.id.tv_02);
+
+        TextView order_price = findViewById(R.id.order_price);
+        TextView price = findViewById(R.id.price);
+        order_price.setText(totPrice);
+        price.setText(totPrice);
 
         if (payType.equals(CommonUtil._신용카드)) {
             iv_01.setImageResource(R.drawable.insert_credit_card);

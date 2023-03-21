@@ -19,11 +19,13 @@ public class Dialog100 extends NonCancelableDialog {
 
     String curReqType = ""; // 현재 거래구분(승인/취소)
     String payType = ""; // 결제방법(신용카드/삼성페이)
+    String totPrice = ""; //결제금액
 
-    public Dialog100(@NonNull Context context, String curReqType){
+    public Dialog100(@NonNull Context context, String curReqType, String totPrice){
         super(context, R.layout.dialog_100);
         this.context = context;
         this.curReqType = curReqType;
+        this.totPrice = totPrice;
     }
 
     public interface DialogListener{
@@ -42,6 +44,11 @@ public class Dialog100 extends NonCancelableDialog {
         Button btn_01 = findViewById(R.id.btn_01);
         Button btn_02 = findViewById(R.id.btn_02);
         Button btn_cancel = findViewById(R.id.btn_cancel);
+
+        TextView order_price = findViewById(R.id.order_price);
+        TextView price = findViewById(R.id.price);
+        order_price.setText(totPrice);
+        price.setText(totPrice);
 
         if(curReqType.equals(CommonUtil._승인요청)) {
             tv_title.setText("결제 방법 선택");
