@@ -1,5 +1,7 @@
 package kr.co.nicevan.nvcat.service.common;
 
+import java.text.DecimalFormat;
+
 public class CommonServiceImpl implements CommonService{
 
     /**  2022-01-30 작성자 : 염에녹
@@ -32,5 +34,11 @@ public class CommonServiceImpl implements CommonService{
         return sb.toString();
     }
 
+    //가격 formatter. String to String(return 0,000원)
+    @Override
+    public String formatByPrice(String data){
+        DecimalFormat formatter = new DecimalFormat();
+        return  formatter.format(Integer.parseInt(data)) + "원";
+    }
 
 }
