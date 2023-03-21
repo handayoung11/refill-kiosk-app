@@ -2,6 +2,7 @@ package kr.co.nicevan.nvcat.retrofit;
 
 import static kr.co.nicevan.nvcat.CommonUtil.BASE_URL;
 
+import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
@@ -23,7 +24,8 @@ public class RetrofitClient {
 
         //retrofit cookie config
         CookieManager cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
-        CookieJar cookieJar = new JavaNetCookieJar(cookieManager);
+        CookieHandler.setDefault(cookieManager);
+        CookieJar cookieJar = new JavaNetCookieJar(CookieHandler.getDefault());
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).cookieJar(cookieJar).build();
 
         //retrofit 객체 생성.
