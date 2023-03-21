@@ -1,7 +1,8 @@
 package kr.co.nicevan.nvcat.activity;
 
-import static kr.co.nicevan.nvcat.CommonUtil.BASE_URL;
 import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_LOGIN_URL;
+import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_ORDER_SUCCESS_URL;
+import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_SHOP_SELECT_URL;
 import static kr.co.nicevan.nvcat.CommonUtil._대기종료;
 import static kr.co.nicevan.nvcat.CommonUtil._승인요청;
 import static kr.co.nicevan.nvcat.CommonUtil._승인응답;
@@ -42,7 +43,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -56,14 +56,17 @@ import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.KioskOrderDTO;
 import kr.co.nicevan.nvcat.dto.LabelDTO;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
+import kr.co.nicevan.nvcat.dto.OrderDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.main_activity_manger.MainDialogManager;
 import kr.co.nicevan.nvcat.main_activity_manger.NicepayManager;
+import kr.co.nicevan.nvcat.retrofit.RevealLongCallbacks;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.roomdb.Payment;
 import kr.co.nicevan.nvcat.roomdb.PaymentDao;
 import kr.co.nicevan.nvcat.roomdb.RoomDB;
 import kr.co.nicevan.nvcat.service.PrinterService;
+import kr.co.nicevan.nvcat.service.common.CommonService;
 import kr.co.nicevan.nvcat.service.label.LabelService;
 import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
 import kr.co.nicevan.nvcat.service.login.LoginService;
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     Context context;
 
     public WebView webView;
-    public WebView webView2;
+//    public WebView webView2;
 
     RoomDB db;
     PaymentDao paymentDao;
@@ -103,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     // WEB 결제정보 파라미터
     String payAmount = ""; // 거래금액
     String payOrderNo = ""; // 주문번호
-    String payUserId = ""; // 주문자 고유 아이디
+    String payUserId = ""; // 주문자 고유 아이디(핸드폰번호)
     String payAgreenum = ""; // 승인번호 (취소요청시만 해당)
     String payAgreedate = ""; // 원거래일자(YYMMDD) (취소요청시만 해당)
 
@@ -118,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
     PrinterService printerService = appConfig.printerService();
     LoginService loginService = appConfig.loginService();
     OrderService orderService = appConfig.orderService();
+    CommonService commonService = appConfig.commonService();
 
 
     MainDialogManager mainDialogManager;
@@ -125,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
 
     //카드관련 응답데이터 setDTO.
     CardDTO cardInfo = new CardDTO();
+    //결제시도시 데이터 setDTO
+    OrderDTO orderDTO = new OrderDTO();
     KeyStoreUtil keyStoreUtil;
 
     @Override
@@ -165,23 +171,22 @@ public class MainActivity extends AppCompatActivity {
         webView = findWebViewByIdWithSettings(R.id.webView);
         webView.addJavascriptInterface(new WebViewInterface(this), "android");
 
-        String url = BASE_URL;
         //ID, PW 정보 없는 경우 로그인 화면으로 이동
         String id = keyStoreUtil.getData(KeyStoreUtil.ID_KEY, null);
         String pw = keyStoreUtil.getData(KeyStoreUtil.PW_KEY, null);
+
         if (pw == null || id == null) {
-            url = KIOSK_LOGIN_URL;
+            webView.loadUrl(KIOSK_LOGIN_URL);
         } else {
             //login 실패 시 로그인 페이지로 이동
-            loginService.login(id, pw, null, () -> webView.loadUrl(KIOSK_LOGIN_URL));
+            loginService.login(id, pw, () -> webView.loadUrl(KIOSK_SHOP_SELECT_URL), () -> webView.loadUrl(KIOSK_LOGIN_URL));
         }
-        webView.loadUrl(url);
         // webView End =============================================================
 
         // webView2 Start =============================================================
-        webView2 = findWebViewByIdWithSettings(R.id.webView2);
-        webView2.addJavascriptInterface(new WebViewInterface2(this), "android2");
-        webView2.loadUrl(CommonUtil.BASE_URL + "kiosk/webview");
+//        webView2 = findWebViewByIdWithSettings(R.id.webView2);
+//        webView2.addJavascriptInterface(new WebViewInterface2(this), "android2");
+//        webView2.loadUrl(CommonUtil.BASE_URL + "kiosk/webview");
         // webView2 End =============================================================
 
         PrinterManager.init(this);
@@ -195,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 결제방법 선택 팝업
-                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", ""));
+                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", "", "55,000원"));
             }
         });
 
@@ -206,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 결제방법 선택 팝업
-                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117"));
+                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117", "55,000원"));
             }
         });
 
@@ -285,31 +290,30 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void requestPayment(String reqType, String amount, String orderNo, String userId, String agreenum, String agreedate) {
-            /*
-            WEB 자바스크립트에서 아래 형태로 호출
-            android.requestPayment('승인', '3000', '2301101234', '01011112222', '', '');
-            */
+        public void requestPayment(String orderJsonData) {
+
+            //주문정보 DTO 저장
+            orderDTO.dtoByJson(orderJsonData);
+            orderDTO.formatToPrice(orderDTO.getAmount(), commonService);
 
             String curReqType = "";
             // 현재 거래구분(승인/취소)
-            if (reqType.equals("승인")) {
+            if (orderDTO.getReqType().equals("승인")) {
                 curReqType = _승인요청;
-            } else if (reqType.equals("취소")) {
+            } else if (orderDTO.getReqType().equals("취소")) {
                 curReqType = _취소요청;
             }
 
-            payAmount = amount; // 거래금액
-            payOrderNo = orderNo; // 주문번호
-            payUserId = userId; // 주문자 고유 아이디
-            payAgreenum = agreenum; // 승인번호 (취소요청시만 해당)
+            payAmount = orderDTO.getAmount(); // 거래금액
+            payOrderNo = ""; // 주문번호
+            payUserId = orderDTO.getPhone(); // 주문자 번호
+            payAgreenum = orderDTO.getAgreeNum(); // 승인번호 (취소요청시만 해당)
 
-            if (agreedate.length() >= 6) {
-                payAgreedate = agreedate.substring(0, 6); // 원거래일자(YYMMDD) (취소요청시만 해당)
+            if (orderDTO.getAgreeDate().length() >= 6) {
+                payAgreedate = orderDTO.getAgreeDate().substring(0, 6); // 원거래일자(YYMMDD) (취소요청시만 해당)
             }
-
             // 결제방법 선택 팝업
-            nicePayManager.selectPayMethod(curReqType, new NicepayDTO.ReqPaymentDTO(payAmount, payAgreenum, payAgreedate));
+            nicePayManager.selectPayMethod(curReqType, new NicepayDTO.ReqPaymentDTO(payAmount, payAgreenum, payAgreedate, commonService.formatByPrice(orderDTO.getAmount())));
         }
     }
 
@@ -341,24 +345,22 @@ public class MainActivity extends AppCompatActivity {
             public void onPositiveClicked() {
                 // 프린터 출력중 팝업
                 mainDialogManager.popDialog400();
-
                 // 프린트용 데이터 초기화
                 printerService.resetPrintData();
-
                 // 영수증 출력
                 printReceipt(cardInfo);
-
                 // 라벨 출력
                 printLabel(cardInfo);
+                mainDialogManager.closeDialog400();
             }
 
             @Override
             public void onNegativeClicked() {
                 // 프린터 출력중 팝업
                 mainDialogManager.popDialog400();
-
                 // 라벨 출력
                 printLabel(cardInfo);
+                mainDialogManager.closeDialog400();
             }
         });
         dialog300.show();
@@ -591,10 +593,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(@NonNull ReceiptDTO.ReceiptResp value) {
                 Log.d("RevealCallbacks","onSuccess");
                 boolean printed = printerService.receiptPrint(value, cardInfo);
-                if (!printed) {
-                    mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
-                    mainDialogManager.closeDialog400();
-                }
+                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
+
             }
 
             @Override
@@ -606,7 +606,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("[error msg] : ", errorResponse.getMsg());
                 Log.d("","==================================================");
                 mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
-                mainDialogManager.closeDialog400();
             }
         });
     }
@@ -622,7 +621,6 @@ public class MainActivity extends AppCompatActivity {
                 boolean printed = printerService.labelPrint(value);
                 if (!printed) {
                     mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
-                    mainDialogManager.closeDialog400();
                 }
             }
             @Override
@@ -634,7 +632,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("[error msg] : ", errorResponse.getMsg());
                 Log.d("","==================================================");
                 mToastHandler.obtainMessage(0, 0, 0, errorResponse.getMsg()).sendToTarget();
-                mainDialogManager.closeDialog400();
             }
         });
     }
@@ -656,12 +653,14 @@ public class MainActivity extends AppCompatActivity {
 
         // 결제정보 저장
 //        webView2.loadUrl("javascript:savePayment('" + rstJson + "')");
-        ArrayList<Long> itemOfShopIdList = new ArrayList<>();
-        itemOfShopIdList.add(55L);
-        ArrayList<Integer> volumes = new ArrayList<>();
-        volumes.add(300);
-
-        orderService.saveKioskOrders(new KioskOrderDTO.SaveOrders(itemOfShopIdList, volumes, "010testtest", rstAgreenum, null));
+        orderService.saveKioskOrders(
+                new KioskOrderDTO.SaveOrders(orderDTO.getIosIds(), orderDTO.getVolumes(), orderDTO.getPhone(), rstAgreenum, null),
+                new RevealLongCallbacks() {
+                    @Override
+                    public void on(@NonNull Long value) {
+                        webView.loadUrl(KIOSK_ORDER_SUCCESS_URL+value);
+                    }
+                });
     }
 
     public final Handler mToastHandler = new Handler(new Handler.Callback() {
