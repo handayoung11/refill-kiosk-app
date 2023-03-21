@@ -44,7 +44,7 @@ public class NicepayManager {
     public void selectPayMethod(String curReqType, NicepayDTO.ReqPaymentDTO dto) {
         this.curReqType = curReqType;
         payInfo = dto;
-        MainDialogManager.getInstance().popDialog100(curReqType);
+        MainDialogManager.getInstance().popDialog100(curReqType, dto.getPayAmountFormat());
     }
 
     public String msPay() {
@@ -58,9 +58,9 @@ public class NicepayManager {
     /**
      * IC 결제
      */
-    public String icPay(String payType) {
+    public String icPay(String payType, String totPrice) {
         // IC,삼성카드 결제요청 대기 팝업
-        MainDialogManager.getInstance().popICDialog(curReqType, payType);
+        MainDialogManager.getInstance().popICDialog(curReqType, payType, totPrice);
 
         // NVCAT 결제요청
         String sendData = reqPayment(_IC카드);
