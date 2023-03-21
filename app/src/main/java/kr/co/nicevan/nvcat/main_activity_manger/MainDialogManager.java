@@ -51,12 +51,12 @@ public class MainDialogManager {
     /**
      * 팝업 Dialog100 (결제방법)
      */
-    public void popDialog100(String reqType) {
+    public void popDialog100(String reqType, String totPrice) {
 
-        Dialog100 dialog100 = new Dialog100(mainActivity, reqType);
+        Dialog100 dialog100 = new Dialog100(mainActivity, reqType, totPrice);
         dialog100.setDialogListener(payType -> {
             // 카드투입 요청
-            NicepayManager.getInstance().icPay(payType);
+            NicepayManager.getInstance().icPay(payType, totPrice);
         });
         dialog100.show();
     }
@@ -64,9 +64,9 @@ public class MainDialogManager {
     /**
      * 팝업 Dialog200 (결제요청 대기)
      */
-    public void popICDialog(String curReqType, String payType) {
+    public void popICDialog(String curReqType, String payType, String totPrice) {
 
-        dialog200 = new Dialog200(mainActivity, curReqType, payType);
+        dialog200 = new Dialog200(mainActivity, curReqType, payType, totPrice);
         dialog200.show();
     }
 
