@@ -3,16 +3,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import kr.co.nicevan.nvcat.retrofit.RetrofitClient;
-import kr.co.nicevan.nvcat.retrofit.RetrofitResponseAPI;
-import kr.co.nicevan.nvcat.retrofit.RevealStringCallbacks;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorCode;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorUtils;
-import kr.co.nicevan.nvcat.service.common.CommonService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
