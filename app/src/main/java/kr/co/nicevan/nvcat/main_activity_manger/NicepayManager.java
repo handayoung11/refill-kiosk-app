@@ -1,6 +1,5 @@
 package kr.co.nicevan.nvcat.main_activity_manger;
 
-import static kr.co.nicevan.nvcat.CommonUtil.CATID;
 import static kr.co.nicevan.nvcat.CommonUtil._IC카드;
 import static kr.co.nicevan.nvcat.CommonUtil._MS카드;
 import static kr.co.nicevan.nvcat.dto.NicepayDTO.fs;
@@ -9,6 +8,7 @@ import android.util.Log;
 
 import kr.co.nicevan.nvcat.activity.MainActivity;
 import kr.co.nicevan.nvcat.dto.NicepayDTO;
+import kr.co.nicevan.nvcat.util.KeyStoreUtil;
 
 public class NicepayManager {
 
@@ -92,8 +92,9 @@ public class NicepayManager {
         String spSigndata = ""; // 서명데이터 (NVCAT 모듈에서 알아서 전송)
 
         // 전문데이터 세팅
-        String sendDataArr[] = {curReqType, spReqStyle, wcc, spAmount, spTax, spBongsa, spHalbu, spAgreenum, spAgreedate, CATID, "",
-                "", "", spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
+        String sendDataArr[] = {curReqType, spReqStyle, wcc, spAmount, spTax, spBongsa, spHalbu, spAgreenum, spAgreedate,
+                KeyStoreUtil.getInstance().getData(KeyStoreUtil.CAT_ID_KEY, null), "", "", "",
+                spMyunse, "", "", spTxtnum, spFiller, "", spTxt, spDevicegb, "", "", "", spSigndata, "", "", "", "", ""};
         StringBuilder sendData = new StringBuilder();
 
         for (int i = 0; i < sendDataArr.length; i++) {
