@@ -215,11 +215,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btn_03).setOnClickListener(v -> {
-            Intent intent = new Intent(this, CatIdActivity.class);
-            startActivity(intent);
-        });
-
         String strPathLOG = "";
         File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
         if (mediaDirs != null && mediaDirs.length > 0) {
@@ -287,6 +282,17 @@ public class MainActivity extends AppCompatActivity {
         public void completeLogin(String id, String pw) {
             keyStoreUtil.storeData(KeyStoreUtil.ID_KEY, id);
             keyStoreUtil.storeData(KeyStoreUtil.PW_KEY, pw);
+        }
+
+        @JavascriptInterface
+        public void showCatIdScreen() {
+            Intent intent = new Intent(mContext, CatIdActivity.class);
+            startActivity(intent);
+        }
+
+        @JavascriptInterface
+        public boolean isCatIdEmpty() {
+            return keyStoreUtil.getData(KeyStoreUtil.CAT_ID_KEY, null) == null;
         }
 
         @JavascriptInterface
