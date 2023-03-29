@@ -21,7 +21,7 @@ public interface RetrofitResponseAPI {
     @POST("/kiosk/order/label/{id}")
     Call<List<LabelDTO.LabelResp>> postLabel(@Path(value = "id") String approvalNo);
     @POST("/login")
-    Call<ResponseBody> login(@Query("username") String id, @Query("password") String pw);
+    Call<ResponseBody> login(@Query("username") String id, @Query("password") String pw, @Query("remember-me") String rmemberMe);
     @POST("/kiosk/order")
     Call<OrderDTO> saveKioskOrders(@Body KioskOrderDTO.SaveOrders saveOrders);
 }

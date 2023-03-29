@@ -55,6 +55,6 @@ public class LoginServiceImpl implements LoginService {
     }
 
     public void login(String id, String pw, Callback<ResponseBody> callback) {
-        RetrofitClient.getDefaultResponseAPI().login(id, pw).enqueue(callback);
+        RetrofitClient.getDefaultResponseAPI().login(id, pw, "on").enqueue(callback);
     }
 }
