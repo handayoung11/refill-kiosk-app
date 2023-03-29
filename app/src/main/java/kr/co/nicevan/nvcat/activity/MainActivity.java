@@ -25,7 +25,6 @@ import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
@@ -48,7 +47,6 @@ import java.util.List;
 import java.util.Locale;
 
 import kr.co.nicevan.nvcat.AppConfig;
-import kr.co.nicevan.nvcat.CommonUtil;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.R;
 import kr.co.nicevan.nvcat.dialog.Dialog300;
@@ -244,11 +242,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            printerService.closeAll();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            printerService.closeAll();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
