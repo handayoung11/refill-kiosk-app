@@ -15,12 +15,14 @@ public class KioskOrderDTO {
         private String approvementId;
         private Long memberId;
 
-        public SaveOrders(ArrayList<Long> itemOfShopIdList, ArrayList<Integer> volumes, String phone, String approvementId, Long memberId) {
+        private String catId;
+        public SaveOrders(ArrayList<Long> itemOfShopIdList, ArrayList<Integer> volumes, String phone, String approvementId, Long memberId, String catId) {
             this.itemOfShopIdList = itemOfShopIdList;
             this.volumes = volumes;
             this.phone = phone;
             this.approvementId = approvementId;
             this.memberId = memberId;
+            this.catId = catId;
         }
 
         public ArrayList<Long> getItemOfShopIdList() {

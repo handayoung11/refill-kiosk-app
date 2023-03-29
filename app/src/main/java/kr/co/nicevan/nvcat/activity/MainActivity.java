@@ -660,7 +660,7 @@ public class MainActivity extends AppCompatActivity {
         // 결제정보 저장
 //        webView2.loadUrl("javascript:savePayment('" + rstJson + "')");
         orderService.saveKioskOrders(
-                new KioskOrderDTO.SaveOrders(orderDTO.getIosIds(), orderDTO.getVolumes(), orderDTO.getPhone(), rstAgreenum, null),
+                new KioskOrderDTO.SaveOrders(orderDTO.getIosIds(), orderDTO.getVolumes(), orderDTO.getPhone(), rstAgreenum, null, keyStoreUtil.getData(KeyStoreUtil.CAT_ID_KEY, null)),
                 new RevealLongCallbacks() {
                     @Override
                     public void on(@NonNull Long value) {
