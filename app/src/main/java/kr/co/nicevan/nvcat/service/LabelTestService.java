@@ -49,7 +49,7 @@ public class LabelTestService {
         StaticLayout textLayout = StaticLayout
                 .Builder
                 .obtain(text, 0 ,text.length(), textPaint, width)
-                .setAlignment(Layout.Alignment.ALIGN_LEFT)
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                 .setLineSpacing(0f, 1.2f)
                 .setIncludePad(true)
                 .build();

@@ -33,7 +33,7 @@ public class ComponentUtil {
         webViewSettings.setBlockNetworkImage(false);
         // 웹뷰가 앱에 등록되어 있는 이미지 리소스를 자동으로 로드하도록 설정
         webViewSettings.setLoadsImagesAutomatically(true);
-        webViewSettings.setAppCacheEnabled(true);
+//        webViewSettings.setApp(true);
         webViewSettings.setDatabaseEnabled(true);
         webViewSettings.setDomStorageEnabled(true);
         webViewSettings.setGeolocationEnabled(true);
@@ -44,6 +44,8 @@ public class ComponentUtil {
         //화면비율 설정
         webViewSettings.setUseWideViewPort(true);
         webViewSettings.setLoadWithOverviewMode(true);
+        webViewSettings.setTextZoom(100);
+
         webView.setWebViewClient(new WebViewClient() {
             //@TargetApi(Build.VERSION_CODES.N)
             @Override
