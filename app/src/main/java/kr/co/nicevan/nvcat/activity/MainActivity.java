@@ -294,6 +294,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public String getCatId(){
+            return keyStoreUtil.getData(KeyStoreUtil.CAT_ID_KEY, null);
+        }
+
+
+        @JavascriptInterface
         public void requestPayment(String orderJsonData) {
 
             //주문정보 DTO 저장
