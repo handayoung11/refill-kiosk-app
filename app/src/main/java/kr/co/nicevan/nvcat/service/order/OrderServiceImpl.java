@@ -9,11 +9,14 @@ import kr.co.nicevan.nvcat.dto.KioskOrderDTO;
 import kr.co.nicevan.nvcat.dto.OrderDTO;
 import kr.co.nicevan.nvcat.retrofit.RetrofitClient;
 import kr.co.nicevan.nvcat.retrofit.RevealLongCallbacks;
+import kr.co.nicevan.nvcat.retrofit.RevealStringListCallbacks;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorCode;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorUtils;
+import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
 import kr.co.nicevan.nvcat.service.login.LoginService;
 import kr.co.nicevan.nvcat.util.KeyStoreUtil;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -63,6 +66,21 @@ public class OrderServiceImpl implements OrderService {
                     @Override
                     public void onFailure(Call<OrderDTO> call, Throwable t) {
                         callbacks.onError(ErrorResponse.of(ErrorCode.RETROFIT_NETWORK_FAILED));
+                    }
+                });
+    }
+
+    @Override
+    public void sendRefillAuthApi(String phone, Long odIdx, @NonNull RevealOrderRespCallbacks2 callbacks){
+        RetrofitClient.getDefaultResponseAPI().sendRefillAuth(new KioskOrderDTO.SendRefillAuth(odIdx, phone))
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if(!response.isSuccessful()) callbacks.onError(ErrorUtils.parseError(response));
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        callbacks.onError(ErrorResponse.of(ErrorCode.RETROFIT_SMS_FAILED));
                     }
                 });
     }

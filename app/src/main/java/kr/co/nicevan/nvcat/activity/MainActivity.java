@@ -69,10 +69,15 @@ import kr.co.nicevan.nvcat.service.label.LabelService;
 import kr.co.nicevan.nvcat.service.label.RevealLabelRespCallbacks;
 import kr.co.nicevan.nvcat.service.login.LoginService;
 import kr.co.nicevan.nvcat.service.order.OrderService;
+import kr.co.nicevan.nvcat.service.order.RevealOrderRespCallbacks2;
 import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
 import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
 import kr.co.nicevan.nvcat.util.KeyStoreUtil;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -194,24 +199,24 @@ public class MainActivity extends AppCompatActivity {
         /**
          * 결제요청 (결제방법선택)
          */
-        findViewById(R.id.btn_01).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 결제방법 선택 팝업
-                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", "", "55,000원"));
-            }
-        });
+//        findViewById(R.id.btn_01).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // 결제방법 선택 팝업
+//                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", "", "55,000원"));
+//            }
+//        });
 
         /**
          * 결제취소요청
          */
-        findViewById(R.id.btn_02).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 결제방법 선택 팝업
-                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117", "55,000원"));
-            }
-        });
+//        findViewById(R.id.btn_02).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // 결제방법 선택 팝업
+//                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117", "55,000원"));
+//            }
+//        });
 
         String strPathLOG = "";
         File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
@@ -668,7 +673,18 @@ public class MainActivity extends AppCompatActivity {
                 new RevealLongCallbacks() {
                     @Override
                     public void on(@NonNull Long value) {
-                        webView.loadUrl(KIOSK_ORDER_SUCCESS_URL+value);
+                        orderService.sendRefillAuthApi(orderDTO.getPhone(), value, new RevealOrderRespCallbacks2() {
+                                    @Override
+                                    public void onError(@NonNull ErrorResponse errorResponse) {
+                                        Log.d("","==================================================");
+                                        Log.d(this.getClass().getSimpleName(),"RevealOrderRespCallbacks2");
+                                        Log.d("[error code] : ", String.valueOf(errorResponse.getStatus()));
+                                        Log.d("[error title] : ", errorResponse.getTitle());
+                                        Log.d("[error msg] : ", errorResponse.getMsg());
+                                        Log.d("","==================================================");
+                                    }
+                                });
+                        webView.loadUrl(KIOSK_ORDER_SUCCESS_URL + value);
                     }
                 });
     }

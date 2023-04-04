@@ -43,4 +43,22 @@ public class KioskOrderDTO {
             return memberId;
         }
     }
+
+    public static class SendRefillAuth{
+        private Long odIdx;
+        private String odPhone;
+
+        public SendRefillAuth(Long odIdx, String odPhone) {
+            this.odIdx = odIdx;
+            this.odPhone = odPhone;
+        }
+
+        public Long getOdIdx() {
+            return odIdx;
+        }
+
+        public String getOdPhone() {
+            return odPhone;
+        }
+    }
 }

@@ -8,6 +8,7 @@ import kr.co.nicevan.nvcat.dto.OrderDTO;
 import kr.co.nicevan.nvcat.dto.ReceiptDTO;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -24,4 +25,6 @@ public interface RetrofitResponseAPI {
     Call<ResponseBody> login(@Query("username") String id, @Query("password") String pw, @Query("remember-me") String rmemberMe);
     @POST("/kiosk/order")
     Call<OrderDTO> saveKioskOrders(@Body KioskOrderDTO.SaveOrders saveOrders);
+    @POST("/kiosk/order/nonmember/authority")
+    Call<ResponseBody> sendRefillAuth(@Body KioskOrderDTO.SendRefillAuth refillAuth);
 }
