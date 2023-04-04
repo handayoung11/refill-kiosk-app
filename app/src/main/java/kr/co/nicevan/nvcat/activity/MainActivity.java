@@ -590,12 +590,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }).start();
 
+            // 결과 web 전달
+            returnPaymentResult(rstResult, rstAmount, rstOrderNo, rstUserId, rstAgreenum, rstAgreedate, rstJson);
+
             // 영수증 출력확인 팝업
             popDialog300();
         }
-
-        // 결과 web 전달
-        returnPaymentResult(rstResult, rstAmount, rstOrderNo, rstUserId, rstAgreenum, rstAgreedate, rstJson);
     }
 
     /**
@@ -634,9 +634,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
                 boolean printed = printerService.labelPrint(value);
-                if (!printed) {
-                    mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
-                }
+                if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
+
             }
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
