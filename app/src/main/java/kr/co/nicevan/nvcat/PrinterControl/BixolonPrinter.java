@@ -1711,9 +1711,7 @@ public class BixolonPrinter implements ErrorListener, OutputCompleteListener, St
         return completed;
     }
 
-    public boolean isOpen() {
-        return open;
-    }
+    public boolean isOpen() { return open; }
 
     public PrinterType getType() {
         return type;
