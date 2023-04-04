@@ -166,9 +166,9 @@ public class PrinterServiceImpl implements PrinterService {
         strData += "[주소] "+ response.getAddress()+"\n";
         strData += "[대표자] "+ response.getOwner()+"\t\t"+"[TEL] "+ response.getTell()+"\n";
         strData += "[매출일] "+ response.getPayDate()+"\n";
-        strData += "=================================================\n";
+        strData += "================================================\n";
         strData += "\t\t상품명\t\t단가\t\t수량\t\t금액\t\n ";
-        strData += "-------------------------------------------------\n";
+        strData += "------------------------------------------------\n";
         for(ReceiptDTO.ReceiptResp.ItemDTO i : response.getItems()){
             String name = commonService.formatterByLeftSpace(i.getItemName(), 11);
             String unitPrice = commonService.formatterByLeftSpace(String.valueOf((i.getPrice() / i.getQuantity())), 7);
@@ -176,20 +176,20 @@ public class PrinterServiceImpl implements PrinterService {
             String price = CommonUtil.convertCommaDecimalFormat(String.valueOf(i.getPrice()));
             strData += name+"\t"+unitPrice+"\t"+quantity+"\t"+price+"\n";
         }
-        strData += "-------------------------------------------------\n";
+        strData += "------------------------------------------------\n";
         strData += "합계금액\t\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "-------------------------------------------------\n";
+        strData += "------------------------------------------------\n";
         strData += "과세물품가액\t\t\t\t\t\t"+card.getDutiableVal()+"\n";
         strData += "부  가  세\t\t\t\t\t\t"+card.getTax()+"\n";
         strData += "매출합계(카드)\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "=================================================\n";
+        strData += "================================================\n";
         strData += "[카드번호]\t\t"+card.getCardBin()+"\n";
         strData += "[할부개월]\t\t\t\t\t\t\t"+card.getInstallment()+"\n";
         strData += "[카드사명]\t\t\t\t\t\t"+card.getCardName()+"\n";
         strData += "[승인번호]\t\t\t\t"+card.getApprovalNo()+"\n";
         strData += "[승인일자]\t\t\t\t\t"+card.getApprovalDate()+"\n";
         strData += "[결제금액]\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "-------------------------------------------------\n";
+        strData += "------------------------------------------------\n";
         return strData;
     }
 
