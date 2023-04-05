@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class KioskOrderDTO {
 
     public static class SaveOrders {
+        private String rstResult;
         @SerializedName("itemOfShopIdList")
         private ArrayList<Long> itemOfShopIdList;
         @SerializedName("volumes")
@@ -59,6 +60,16 @@ public class KioskOrderDTO {
 
         public String getOdPhone() {
             return odPhone;
+        }
+    }
+
+    public static class RefundOrderDTO {
+        private Long odIdx;
+        private String agreeNum;
+
+        public RefundOrderDTO(Long odIdx, String agreeNum) {
+            this.odIdx = odIdx;
+            this.agreeNum = agreeNum;
         }
     }
 }

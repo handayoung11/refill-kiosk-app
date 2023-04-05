@@ -49,7 +49,7 @@ public class NicepayManager {
 
     public String msPay() {
         // MS결제요청 대기 팝업
-        MainDialogManager.getInstance().popMsDialog();
+        MainDialogManager.getInstance().popMsDialog(curReqType);
 
         // NVCAT 결제요청
         return reqPayment(_MS카드);

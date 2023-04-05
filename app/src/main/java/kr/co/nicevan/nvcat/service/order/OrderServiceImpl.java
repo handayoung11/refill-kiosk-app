@@ -84,4 +84,20 @@ public class OrderServiceImpl implements OrderService {
                     }
                 });
     }
+
+    @Override
+    public void refundKioskOrdersApi(KioskOrderDTO.RefundOrderDTO refund, @NonNull RevealOrderRespCallbacks2 callbacks){
+        RetrofitClient.getDefaultResponseAPI()
+                .refundKioskOrder(refund)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if(!response.isSuccessful()) callbacks.onError(ErrorUtils.parseError(response));
+                    }
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        callbacks.onError(ErrorResponse.of(ErrorCode.RETROFIT_ORDER_REFUND_FAILED));
+                    }
+                });
+    }
 }

@@ -10,6 +10,7 @@
     tools:context=".dialog.Dialog250">
 
     <TextView
+        android:id="@+id/tv_title"
         style="@style/title_text"
         android:text="마그네틱 결제" />
 
@@ -27,6 +28,7 @@
 
             <TextView
                 style="@style/gif_info_md_body_text"
+                android:id="@+id/body_text"
                 android:text="IC 카드를 인식하지 못하여\nMS 결제를 진행합니다." />
 
 
@@ -36,6 +38,7 @@
 
             <TextView
                 style="@style/gif_info_md_red_text"
+                android:id="@+id/footer_text"
                 android:text="@string/msg_07" />
 
         </com.ssomai.android.scalablelayout.ScalableLayout>

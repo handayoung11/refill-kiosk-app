@@ -24,6 +24,7 @@
 
             <TextView
                 android:text="결제가 완료되었습니다."
+                android:id="@+id/body_text"
                 style="@style/gif_info_md_body_text"
                 app:scale_top="35"
                 app:scale_textsize="5.5"/>

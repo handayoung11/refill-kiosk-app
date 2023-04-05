@@ -27,4 +27,6 @@ public interface RetrofitResponseAPI {
     Call<OrderDTO> saveKioskOrders(@Body KioskOrderDTO.SaveOrders saveOrders);
     @POST("/kiosk/order/nonmember/authority")
     Call<ResponseBody> sendRefillAuth(@Body KioskOrderDTO.SendRefillAuth refillAuth);
+    @POST("/kiosk/order/refund")
+    Call<ResponseBody> refundKioskOrder(@Body KioskOrderDTO.RefundOrderDTO refund);
 }

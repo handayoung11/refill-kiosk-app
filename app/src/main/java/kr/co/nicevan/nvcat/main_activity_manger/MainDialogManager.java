@@ -30,7 +30,6 @@ public class MainDialogManager {
 
     private MainDialogManager(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
-        dialog250 = new Dialog250(mainActivity);
     }
 
     public static MainDialogManager init(MainActivity mainActivity) {
@@ -75,13 +74,16 @@ public class MainDialogManager {
             dialog200.dismiss();
         }
     }
-
-    public void popMsDialog() {
+    /**
+     * 팝업 Dialog250 ( MS 결제요청 대기)
+     */
+    public void popMsDialog(String curReqType) {
+        dialog250 = new Dialog250(curReqType, mainActivity);
         dialog250.show();
     }
 
     public void closeMsDialog() {
-        if (dialog250.isShowing()) {
+        if (dialog250 != null &&dialog250.isShowing()) {
             dialog250.dismiss();
         }
     }

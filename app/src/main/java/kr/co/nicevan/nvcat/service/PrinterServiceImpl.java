@@ -137,7 +137,7 @@ public class PrinterServiceImpl implements PrinterService {
         return printOut(PrinterDTO.of(res, card.getSingImg(), RECEIPT));
     }
 
-    /**  2022-01-30 작성자 : 염에녹
+    /**  2023-01-30 작성자 : 염에녹
      * 기능 : 라벨 formatter.
      */
     private String outStringForLabel(LabelDTO.LabelResp response) {
@@ -156,7 +156,7 @@ public class PrinterServiceImpl implements PrinterService {
     }
 
 
-    /**  2022-01-30 작성자 : 염에녹
+    /**  2023-01-30 작성자 : 염에녹
      * 기능 : 영수증 formatter.
      */
     private String outStringForReceipt(ReceiptDTO.ReceiptResp response, CardDTO card) {
@@ -167,8 +167,8 @@ public class PrinterServiceImpl implements PrinterService {
         strData += "[대표자] "+ response.getOwner()+"\t\t"+"[TEL] "+ response.getTell()+"\n";
         strData += "[매출일] "+ response.getPayDate()+"\n";
         strData += "================================================\n";
-        strData += "\t\t상품명\t\t단가\t\t수량\t\t금액\t\n ";
-        strData += "------------------------------------------------\n";
+        strData += "\t상품명\t\t단가\t\t수량\t\t금액\t\t\n ";
+        strData += "-----------------------------------------------\n";
         for(ReceiptDTO.ReceiptResp.ItemDTO i : response.getItems()){
             String name = commonService.formatterByLeftSpace(i.getItemName(), 11);
             String unitPrice = commonService.formatterByLeftSpace(String.valueOf((i.getPrice() / i.getQuantity())), 7);

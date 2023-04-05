@@ -41,21 +41,26 @@ public class Dialog200 extends NonCancelableDialog {
         TextView price = findViewById(R.id.price);
         order_price.setText(totPrice);
         price.setText(totPrice);
+        TextView tv_title = findViewById(R.id.tv_title);
 
         if (payType.equals(CommonUtil._신용카드)) {
             iv_01.setImageResource(R.drawable.insert_credit_card);
             tv_01.setText(context.getResources().getString(R.string.msg_01));
             if (curReqType.equals(CommonUtil._승인요청)) {
+                tv_title.setText("신용카드 결제");
                 tv_02.setText(context.getResources().getString(R.string.msg_02));
             } else if (curReqType.equals(CommonUtil._취소요청)) {
+                tv_title.setText("신용카드 취소");
                 tv_02.setText(context.getResources().getString(R.string.msg_02_01));
             }
         } else if (payType.equals(CommonUtil._삼성페이)) {
             iv_01.setImageResource(R.drawable.insert_sg_pay);
             tv_01.setText(context.getResources().getString(R.string.msg_01_0));
             if (curReqType.equals(CommonUtil._승인요청)) {
+                tv_title.setText("신용카드 결제");
                 tv_02.setText(context.getResources().getString(R.string.msg_02_0));
             } else if (curReqType.equals(CommonUtil._취소요청)) {
+                tv_title.setText("신용카드 취소");
                 tv_02.setText(context.getResources().getString(R.string.msg_02_0_01));
             }
         }

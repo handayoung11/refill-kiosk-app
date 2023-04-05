@@ -6,6 +6,9 @@ public enum ErrorCode {
 
     /**sms전송실패**/
     RETROFIT_SMS_FAILED(503, "SMS01", "문자/링크전송에 실패하엿습니다."),
+    /**주문내역 실패 데이터 저장 실패**/
+    RETROFIT_ORDER_REFUND_FAILED(503, "ORDER02", "주문내역 취소를 실패하였습니다."),
+
     ;
     private int status;
     private final String message;

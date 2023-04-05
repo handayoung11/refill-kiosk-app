@@ -12,4 +12,5 @@ public interface OrderService {
 
     void saveKioskOrders(KioskOrderDTO.SaveOrders saveOrders, @NonNull RevealLongCallbacks callbacks);
     void sendRefillAuthApi(String phone, Long odIdx, @NonNull RevealOrderRespCallbacks2 callbacks);
+    void refundKioskOrdersApi(KioskOrderDTO.RefundOrderDTO refund, @NonNull RevealOrderRespCallbacks2 callbacks);
 }

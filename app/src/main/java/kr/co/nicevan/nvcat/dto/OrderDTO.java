@@ -34,6 +34,7 @@ public class OrderDTO {
                 this.iosIds.add(Long.parseLong((String) iosIds.get(i)));
                 this.volumes.add(Integer.parseInt((String) volumes.get(i)));
             }
+            this.odId = data.getLong("odId");
             this.phone = data.getString("pNum");
             this.reqType = data.getString("reqType");
             this.amount = data.getString("amount");
