@@ -22,6 +22,7 @@ public class CommonUtil {
     public static String KIOSK_SHOP_SELECT_URL = BASE_URL + "kiosk/item-of-shop/shop";
     public static String KIOSK_HOME_URL = BASE_URL + "kiosk/item_of_shop";
     public static String KIOSK_ORDER_SUCCESS_URL = BASE_URL + "kiosk/order/complete/";
+    public static String KIOSK_ORDER_DETAIL_URL = BASE_URL + "kiosk/order/detail/";
 
     // 키오스크 정보 (키오스크 정보 관리자 화면에서 저장한 값 가져오기)
     public static String CATID = "2393300001"; // CATID
