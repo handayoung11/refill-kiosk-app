@@ -1,6 +1,7 @@
 package kr.co.nicevan.nvcat.dto;
 
 public class CardDTO {
+        private String rstResult; //영수증 구분 [정상승인/정상취소/비정상]
         private String dutiableVal; //과세물품가액
         private String tax; //부가세
         private String totPrice; //매출합계
@@ -11,6 +12,7 @@ public class CardDTO {
         private String approvalDate; //승인일자
         private String singImg; //서명이미지
 
+        public String getRstResult() { return rstResult; }
         public String getDutiableVal() {
             return dutiableVal;
         }
@@ -40,7 +42,8 @@ public class CardDTO {
     public CardDTO() {
     }
 
-    public CardDTO(String dutiableVal, String tax, String totPrice, String cardBin, String installment, String cardName, String approvalNo, String approvalDate, String signImg) {
+    public CardDTO(String rstResult, String dutiableVal, String tax, String totPrice, String cardBin, String installment, String cardName, String approvalNo, String approvalDate, String signImg) {
+            this.rstResult = rstResult;
             this.dutiableVal = dutiableVal;
             this.tax = tax;
             this.totPrice = totPrice;

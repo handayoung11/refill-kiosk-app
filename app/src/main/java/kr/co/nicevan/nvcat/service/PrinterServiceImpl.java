@@ -160,7 +160,7 @@ public class PrinterServiceImpl implements PrinterService {
      * 기능 : 영수증 formatter.
      */
     private String outStringForReceipt(ReceiptDTO.ReceiptResp response, CardDTO card) {
-        String strData = "영수증\n";
+        String strData = "영수증("+card.getRstResult()+")\n";
         strData += "[매장명] "+response.getShopName()+"\n";
         strData += "[사업자번호] "+response.getCompanyNo()+"\n";
         strData += "[주소] "+ response.getAddress()+"\n";

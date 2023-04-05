@@ -61,8 +61,8 @@ import kr.co.nicevan.nvcat.main_activity_manger.NicepayManager;
 import kr.co.nicevan.nvcat.retrofit.RevealLongCallbacks;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
 import kr.co.nicevan.nvcat.roomdb.Payment;
-import kr.co.nicevan.nvcat.roomdb.PaymentDao;
-import kr.co.nicevan.nvcat.roomdb.RoomDB;
+//import kr.co.nicevan.nvcat.roomdb.PaymentDao;
+//import kr.co.nicevan.nvcat.roomdb.RoomDB;
 import kr.co.nicevan.nvcat.service.PrinterService;
 import kr.co.nicevan.nvcat.service.common.CommonService;
 import kr.co.nicevan.nvcat.service.label.LabelService;
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
     public WebView webView;
 //    public WebView webView2;
 
-    RoomDB db;
-    PaymentDao paymentDao;
+//    RoomDB db;
+//    PaymentDao paymentDao;
 
     // 전문요청코드
     int SEND_REQUEST_CODE = 1;
@@ -167,8 +167,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "NVCAT RESTART");
 
-        db = RoomDB.getDBInstance(getApplicationContext());
-        paymentDao = db.paymentDao();
+//        db = RoomDB.getDBInstance(getApplicationContext());
+//        paymentDao = db.paymentDao();
 
         // webView Start =============================================================
         webView = findWebViewByIdWithSettings(R.id.webView);
@@ -365,7 +365,7 @@ public class MainActivity extends AppCompatActivity {
                 // 영수증 출력
                 printReceipt(cardInfo);
                 // 라벨 출력
-                printLabel(cardInfo);
+                if("정상승인".equals(cardInfo.getRstResult())) printLabel(cardInfo);
                 mainDialogManager.closeDialog400();
             }
 
@@ -473,9 +473,6 @@ public class MainActivity extends AppCompatActivity {
         prtTax = convertCommaDecimalFormat(surtax + ""); // 부가세 포맷
         prtTotAmount = convertCommaDecimalFormat(totalPrice + ""); // 합계금액
         signImgString = getSignBitmapString();
-        cardInfo = new CardDTO(prtAmount, prtTax, prtTotAmount, respDTO.getData(17), respDTO.getData(6),
-                respDTO.getData(18), respDTO.getData(7), respDTO.getData(8), signImgString);
-
 
         // WEB 결과 데이터
         String rstResult = "";
@@ -557,44 +554,48 @@ public class MainActivity extends AppCompatActivity {
         if (rstResCode.equals("0000")) {
 
             // 로컬DB 저장
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Payment payment = new Payment();
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Payment payment = new Payment();
+//
+//                    payment.order_no = rstOrderNo;
+//                    payment.user_id = rstUserId;
+//                    payment.req_type = rstReqType;
+//                    payment.req_kind = rstReqKind;
+//                    payment.res_code = rstResCode;
+//                    payment.amount = rstAmount;
+//                    payment.tax = rstTax;
+//                    payment.bongsa = rstBongsa;
+//                    payment.halbu = rstHalbu;
+//                    payment.agree_num = rstAgreenum;
+//                    payment.agree_date = rstAgreedate;
+//                    payment.bank_cd1 = rstBankCd1;
+//                    payment.bank_nm1 = rstBankNm1;
+//                    payment.bank_cd2 = rstBankCd2;
+//                    payment.bank_nm2 = rstBankNm2;
+//                    payment.store_no = rstStoreNo;
+//                    payment.cat_id = rstCatId;
+//                    payment.res_msg = rstResMsg;
+//                    payment.card_no = rstCardNo;
+//                    payment.card_gubun = rstCardGubun;
+//                    payment.mng_no = rstMngNo;
+//                    payment.seq_no = rstSeqNo;
+//                    payment.sign_img = rstSignImg;
+//
+//                    paymentDao.insertPayment(payment);
+//                }
+//            }).start();
 
-                    payment.order_no = rstOrderNo;
-                    payment.user_id = rstUserId;
-                    payment.req_type = rstReqType;
-                    payment.req_kind = rstReqKind;
-                    payment.res_code = rstResCode;
-                    payment.amount = rstAmount;
-                    payment.tax = rstTax;
-                    payment.bongsa = rstBongsa;
-                    payment.halbu = rstHalbu;
-                    payment.agree_num = rstAgreenum;
-                    payment.agree_date = rstAgreedate;
-                    payment.bank_cd1 = rstBankCd1;
-                    payment.bank_nm1 = rstBankNm1;
-                    payment.bank_cd2 = rstBankCd2;
-                    payment.bank_nm2 = rstBankNm2;
-                    payment.store_no = rstStoreNo;
-                    payment.cat_id = rstCatId;
-                    payment.res_msg = rstResMsg;
-                    payment.card_no = rstCardNo;
-                    payment.card_gubun = rstCardGubun;
-                    payment.mng_no = rstMngNo;
-                    payment.seq_no = rstSeqNo;
-                    payment.sign_img = rstSignImg;
+            cardInfo = new CardDTO(rstResult, prtAmount, prtTax, prtTotAmount, rstCardNo, rstHalbu, rstCardGubun, rstAgreenum, rstAgreedate, signImgString);
 
-                    paymentDao.insertPayment(payment);
-                }
-            }).start();
-
-            // 결과 web 전달
+            // 결과 web 전달 - save
             returnPaymentResult(rstResult, rstAmount, rstOrderNo, rstUserId, rstAgreenum, rstAgreedate, rstJson);
 
             // 영수증 출력확인 팝업
             popDialog300();
+        } else{
+            mToastHandler.obtainMessage(0, 0, 0, "결제에 실패하였습니다.["+rstResCode+"]").sendToTarget();
         }
     }
 
