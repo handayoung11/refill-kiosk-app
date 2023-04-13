@@ -32,14 +32,16 @@ public class OrderDTO {
             this.volumes = new ArrayList<>();
             for(int i=0; i<iosIds.length();i++){
                 this.iosIds.add(Long.parseLong((String) iosIds.get(i)));
-                this.volumes.add(Integer.parseInt((String) volumes.get(i)));
+                String volumeNum = ((String) volumes.get(i)).replace(",", "");
+                this.volumes.add(Integer.parseInt(volumeNum));
             }
-            this.odId = data.getLong("odId");
             this.phone = data.getString("pNum");
             this.reqType = data.getString("reqType");
             this.amount = data.getString("amount");
             this.agreeNum = data.getString("agreeNum");
             this.agreeDate = data.getString("agreeDate");
+            // 환불 요청 시 문제 없지만, 결제 요청 시 odId가 null이라서 Exception 발생, 맨 아래 둘 것
+            this.odId = data.getLong("odId");
         }
         catch (Exception e){
             Log.i("TAG","error : " + e);
