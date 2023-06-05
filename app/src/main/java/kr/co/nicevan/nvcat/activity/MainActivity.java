@@ -611,7 +611,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("RevealCallbacks","onSuccess");
                 boolean printed = printerService.receiptPrint(value, cardInfo);
                 if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer open").sendToTarget();
-                webView.loadUrl(KIOSK_ORDER_DETAIL_URL + keyStoreUtil.getData(KeyStoreUtil.CAT_ID_KEY, null));
             }
 
             @Override
