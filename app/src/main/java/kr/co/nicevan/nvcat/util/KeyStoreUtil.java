@@ -37,7 +37,7 @@ public class KeyStoreUtil {
     public static String ID_KEY = "id";
     public static String PW_KEY = "pw";
     public static String CAT_ID_KEY = "cat_id";
-
+    public static String SHOP_ID_KEY = "shop_id";
     private static KeyStoreUtil instance;
 
     private KeyStoreUtil(Context context) {

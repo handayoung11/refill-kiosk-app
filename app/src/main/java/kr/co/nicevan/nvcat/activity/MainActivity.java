@@ -1,7 +1,7 @@
 package kr.co.nicevan.nvcat.activity;
 
+import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_HOME_URL;
 import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_LOGIN_URL;
-import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_ORDER_DETAIL_URL;
 import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_ORDER_SUCCESS_URL;
 import static kr.co.nicevan.nvcat.CommonUtil.KIOSK_SHOP_SELECT_URL;
 import static kr.co.nicevan.nvcat.CommonUtil._대기종료;
@@ -61,9 +61,6 @@ import kr.co.nicevan.nvcat.main_activity_manger.MainDialogManager;
 import kr.co.nicevan.nvcat.main_activity_manger.NicepayManager;
 import kr.co.nicevan.nvcat.retrofit.RevealLongCallbacks;
 import kr.co.nicevan.nvcat.retrofit.error.ErrorResponse;
-import kr.co.nicevan.nvcat.roomdb.Payment;
-//import kr.co.nicevan.nvcat.roomdb.PaymentDao;
-//import kr.co.nicevan.nvcat.roomdb.RoomDB;
 import kr.co.nicevan.nvcat.service.PrinterService;
 import kr.co.nicevan.nvcat.service.common.CommonService;
 import kr.co.nicevan.nvcat.service.label.LabelService;
@@ -75,10 +72,6 @@ import kr.co.nicevan.nvcat.service.receipt.ReceiptService;
 import kr.co.nicevan.nvcat.service.receipt.RevealReceiptRespCallbacks;
 import kr.co.nicevan.nvcat.util.ComponentUtil;
 import kr.co.nicevan.nvcat.util.KeyStoreUtil;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -183,7 +176,13 @@ public class MainActivity extends AppCompatActivity {
             webView.loadUrl(KIOSK_LOGIN_URL);
         } else {
             //login 실패 시 로그인 페이지로 이동
-            loginService.login(id, pw, () -> webView.loadUrl(KIOSK_SHOP_SELECT_URL), () -> webView.loadUrl(KIOSK_LOGIN_URL));
+            loginService.login(id, pw, () -> {
+                String shopId = keyStoreUtil.getData(KeyStoreUtil.SHOP_ID_KEY, null);
+                if (shopId == null)
+                    webView.loadUrl(KIOSK_SHOP_SELECT_URL);
+                else
+                    webView.loadUrl(KIOSK_HOME_URL + shopId);
+            }, () -> webView.loadUrl(KIOSK_LOGIN_URL));
         }
         // webView End =============================================================
 
@@ -289,6 +288,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void saveShop(String shopId) {
+            keyStoreUtil.storeData(KeyStoreUtil.SHOP_ID_KEY, shopId);
+        }
+
+        @JavascriptInterface
         public void showCatIdScreen() {
             Intent intent = new Intent(mContext, CatIdActivity.class);
             startActivity(intent);
@@ -333,23 +337,6 @@ public class MainActivity extends AppCompatActivity {
                 nicePayManager.selectPayMethod(curReqType, new NicepayDTO.ReqPaymentDTO(payAmount, payAgreenum, payAgreedate, commonService.formatByPrice(orderDTO.getAmount())));
             }
         }
-    }
-
-    /**
-     * JavascriptInterface
-     */
-    public class WebViewInterface2 {
-        Context mContext;
-
-        WebViewInterface2(Context ctx) {
-            mContext = ctx;
-        }
-
-        @JavascriptInterface
-        public void showToast(String toast) {
-            Toast.makeText(mContext, toast, Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     /**
@@ -428,8 +415,6 @@ public class MainActivity extends AppCompatActivity {
 
             // resultCode == -1
             if (resultCode == RESULT_OK) {
-                Toast.makeText(getApplicationContext(), "RESULT_OK", Toast.LENGTH_SHORT).show();
-
                 // 요청정상처리
                 if (NVCAT_RETURN_CODE == 1) {
                     // 응답 전문 데이터 추출
