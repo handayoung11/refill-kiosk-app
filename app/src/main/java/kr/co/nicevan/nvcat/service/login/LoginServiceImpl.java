@@ -31,6 +31,12 @@ public class LoginServiceImpl implements LoginService {
             @Override
             public void onResponse(Call call, Response response) {
                 super.onResponse(call, response);
+
+                if (response.code() != 200) {
+                    onFailure.run();
+                    return;
+                }
+
                 // cookie load
                 List<Cookie> cookies = new JavaNetCookieJar(CookieHandler.getDefault()).loadForRequest(HttpUrl.get(CommonUtil.BASE_URL));
 
