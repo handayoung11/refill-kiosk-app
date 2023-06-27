@@ -86,10 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
     // 전문요청코드
     int SEND_REQUEST_CODE = 1;
-    int SEND_REQUEST_CHKVALID = 2;
-    int SEND_REQUEST_CHKCARDBIN = 3;
-    int SEND_REQUEST_CHKCASHIC = 4;
-    int SEND_REQUEST_CHKMEMBERSHIP = 5;
     int SEND_REQUEST_NORMAL = 6;
 
     Dialog300 dialog300; // 결제완료/영수증출력
@@ -119,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
     LoginService loginService = appConfig.loginService();
     OrderService orderService = appConfig.orderService();
     CommonService commonService = appConfig.commonService();
-
 
     MainDialogManager mainDialogManager;
     NicepayManager nicePayManager;
@@ -196,28 +191,6 @@ public class MainActivity extends AppCompatActivity {
         mainDialogManager = MainDialogManager.init(this);
         nicePayManager = NicepayManager.init(this);
 
-        /**
-         * 결제요청 (결제방법선택)
-         */
-//        findViewById(R.id.btn_01).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 결제방법 선택 팝업
-//                nicePayManager.selectPayMethod(_승인요청, new NicepayDTO.ReqPaymentDTO("55000", "", "", "55,000원"));
-//            }
-//        });
-
-        /**
-         * 결제취소요청
-         */
-//        findViewById(R.id.btn_02).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // 결제방법 선택 팝업
-//                nicePayManager.selectPayMethod(_취소요청, new NicepayDTO.ReqPaymentDTO("550000", "11586893", "230117", "55,000원"));
-//            }
-//        });
-
         String strPathLOG = "";
         File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
         if (mediaDirs != null && mediaDirs.length > 0) {
@@ -226,15 +199,7 @@ public class MainActivity extends AppCompatActivity {
             strPathLOG = MainActivity.this.getFilesDir().getParent() + "/Bixolon/Log/";
         }
 
-        LogService.InitDebugLog(true,
-                true,
-                BXLCommonConst._LOG_LEVEL_HIGH,
-                128,
-                128,
-                (1024 * 1024) * 10 /* 10MB */,
-                0,
-                strPathLOG,
-                "bixolon.log");
+        verifyStoragePermissions(this);
 
     }
 
