@@ -13,9 +13,12 @@ import static kr.co.nicevan.nvcat.CommonUtil.bitmapToString;
 import static kr.co.nicevan.nvcat.CommonUtil.convertCommaDecimalFormat;
 import static kr.co.nicevan.nvcat.CommonUtil.hideSystemUI;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -35,9 +38,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-import com.bixolon.commonlib.BXLCommonConst;
-import com.bixolon.commonlib.log.LogService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -580,7 +582,6 @@ public class MainActivity extends AppCompatActivity {
      * 라벨 출력
      */
     public void printLabel(CardDTO cardInfo) {
-        mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
         labelService.printLabelByOrder(cardInfo.getApprovalNo(), new RevealLabelRespCallbacks() {
             @Override
             public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
@@ -726,5 +727,23 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    public static void verifyStoragePermissions(Activity activity) {
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
 }
