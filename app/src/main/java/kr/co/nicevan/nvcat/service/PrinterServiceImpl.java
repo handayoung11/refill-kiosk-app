@@ -1,8 +1,9 @@
 package kr.co.nicevan.nvcat.service;
 
-import static kr.co.nicevan.nvcat.CommonUtil.stringToBitmap;
-import static kr.co.nicevan.nvcat.PrinterControl.PrinterManager.*;
-import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.*;
+import static com.hwasung.HW_API.FULL;
+import static kr.co.nicevan.nvcat.PrinterControl.PrinterManager.getInstance;
+import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.LABEL;
+import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.RECEIPT;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -16,6 +17,8 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 
+import com.hwasung.HW_API;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.co.nicevan.nvcat.CommonUtil;
-import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterManager;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterType;
 import kr.co.nicevan.nvcat.dto.CardDTO;
@@ -37,6 +39,8 @@ public class PrinterServiceImpl implements PrinterService {
 
 
     private final CommonService commonService;
+    String ex_storage = Environment.getExternalStorageDirectory().getAbsolutePath();
+
 
     public PrinterServiceImpl(CommonService commonService) {
         this.commonService = commonService;
@@ -47,15 +51,15 @@ public class PrinterServiceImpl implements PrinterService {
     @Override
     public void closeAll() {
         PrinterManager instance = getInstance();
-        instance.getRecPrt().printerClose();
-        instance.getLabPrt().printerClose();
+        instance.getRecPrt().usbClose();
+        instance.getLabPrt().usbClose();
     }
 
     @Override
     public void resetPrintData() {
-        PrinterManager instance = getInstance();
-        instance.getRecPrt().resetPrintData();
-        instance.getLabPrt().resetPrintData();
+//        PrinterManager instance = getInstance();
+//        instance.getRecPrt().resetPrintData();
+//        instance.getLabPrt().resetPrintData();
     }
 
     /**
@@ -63,11 +67,13 @@ public class PrinterServiceImpl implements PrinterService {
      */
     @Override
     public boolean isCompleted(PrinterType type) {
-        PrinterManager instance = getInstance();
+//        PrinterManager instance = getInstance();
         if (type == LABEL) {
-            return instance.getLabPrt().isCompleted();
+//            return instance.getLabPrt().isCompleted();
+            return true;
         } else if (type == RECEIPT) {
-            return instance.getRecPrt().isCompleted();
+//            return instance.getRecPrt().isCompleted();
+            return true;
         } else {
             throw new IllegalArgumentException("지원하지 않는 PrinterType입니다.");
         }
@@ -78,50 +84,47 @@ public class PrinterServiceImpl implements PrinterService {
      * 프린트 공통 함수
      */
     private boolean printOut(PrinterDTO printerDTO) {
-        // Printer 객체 취득.
-        BixolonPrinter printer;
-        if(printerDTO.getType().equals(RECEIPT)) printer = getInstance().getRecPrt();
-        else if(printerDTO.getType().equals(LABEL)) printer = getInstance().getLabPrt();
+        HW_API printer;
+        if(printerDTO.getType().equals(RECEIPT)) {
+            printer = getInstance().getRecPrt();
+//            if(printer.status() != 0) return false;
+            printByText(printer, printerDTO);
+            printer.cut(FULL);
+        }
+        else if(printerDTO.getType().equals(LABEL)) {
+            printer = getInstance().getLabPrt();
+//            if(printer.status() != 0) return false;
+            printByBitMap(printer, printerDTO);
+        }
         else return false;
 
-        //프린트 출력.
-        if(!printer.isOpen()) return false;
-        printer.beginTransactionPrint();
-        Log.d(TAG, "P-alignment : " + printerDTO.getConfig().getAlignment());
-        Log.d(TAG, "P-attribute : " + printerDTO.getConfig().getAttribute());
-        Log.d(TAG, "P-spinnerSize : " + printerDTO.getConfig().getSpinnerSize());
-        if(printerDTO.getType().equals(RECEIPT)) printByText(printer, printerDTO);
-        else if(printerDTO.getType().equals(LABEL)) printByBitMap(printer, printerDTO);
-
-        //프린트 종료.
-        if(printerDTO.getType().equals(RECEIPT)) printer.cutPaper();
-        else if(printerDTO.getType().equals(LABEL)) printer.formFeed();
-        printer.endTransactionPrint();
+        Log.d(TAG, "printer status: " + printer.status());
+        printer.usbClose();
         return true;
     }
 
     /**
      * 출력 공통 함수
      */
-    private void printByText(BixolonPrinter printer, PrinterDTO p){
+    private void printByText(HW_API printer, PrinterDTO p){
         //프린트 텍스트 출력
         for(String s : p.getOutput()){
             Log.d("",s);
-            printer.printText(s, p.getConfig().getAlignment(), p.getConfig().getAttribute(), p.getConfig().getSpinnerSize());
+            printer.sendStr(s);
         }
-        if(p.getImg() == ""){
-            Bitmap stringBitmap = stringToBitmap(p.getImg());
-            printer.printImage(stringBitmap, 384, -1, 50, 0, 1);
-        }
+        printer.feedLine(2);
     }
 
-    private void printByBitMap(BixolonPrinter printer, PrinterDTO p){
+    private void printByBitMap(HW_API printer, PrinterDTO p){
         //프린트 텍스트 출력
         for(String s : p.getOutput()){
             Log.d("",s);
-            Bitmap bitmap = getBitMapText(s, printer.getPrinterMaxWidth(), printer.getContext().getAssets());
-//            saveBitmapToJpg(bitmap, "label","labelTest");
-            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
+            Bitmap bitmap = getBitMapText(s, 576, PrinterManager.getInstance().getContext().getAssets());
+            saveBitmapToJpg(bitmap, "label","labelTest");
+//            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
+            printer.printImage(ex_storage + "/label/labelTest.jpg");
+            printer.feedLine(2);
+            printer.cut(FULL);
         }
     }
 
@@ -144,7 +147,6 @@ public class PrinterServiceImpl implements PrinterService {
         StringBuilder sb = new StringBuilder();
         sb.append(response.getLiquidName()+" "+response.getOdExAmount()+"g\n");
         sb.append("[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n");
-        sb.append("[제조일] 2022-01-01"+"\t\t\t\t\t"+"[사용기한]  2022-01-01"+"까지\n");
         sb.append("-----------------------------------------------------------------\n");
         sb.append("[전성분]\n");
         sb.append(response.getLiquidIngredients()+"\n\n");
@@ -158,39 +160,44 @@ public class PrinterServiceImpl implements PrinterService {
 
     /**  2023-01-30 작성자 : 염에녹
      * 기능 : 영수증 formatter.
+     * 8cm 용지 기준으로 한 줄은 66칸(한글은 글자 당 2칸, \t(탭)은 8칸)
      */
     private String outStringForReceipt(ReceiptDTO.ReceiptResp response, CardDTO card) {
-        String strData = "영수증("+card.getRstResult()+")\n";
-        strData += "[매장명] "+response.getShopName()+"\n";
-        strData += "[사업자번호] "+response.getCompanyNo()+"\n";
-        strData += "[주소] "+ response.getAddress()+"\n";
-        strData += "[대표자] "+ response.getOwner()+"\t\t"+"[TEL] "+ response.getTell()+"\n";
-        strData += "[매출일] "+ response.getPayDate()+"\n";
-        strData += "================================================\n";
-        strData += "\t상품명\t\t단가\t\t수량\t\t금액\t\t\n ";
-        strData += "-----------------------------------------------\n";
+        StringBuilder strData = new StringBuilder("영수증("+card.getRstResult()+")\n");
+        strData.append("[매장명] "+response.getShopName()+"\n");
+        strData.append("[사업자번호] "+response.getCompanyNo()+"\n");
+        strData.append("[주소] "+ response.getAddress()+"\n");
+        strData.append("[대표자] "+ response.getOwner()+"\t\t"+"[TEL] "+ response.getTell()+"\n");
+        strData.append("[매출일] "+ response.getPayDate()+"\n");
+        strData.append("================================================\n");
+        strData.append("\t상품명\t\t단가\t\t수량\t\t금액\t\t\n ");
+        strData.append("-----------------------------------------------\n");
         for(ReceiptDTO.ReceiptResp.ItemDTO i : response.getItems()){
             String name = commonService.formatterByLeftSpace(i.getItemName(), 11);
             String unitPrice = commonService.formatterByLeftSpace(String.valueOf((i.getPrice() / i.getQuantity())), 7);
             String quantity = commonService.formatterByLeftSpace(i.getQuantity() + i.getUnit(), 5);
             String price = CommonUtil.convertCommaDecimalFormat(String.valueOf(i.getPrice()));
-            strData += name+"\t"+unitPrice+"\t"+quantity+"\t"+price+"\n";
+            strData.append(name+"\t"+unitPrice+"\t"+quantity+"\t"+price+"\n");
         }
-        strData += "------------------------------------------------\n";
-        strData += "합계금액\t\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "------------------------------------------------\n";
-        strData += "과세물품가액\t\t\t\t\t\t"+card.getDutiableVal()+"\n";
-        strData += "부  가  세\t\t\t\t\t\t"+card.getTax()+"\n";
-        strData += "매출합계(카드)\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "================================================\n";
-        strData += "[카드번호]\t\t"+card.getCardBin()+"\n";
-        strData += "[할부개월]\t\t\t\t\t\t\t"+card.getInstallment()+"\n";
-        strData += "[카드사명]\t\t\t\t\t\t"+card.getCardName()+"\n";
-        strData += "[승인번호]\t\t\t\t"+card.getApprovalNo()+"\n";
-        strData += "[승인일자]\t\t\t\t\t"+card.getApprovalDate()+"\n";
-        strData += "[결제금액]\t\t\t\t\t\t"+card.getTotPrice()+"\n";
-        strData += "------------------------------------------------\n";
-        return strData;
+        strData.append("------------------------------------------------\n");
+        strData.append("합계금액\t\t\t\t\t\t\t"+card.getTotPrice()+"\n");
+        strData.append("------------------------------------------------\n");
+        strData.append("과세물품가액\t\t\t\t\t\t"+card.getDutiableVal()+"\n");
+        strData.append("부  가  세\t\t\t\t\t\t"+card.getTax()+"\n");
+        strData.append("매출합계(카드)\t\t\t\t\t\t"+card.getTotPrice()+"\n");
+        strData.append("================================================\n");
+        strData.append("[할부개월]\t\t\t\t\t\t\t      "+card.getInstallment()+"\n");
+        strData.append("[카드구분]\t\t\t\t\t\t\t"+card.getCardName()+"\n");
+        strData.append("[승인번호]\t\t\t\t"+card.getApprovalNo()+"\n");
+        strData.append("[승인일자]\t\t\t    "+card.getApprovalDate()+"\n");
+        strData.append("[카드번호]\t\t\t"+card.getCardBin()+"\n");
+        StringBuilder space = new StringBuilder();
+        for (int i =  7 - card.getTotPrice().length() ; i > 0; i--) {
+            space.append(" ");
+        }
+        strData.append("[결제금액]\t\t\t\t\t\t " +space+card.getTotPrice()+"\n");
+        strData.append("------------------------------------------------\n");
+        return strData.toString();
     }
 
     private Bitmap getBitMapText(String text, int width, AssetManager am){
@@ -226,17 +233,17 @@ public class PrinterServiceImpl implements PrinterService {
     }
 
     private void saveBitmapToJpg(Bitmap bitmap, String folder, String name) {
-        String ex_storage = Environment.getExternalStorageDirectory().getAbsolutePath();
         // Get Absolute Path in External Sdcard
         String foler_name = "/"+folder+"/";
         String file_name = name+".jpg";
         String string_path = ex_storage+foler_name;
 
-        File file_path;
+        Log.d(TAG, "external path: " + string_path);
+        File file;
         try{
-            file_path = new File(string_path);
-            if(!file_path.isDirectory()) file_path.mkdirs();
-            FileOutputStream out = new FileOutputStream(string_path+file_name, true);
+            file = new File(string_path);
+            if(!file.isDirectory()) file.mkdirs();
+            FileOutputStream out = new FileOutputStream(string_path+file_name, false);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
 
