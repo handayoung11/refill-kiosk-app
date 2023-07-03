@@ -2,7 +2,6 @@ package kr.co.nicevan.nvcat.service;
 
 import java.util.List;
 
-import kr.co.nicevan.nvcat.PrinterControl.BixolonPrinter;
 import kr.co.nicevan.nvcat.PrinterControl.PrinterType;
 import kr.co.nicevan.nvcat.dto.CardDTO;
 import kr.co.nicevan.nvcat.dto.LabelDTO;

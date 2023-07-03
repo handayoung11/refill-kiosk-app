@@ -15,7 +15,6 @@ public class PrinterManager {
     Context context;
 
     private PrinterManager(Context context) {
-        DefaultBixolonPrinterUserListener listener = new DefaultBixolonPrinterUserListener();
         this.context = context;
         receiptPrinter = new HW_API();
         labelPrinter = new HW_API();
