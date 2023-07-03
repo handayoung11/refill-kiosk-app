@@ -183,26 +183,11 @@ public class MainActivity extends AppCompatActivity {
         }
         // webView End =============================================================
 
-        // webView2 Start =============================================================
-//        webView2 = findWebViewByIdWithSettings(R.id.webView2);
-//        webView2.addJavascriptInterface(new WebViewInterface2(this), "android2");
-//        webView2.loadUrl(CommonUtil.BASE_URL + "kiosk/webview");
-        // webView2 End =============================================================
-
         PrinterManager.init(this);
         mainDialogManager = MainDialogManager.init(this);
         nicePayManager = NicepayManager.init(this);
 
-        String strPathLOG = "";
-        File[] mediaDirs = MainActivity.this.getExternalMediaDirs();
-        if (mediaDirs != null && mediaDirs.length > 0) {
-            strPathLOG = mediaDirs[0].getPath() + "/Log/";
-        } else {
-            strPathLOG = MainActivity.this.getFilesDir().getParent() + "/Bixolon/Log/";
-        }
-
         verifyStoragePermissions(this);
-
     }
 
     @Override
