@@ -69,7 +69,6 @@ dependencies {
         implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
         implementation 'io.reactivex.rxjava3:rxjava:3.0.7'
     }
-    implementation project(path: ':bixolon_pdf')
     implementation files('libs/HW_API.jar')
 
     implementation 'com.ssomai:android.scalablelayout:2.1.6'
