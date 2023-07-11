@@ -287,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 // 결제방법 선택 팝업
                 nicePayManager.selectPayMethod(curReqType, new NicepayDTO.ReqPaymentDTO(payAmount, payAgreenum, payAgreedate, commonService.formatByPrice(orderDTO.getAmount())));
+//                String NVCAT_RECV_DATA = "0210\u001C10\u001C0000\u001C000000001200\u001C000000000109\u001C000000000000\u001C00\u001C15495229    \u001C230626154959\u001C01\u001C우리비씨            \u001C01\u001C비씨카드 EDC        \u001C784853182      \u001C2393300001\u001C         \u001C IC카드 정상승인 15495229                                                                                       \u001C553208**********\u001C0\u001C23933000010626154955\u001CNS230626154959D37352\u001C         \u001C         \u001C         \u001C               \u001C            \u001C\u001C          \u001C\u001C\u001C";
+//                RecvFS(NVCAT_RECV_DATA);
             }
         }
     }
@@ -300,10 +302,6 @@ public class MainActivity extends AppCompatActivity {
         dialog300.setDialogListener(new Dialog300.DialogListener() {
             @Override
             public void onPositiveClicked() {
-                // 프린터 출력중 팝업
-                mainDialogManager.popDialog400();
-                // 프린트용 데이터 초기화
-                printerService.resetPrintData();
                 // 영수증 출력
                 printReceipt(cardInfo);
                 // 라벨 출력
@@ -313,8 +311,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onNegativeClicked() {
-                // 프린터 출력중 팝업
-                mainDialogManager.popDialog400();
                 // 라벨 출력
                 printLabel(cardInfo);
                 mainDialogManager.closeDialog400();
@@ -540,7 +536,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 영수증 출력
      */
-    public  void printReceipt(CardDTO cardInfo) {
+    public void printReceipt(CardDTO cardInfo) {
         mToastHandler.obtainMessage(0, 0, 0, "print Start").sendToTarget();
         receiptService.printReceiptByOrder(cardInfo, new RevealReceiptRespCallbacks() {
             @Override
@@ -572,7 +568,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(@NonNull List<LabelDTO.LabelResp> value) {
                 boolean printed = printerService.labelPrint(value);
                 if (!printed) mToastHandler.obtainMessage(0, 0, 0, "Fail to printer02 open").sendToTarget();
-
+                MainDialogManager.getInstance().popDialog500();
             }
             @Override
             public void onError(@NonNull ErrorResponse errorResponse) {
