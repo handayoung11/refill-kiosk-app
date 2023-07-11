@@ -17,7 +17,7 @@ import java.util.Base64;
 public class CommonUtil {
 
     public static String TAG = "CommonUtil";
-    public static String BASE_URL = "http://192.168.0.17:8080/";
+    public static String BASE_URL = "https://refillcycle.com/";
     public static String KIOSK_LOGIN_URL = BASE_URL + "kiosk/auth/login";
     public static String KIOSK_SHOP_SELECT_URL = BASE_URL + "kiosk/item-of-shop/shop";
     public static String KIOSK_HOME_URL = BASE_URL + "kiosk/item-of-shop?shopIdx=";
