@@ -1,5 +1,6 @@
 package kr.co.nicevan.nvcat.service;
 
+import static com.hwasung.HW_API.BM_CUT;
 import static com.hwasung.HW_API.FULL;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterManager.getInstance;
 import static kr.co.nicevan.nvcat.PrinterControl.PrinterType.LABEL;
@@ -108,9 +109,10 @@ public class PrinterServiceImpl implements PrinterService {
             Bitmap bitmap = getBitMapText(s, 576, PrinterManager.getInstance().getContext().getAssets());
             saveBitmapToJpg(bitmap, "label","labelTest");
 //            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
+            printer.feedLine(1);
+            printer.textLmargin(24);
             printer.printImage(ex_storage + "/label/labelTest.jpg");
-            printer.feedLine(2);
-            printer.cut(FULL);
+            printer.cut(BM_CUT);
         }
     }
 
