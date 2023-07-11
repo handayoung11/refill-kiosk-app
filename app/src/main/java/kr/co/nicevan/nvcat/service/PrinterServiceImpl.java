@@ -48,20 +48,6 @@ public class PrinterServiceImpl implements PrinterService {
 
     String TAG = PrinterServiceImpl.class.getSimpleName();
 
-    @Override
-    public void closeAll() {
-        PrinterManager instance = getInstance();
-        instance.getRecPrt().usbClose();
-        instance.getLabPrt().usbClose();
-    }
-
-    @Override
-    public void resetPrintData() {
-//        PrinterManager instance = getInstance();
-//        instance.getRecPrt().resetPrintData();
-//        instance.getLabPrt().resetPrintData();
-    }
-
     /**
      * 영수증 출력
      */
