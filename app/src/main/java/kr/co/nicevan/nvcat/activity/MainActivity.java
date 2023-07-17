@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
     Context context;
 
     public WebView webView;
-//    public WebView webView2;
 
 //    RoomDB db;
 //    PaymentDao paymentDao;
@@ -92,8 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     Dialog300 dialog300; // 결제완료/영수증출력
 
-    int waitTimeCnt = 30; // 제한시간(초)
-    boolean isTimeout = false; // 제한시간 초과여부
+    private static String sendData;
 
     // 인코딩 서명이미지
     String signImgString = "";
@@ -326,17 +324,24 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 전문데이터 전송
      *
-     * @param senddata
+     * @param sendData
      */
-    public void send(String senddata) {
+    public void send(String sendData) {
 
-        Log.d(TAG, "send() - senddata : " + senddata);
+        Log.d(TAG, "send() - sendData : " + sendData);
 
-        Intent sendIntent = new Intent();
-        sendIntent.setAction("NICEVCAT"); //setAction에 함수명
-        sendIntent.putExtra("NVCATSENDDATA", senddata); //NVCATSENDDATA에 요청전문
-        sendIntent.setType("text/plain"); //setType은 text/plain 필수
-        startActivityForResult(sendIntent, SEND_REQUEST_CODE);
+        this.sendData = sendData;
+        send();
+    }
+
+    public void send() {
+        if (sendData != null && !sendData.equals("")) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction("NICEVCAT"); //setAction에 함수명
+            sendIntent.putExtra("NVCATSENDDATA", sendData); //NVCATSENDDATA에 요청전문
+            sendIntent.setType("text/plain"); //setType은 text/plain 필수
+            startActivityForResult(sendIntent, SEND_REQUEST_CODE);
+        }
     }
 
     /**
