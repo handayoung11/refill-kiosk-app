@@ -149,12 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
         Thread.setDefaultUncaughtExceptionHandler(new AppUncaughtExceptionHandler());
 
-//         NVCAT 모듈앱 재시작요청
-        Intent sendIntent = new Intent();
-        sendIntent.setAction("NICEVCAT");
-        sendIntent.putExtra("NVCATSENDDATA", "RESTART");
-        sendIntent.setType("text/plain");
-        startActivityForResult(sendIntent, SEND_REQUEST_NORMAL);
+        nvcatRestart();
 
         Log.d(TAG, "NVCAT RESTART");
 
@@ -188,6 +183,15 @@ public class MainActivity extends AppCompatActivity {
         nicePayManager = NicepayManager.init(this);
 
         verifyStoragePermissions(this);
+    }
+
+    private void nvcatRestart() {
+        // NVCAT 모듈앱 재시작요청
+        Intent sendIntent = new Intent();
+        sendIntent.setAction("NICEVCAT");
+        sendIntent.putExtra("NVCATSENDDATA", "RESTART");
+        sendIntent.setType("text/plain");
+        startActivityForResult(sendIntent, SEND_REQUEST_NORMAL);
     }
 
     @Override
