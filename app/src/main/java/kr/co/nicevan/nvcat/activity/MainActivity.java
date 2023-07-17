@@ -367,8 +367,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SEND_REQUEST_CODE) {
 
             // 카드투입 대기팝업 닫기
-            mainDialogManager.closeICDialog();
-            mainDialogManager.closeMsDialog();
+            if (NVCAT_RETURN_CODE != -15) {
+                mainDialogManager.closeICDialog();
+                mainDialogManager.closeMsDialog();
+            }
 
             // resultCode == -1
             if (resultCode == RESULT_OK) {
@@ -377,9 +379,7 @@ public class MainActivity extends AppCompatActivity {
                     // 응답 전문 데이터 추출
                     RecvFS(NVCAT_RECV_DATA);
                 }
-
-                // resultCode == 0
-            } else if (resultCode == RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) { // resultCode == 0
                 Toast.makeText(getApplicationContext(), "RESULT_CANCELED", Toast.LENGTH_SHORT).show();
 
                 // IC 카드리딩실패 (타임아웃)
@@ -387,17 +387,18 @@ public class MainActivity extends AppCompatActivity {
                 if (NVCAT_RETURN_CODE == -7 || (NVCAT_RETURN_CODE == -8 && errorCode.equals("F2"))) {
                     // 대기시간 만료 안내모달
                     NicepayManager.getInstance().closePayment(_대기종료);
-                }
-
-                if (NVCAT_RETURN_CODE == -9) {
+                } else if (NVCAT_RETURN_CODE == -9) {
                     // MS 거래 요청
                     String sendData = nicePayManager.msPay();
                     send(sendData);
+                } else if (NVCAT_RETURN_CODE == -15) {
+                    nvcatRestart();
                 }
             }
 
         } else {
             Log.d(TAG, "onActivityResult() - requestCode != SEND_REQUEST_CODE");
+            send();
         }
     }
 
