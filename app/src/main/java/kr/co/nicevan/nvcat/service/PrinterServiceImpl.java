@@ -140,7 +140,8 @@ public class PrinterServiceImpl implements PrinterService {
         sb.append(response.getLiquidIngredients()+"\n\n");
         sb.append("[사용시 주의사항]\n");
         sb.append(response.getLiquidCaution()+"\n\n");
-        sb.append("[제조업체] "+response.getLiquidManufacturer()+"\t\t"+ "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\t\t"+"[맞춤판매업체] "+response.getLiquidSellerName()+"\n");
+        sb.append("[제조업체] "+response.getLiquidManufacturer()+"\t\t"+ "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\t\t"+"[맞춤판매업체] "+response.getLiquidSellerName());
+        sb.append("\t\t[연락처] " + response.getPhone() + "\n");
         sb.append("-----------------------------------------------------------------\n");
         return sb.toString();
     }

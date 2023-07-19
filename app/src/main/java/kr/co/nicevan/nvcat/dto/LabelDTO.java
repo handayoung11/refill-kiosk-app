@@ -25,6 +25,7 @@ public class LabelDTO {
         private String liquidResponsibleSalesBusiness; //책임판매업자
         @Expose
         private String liquidSellerName; //맞춤판매업체
+        private String phone;
 
         public String getShoName() {
             return shoName;
@@ -64,6 +65,10 @@ public class LabelDTO {
 
         public String getLiquidSellerName() {
             return liquidSellerName;
+        }
+
+        public String getPhone() {
+            return phone;
         }
     }
 
