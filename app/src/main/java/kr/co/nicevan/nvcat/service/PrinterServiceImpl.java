@@ -106,7 +106,7 @@ public class PrinterServiceImpl implements PrinterService {
         //프린트 텍스트 출력
         for(String s : p.getOutput()){
             Log.d("",s);
-            Bitmap bitmap = getBitMapText(s, 576, PrinterManager.getInstance().getContext().getAssets());
+            Bitmap bitmap = getBitMapText(s, 405, PrinterManager.getInstance().getContext().getAssets());
             saveBitmapToJpg(bitmap, "label","labelTest");
 //            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
             printer.feedLine(1);
@@ -134,15 +134,15 @@ public class PrinterServiceImpl implements PrinterService {
     private String outStringForLabel(LabelDTO.LabelResp response) {
         StringBuilder sb = new StringBuilder();
         sb.append(response.getLiquidName()+" "+response.getOdExAmount()+"g\n");
-        sb.append("[제조일] "+ response.getLiquidDateOfManufacture()+"\t\t\t\t\t"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n");
-        sb.append("-----------------------------------------------------------------\n");
+        sb.append("[제조일] "+ response.getLiquidDateOfManufacture()+"\n"+"[사용기한] "+ response.getLiquidDateOfUse()+"까지\n\n");
         sb.append("[전성분]\n");
         sb.append(response.getLiquidIngredients()+"\n\n");
         sb.append("[사용시 주의사항]\n");
-        sb.append(response.getLiquidCaution()+"\n\n");
-        sb.append("[제조업체] "+response.getLiquidManufacturer()+"\t\t"+ "[책임판매업체] "+response.getLiquidResponsibleSalesBusiness()+"\t\t"+"[맞춤판매업체] "+response.getLiquidSellerName());
-        sb.append("\t\t[연락처] " + response.getPhone() + "\n");
-        sb.append("-----------------------------------------------------------------\n");
+        sb.append(response.getLiquidCaution());
+        sb.append("\n\n[제조업체] "+response.getLiquidManufacturer());
+        sb.append("\n[책임판매업체] "+response.getLiquidResponsibleSalesBusiness());
+        sb.append("\n[맞춤판매업체] "+response.getLiquidSellerName());
+        sb.append("\n[연락처] " + response.getPhone() + "\n");
         return sb.toString();
     }
 
@@ -189,11 +189,11 @@ public class PrinterServiceImpl implements PrinterService {
         return strData.toString();
     }
 
-    private Bitmap getBitMapText(String text, int width, AssetManager am){
+    private Bitmap getBitMapText(String text, int width, AssetManager am) {
         //new paint
         Paint paint = new Paint(Paint.LINEAR_TEXT_FLAG);
         paint.setColor(Color.BLACK);
-        paint.setTextSize(16);
+        paint.setTextSize(14);
 
         //set font
 
@@ -213,10 +213,12 @@ public class PrinterServiceImpl implements PrinterService {
         int height = textLayout.getHeight();
         if(height < 400) height = 400;
         //new bitmap
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int leftPadding = 45;
+        Bitmap bitmap = Bitmap.createBitmap(width + leftPadding, height, Bitmap.Config.ARGB_8888);
         //new canvas set bitmap
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.WHITE);
+        canvas.translate(leftPadding, 0);
         textLayout.draw(canvas);
         return bitmap;
     }
