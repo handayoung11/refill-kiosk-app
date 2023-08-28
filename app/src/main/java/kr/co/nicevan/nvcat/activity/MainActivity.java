@@ -307,14 +307,16 @@ public class MainActivity extends AppCompatActivity {
                 // 영수증 출력
                 printReceipt(cardInfo);
                 // 라벨 출력
-                if("정상승인".equals(cardInfo.getRstResult())) printLabel(cardInfo);
+                if(rstReqType.equals(_승인응답)) printLabel(cardInfo);
+                else webView.reload();
                 mainDialogManager.closeDialog400();
             }
 
             @Override
             public void onNegativeClicked() {
                 // 라벨 출력
-                printLabel(cardInfo);
+                if(rstReqType.equals(_승인응답)) printLabel(cardInfo);
+                else webView.reload();
                 mainDialogManager.closeDialog400();
             }
         });
