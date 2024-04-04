@@ -40,7 +40,7 @@ public class PrinterServiceImpl implements PrinterService {
 
 
     private final CommonService commonService;
-    String ex_storage = Environment.getExternalStorageDirectory().getAbsolutePath();
+    File extPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
 
 
     public PrinterServiceImpl(CommonService commonService) {
@@ -111,7 +111,7 @@ public class PrinterServiceImpl implements PrinterService {
 //            printer.printImage(bitmap, printer.getPrinterMaxWidth(), -1, 50, 0, 1);
             printer.feedLine(1);
             printer.textLmargin(24);
-            printer.printImage(ex_storage + "/label/labelTest.jpg");
+            printer.printImage(extPath + "/label/labelTest.jpg");
             printer.cut(BM_CUT);
         }
     }
@@ -227,14 +227,14 @@ public class PrinterServiceImpl implements PrinterService {
         // Get Absolute Path in External Sdcard
         String foler_name = "/"+folder+"/";
         String file_name = name+".jpg";
-        String string_path = ex_storage+foler_name;
 
-        Log.d(TAG, "external path: " + string_path);
         File file;
         try{
-            file = new File(string_path);
+            file = new File(extPath + foler_name);
+            String stringPath = file.getAbsolutePath() + "/";
+            Log.d(TAG, "external path: " + stringPath);
             if(!file.isDirectory()) file.mkdirs();
-            FileOutputStream out = new FileOutputStream(string_path+file_name, false);
+            FileOutputStream out = new FileOutputStream(stringPath + file_name, false);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.close();
 
